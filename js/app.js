@@ -568,17 +568,18 @@
       const legendB = donutEl && donutEl.parentElement
         ? Array.prototype.slice.call(donutEl.parentElement.querySelectorAll('.donut-legend b'))
         : [];
-      const hasS = !!(s && ((Array.isArray(s) && s.length) || (s.positive != null || s.neutral != null || s.negative != null || s.label != null)));
       const emptyS = $('dbEmptySentiment');
-      if (emptyS) emptyS.hidden = hasS;
       if (s && Array.isArray(s) && s.length) {
+        if (emptyS) emptyS.hidden = true;
         N.buildDonut(donutEl, s, (s[0].v || 0) + '%', L('ws.donut.pos').toUpperCase());
         legendB.forEach((b, i) => { if (s[i]) b.textContent = (s[i].v || 0) + '%'; });
         return;
       }
       if (s && typeof s === 'object') {
         const pos = num(s.positive), neu = num(s.neutral), neg = num(s.negative);
-        if (pos != null || neu != null || neg != null) {
+        const anyVal = (pos || 0) + (neu || 0) + (neg || 0) > 0;
+        if (anyVal) {
+          if (emptyS) emptyS.hidden = true;
           const segs = [
             { v: Math.max(0, pos || 0), color: '#35D07F' },
             { v: Math.max(0, neu || 0), color: '#7A8BB5' },
@@ -590,6 +591,16 @@
           legendB.forEach((b, i) => { if (segs[i]) b.textContent = segs[i].v + '%'; });
           return;
         }
+        /* all values are 0 — the backend returned a label but no split */
+        if (emptyS) {
+          emptyS.hidden = false;
+          const p = emptyS.querySelector('p') || emptyS;
+          p.textContent = L('ws.sent.na') + (s.label ? ' (' + s.label + ')' : '');
+        }
+      } else if (emptyS) {
+        emptyS.hidden = false;
+        const p = emptyS.querySelector('p') || emptyS;
+        p.textContent = L('ws.sent.na');
       }
       if (donutEl) donutEl.innerHTML = '';
       legendB.forEach((b) => { b.textContent = '—'; });
@@ -677,10 +688,11 @@
       const cls = tagCls(pick(h, ['cls', 'class', 'severity'], 'tag-blue'));
       const conf = pick(h, ['conf', 'confidence', 'score', 'pct'], null);
       const text = esc(pick(h, ['text', 'summary', 'body', 'title'], '—'));
+      const title = esc(pick(h, ['title'], ''));
       const time = esc(pick(h, ['time', 't', 'age', 'when'], ''));
       return '<div class="hl-card"><div class="hl-top"><span class="hl-tag ' + cls + '">' + tag + '</span>'
         + (conf != null ? '<span class="hl-conf mono">' + esc(/[^0-9.]/.test(String(conf)) ? conf : conf + '%') + '</span>' : '')
-        + '</div><p class="hl-text">' + text + '</p>'
+        + '</div><p class="hl-text">' + (title && title !== text ? '<strong>' + title + '</strong><br>' : '') + text + '</p>'
         + (time ? '<span class="hl-time mono">' + time + '</span>' : '') + '</div>';
     }
     const FEED_MAP = { news: 'feed-news', x: 'feed-x', twitter: 'feed-x', rss: 'feed-rss', facebook: 'feed-fb', fb: 'feed-fb', instagram: 'feed-ig', ig: 'feed-ig', google: 'feed-news', trends: 'feed-news' };
@@ -763,11 +775,16 @@
       if (title) title.textContent = esc(query) + ' — ' + L('ws.brief');
       const st = $('dbSummaryText');
       const es = $('dbEmptySummary');
+      let paras = null;
       if (r.summary && String(r.summary).trim()) {
-        const paras = String(r.summary).split(/\n+/).map((p) => p.trim()).filter(Boolean);
+        paras = String(r.summary).split(/\n+/).map((p) => p.trim()).filter(Boolean);
+      } else if (N.buildBrief) {
+        paras = N.buildBrief(r, N.lang);
+      }
+      if (paras && paras.length) {
         if (st) {
           st.hidden = false;
-          st.innerHTML = (paras.length ? paras : [String(r.summary)]).map((p) => '<p>' + esc(p) + '</p>').join('');
+          st.innerHTML = paras.map((p) => '<p>' + esc(p) + '</p>').join('');
         }
         if (es) es.hidden = true;
       } else if (st) {
@@ -797,39 +814,6 @@
       }
       listWidget($('dbGlobalList'), $('dbEmptyGlobal'), (g || []).map(topicRow));
     }
-    function renderNet(r) {
-      const svgEl = $('dbNetSvg');
-      const empty = $('dbEmptyNet');
-      let nodes = null, links = [];
-      const net = r.network;
-      if (Array.isArray(net)) nodes = net;
-      else if (net && typeof net === 'object') {
-        if (Array.isArray(net.nodes)) { nodes = net.nodes; links = Array.isArray(net.edges) ? net.edges : (Array.isArray(net.links) ? net.links : []); }
-        else if (Array.isArray(net.entities)) nodes = net.entities;
-        else if (Array.isArray(net.relations)) nodes = net.relations;
-      }
-      const nameOf = (n) => {
-        if (n == null) return '';
-        if (typeof n === 'string') return n;
-        return String(pick(n, ['name', 'label', 'title', 'id', 'entity', 'from', 'a'], '') || '');
-      };
-      const lab = (nodes || []).map(nameOf).filter((s) => s);
-      const hasNet = !!lab.length;
-      if (svgEl) svgEl.style.display = hasNet ? '' : 'none';
-      if (empty) empty.hidden = hasNet;
-      if (!svgEl || !hasNet) return;
-      const top = lab.slice(0, 10);
-      const CX = 200, CY = 140, R = 96;
-      const pos = top.map((l, i) => {
-        const a = (Math.PI * 2 * i) / top.length - Math.PI / 2;
-        return { x: CX + R * Math.cos(a), y: CY + R * Math.sin(a), l: l };
-      });
-      let html = '<defs><linearGradient id="dbEdgeGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5EA2FF" stop-opacity=".4"/><stop offset="100%" stop-color="#7A5CFF" stop-opacity=".4"/></linearGradient></defs>';
-      html += '<g class="edges">' + pos.map((p) => '<line x1="' + CX + '" y1="' + CY + '" x2="' + p.x.toFixed(1) + '" y2="' + p.y.toFixed(1) + '"/>').join('') + '</g>';
-      html += '<g class="node node-core"><circle cx="' + CX + '" cy="' + CY + '" r="26"/><text class="node-label" x="' + CX + '" y="' + (CY + 4) + '">N</text></g>';
-      html += pos.map((p, i) => '<g class="node"><circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="13" style="--nc:' + NET_COLORS[i % NET_COLORS.length] + '"/><text class="node-label" x="' + p.x.toFixed(1) + '" y="' + (p.y - 16).toFixed(1) + '">' + esc(p.l.slice(0, 12)) + '</text></g>').join('');
-      svgEl.innerHTML = html;
-    }
     function renderWidgets() {
       const r = lastResult && typeof lastResult === 'object' && !Array.isArray(lastResult) ? lastResult : {};
       const has = (v) => Array.isArray(v) && v.length > 0;
@@ -837,7 +821,6 @@
       renderKpis(r);
       renderSummary(r);
       renderGlobal(r);
-      renderNet(r);
 
       const topics = has(r.topics) ? r.topics : (Array.isArray(r.trendingTopics) ? r.trendingTopics : []);
       const locs = has(r.locations) ? r.locations : (Array.isArray(r.topLocations) ? r.topLocations : []);
@@ -902,6 +885,10 @@
       nums = nums.filter((n) => n != null);
       const isTs = tl && tl.length && tl[0] && typeof tl[0] === 'object' && tl[0].bucket > 1000000000;
       trendLabels = isTs ? tl.map((p) => bucketLabel(p.bucket)) : null;
+      if (trendLabels && trendLabels.length > 7) {
+        const step = Math.ceil(trendLabels.length / 7);
+        trendLabels = trendLabels.map((ll, i) => (i % step === 0 ? ll : ''));
+      }
       trendData = nums.length >= 2 ? nums : null;
       if (!trendData) {
         const emptyTrend = $('dbEmptyTrend');

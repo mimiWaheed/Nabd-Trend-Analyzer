@@ -116,7 +116,7 @@
       'ws.sum2': 'In <strong>politics and society</strong>, the New Administrative Capital is trending with strong positive sentiment, while education reform debates are active across the Delta and Upper Egypt. Misinformation risk is elevated around currency rumors — two clusters flagged for review.',
       'ws.sum3': '<strong>Recommended watchlist:</strong> inflation data release, Suez Canal announcements, and the El Clasico build-up across Alexandria and Cairo.',
       'ws.briefchip1': 'Economy', 'ws.briefchip2': 'Politics', 'ws.briefchip3': 'Sports', 'ws.briefchip4': 'Cairo',
-      'ws.kpi1': 'EGYPT MENTIONS', 'ws.kpi2': 'CAIRO SENTIMENT', 'ws.kpi3': 'ACTIVE CRISES', 'ws.kpi4': 'INFLATION TALKS',
+      'ws.kpi1': 'TOTAL MENTIONS', 'ws.kpi2': 'OVERALL SENTIMENT', 'ws.kpi3': 'ACTIVE CRISES', 'ws.kpi4': 'INFLATION TALKS',
       'ws.gov.t': 'Governorate intelligence', 'ws.gov.s': 'TREND INTENSITY BY REGION',
       'ws.loc.cairo': 'Cairo', 'ws.loc.capital': 'New Capital', 'ws.loc.ale': 'Alexandria',
       'ws.loc.giza': 'Giza', 'ws.loc.suez': 'Suez Canal', 'ws.loc.upper': 'Upper Egypt',
@@ -150,6 +150,15 @@
       'ws.src.count': 'sources',
       'ws.updated': 'updated',
       'ws.conf': 'confidence',
+      'ws.brief.total': 'Total signal: {n} mentions across {s} sources.',
+      'ws.brief.mentions': 'Total signal: {n} mentions.',
+      'ws.brief.topics': 'Leading topics: {t}.',
+      'ws.brief.sentiment': 'Overall tone is {l}.',
+      'ws.brief.tone.pos': 'positive', 'ws.brief.tone.neg': 'negative', 'ws.brief.tone.neu': 'neutral',
+      'ws.brief.crises': 'Active crisis signals: {n}.',
+      'ws.brief.locations': 'Geographic focus: {l}.',
+      'ws.brief.sources': 'Top sources: {l}.',
+      'ws.brief.highlights': '{n} notable signals identified.',
       'ws.feed.t': 'Live feed', 'ws.feed.s': 'NEWS · SOCIAL · RSS',
       'ws.feed.i1': 'Finance minister to discuss subsidy reforms in economic council session',
       'ws.feed.i2': 'Egyptian Pound jumps on record investment inflows',
@@ -550,7 +559,7 @@
       'ws.sum2': 'في <strong>السياسة والمجتمع</strong>، العاصمة الإدارية الجديدة تتصدر الترند بمشاعر إيجابية قوية، بينما تتصاعد مناقشات إصلاح التعليم في الدلتا والصعيد. خطر التضليل مرتفع حول شائعات العملة — مجموعتان رُصدتا للمراجعة.',
       'ws.sum3': '<strong>قائمة المتابعة المقترحة:</strong> إصدار بيانات التضخم، إعلانات قناة السويس، والاستعدادات للكلاسيكو في الإسكندرية والقاهرة.',
       'ws.briefchip1': 'اقتصاد', 'ws.briefchip2': 'سياسة', 'ws.briefchip3': 'رياضة', 'ws.briefchip4': 'القاهرة',
-      'ws.kpi1': 'أحاديث مصر', 'ws.kpi2': 'مشاعر القاهرة', 'ws.kpi3': 'أزمات نشطة', 'ws.kpi4': 'نقاشات التضخم',
+      'ws.kpi1': 'إجمالي الأحاديث', 'ws.kpi2': 'المشاعر العامة', 'ws.kpi3': 'أزمات نشطة', 'ws.kpi4': 'نقاشات التضخم',
       'ws.gov.t': 'ذكاء المحافظات', 'ws.gov.s': 'كثافة الترندات حسب الإقليم',
       'ws.loc.cairo': 'القاهرة', 'ws.loc.capital': 'العاصمة الجديدة', 'ws.loc.ale': 'الإسكندرية',
       'ws.loc.giza': 'الجيزة', 'ws.loc.suez': 'قناة السويس', 'ws.loc.upper': 'الصعيد',
@@ -584,6 +593,15 @@
       'ws.src.count': 'مصدر',
       'ws.updated': 'آخر تحديث',
       'ws.conf': 'ثقة',
+      'ws.brief.total': 'إجمالي الإشارات: {n} ذكرًا عبر {s} مصادر.',
+      'ws.brief.mentions': 'إجمالي الإشارات: {n} ذكرًا.',
+      'ws.brief.topics': 'المواضيع الرائجة: {t}.',
+      'ws.brief.sentiment': 'النبرة العامة {l}.',
+      'ws.brief.tone.pos': 'إيجابية', 'ws.brief.tone.neg': 'سلبية', 'ws.brief.tone.neu': 'محايدة',
+      'ws.brief.crises': 'إشارات الأزمات النشطة: {n}.',
+      'ws.brief.locations': 'التركيز الجغرافي: {l}.',
+      'ws.brief.sources': 'أبرز المصادر: {l}.',
+      'ws.brief.highlights': 'تم رصد {n} إشارات ملحوظة.',
       'ws.feed.t': 'التغذية الحية', 'ws.feed.s': 'أخبار · اجتماعي · RSS',
       'ws.feed.i1': 'وزير المالية يناقش إصلاحات الدعم في اجتماع المجلس الاقتصادي',
       'ws.feed.i2': 'الجنيه المصري يقفز على خلفية تدفقات استثمارية قياسية',
@@ -1514,113 +1532,6 @@
   }
 
   /* ----------------------------------------------------------
-     ANALYSIS SERVICE — mock intelligence provider
-     USER INPUT → analyze(query) → normalized result → rendering
-     Replace the internals with an n8n webhook call in a later
-     task; the public contract (analyze → Promise<result>) stays.
-     ---------------------------------------------------------- */
-  function mockSeries(n) {
-    const out = [];
-    let v = 34;
-    for (let i = 0; i < n; i++) {
-      v += rand(-3.2, 3.6) + Math.sin(i * 0.16) * 2.6 + (i > 30 ? 0.8 : 0);
-      out.push(Math.max(8, Math.min(96, Math.round(v))));
-    }
-    return out;
-  }
-
-  function buildMockResult(query) {
-    const now = new Date();
-    function ts(minsAgo) {
-      const d = new Date(now.getTime() - minsAgo * 60000);
-      const hh = String(d.getHours()).padStart(2, '0');
-      const mm = String(d.getMinutes()).padStart(2, '0');
-      return hh + ':' + mm;
-    }
-    return {
-      query: query || QUERIES[lang][0],
-      timestamp: now.toISOString(),
-      confidence: 94,
-      sourcesAnalyzed: 14,
-      metrics: [
-        { key: 'mentions', label: 'ws.kpi1', value: '1.4M+', delta: '+2.4%', dir: 'up', spark: '10,13,12,16,15,19,22,20,24,27,26,30' },
-        { key: 'sentiment', label: 'ws.kpi2', value: '68.4', delta: '+1.8%', dir: 'up', spark: '14,13,15,14,17,16,18,17,19,20,21,22' },
-        { key: 'crises', label: 'ws.kpi3', value: '3', delta: '-1', dir: 'down', spark: '18,19,17,18,16,17,15,14,12,11,9,8' },
-        { key: 'inflation', label: 'ws.kpi4', value: '68.4%', delta: '+4.2%', dir: 'up', spark: '8,10,9,12,14,13,16,18,17,20,22,24' }
-      ],
-      brief: [
-        { p: 'ws.sum1' }, { p: 'ws.sum2' }, { p: 'ws.sum3' },
-        { chips: ['ws.briefchip1', 'ws.briefchip2', 'ws.briefchip3', 'ws.briefchip4'] }
-      ],
-      sentiment: [{ v: 62, color: '#35D07F' }, { v: 24, color: '#7A8BB5' }, { v: 14, color: '#F45D5D' }],
-      series: mockSeries(48),
-      topics: [
-        { label: 'ws.topics.t1', vol: '1.2M', delta: '+38%', dir: 'up', cat: 'business', sev: 'sev-warn', w: 96 },
-        { label: 'ws.topics.t4', vol: '980K', delta: '+17%', dir: 'up', cat: 'business', sev: 'sev-danger', w: 92 },
-        { label: 'ws.topics.t2', vol: '760K', delta: '+12%', dir: 'up', cat: 'news', sev: 'sev-blue', w: 88 },
-        { label: 'ws.topics.t3', vol: '540K', delta: '+21%', dir: 'up', cat: 'news', sev: 'sev-pos', w: 74 },
-        { label: 'ws.topics.t8', vol: '390K', delta: '+9%', dir: 'up', cat: 'gov', sev: 'sev-purple', w: 71 },
-        { label: 'ws.topics.t5', vol: '610K', delta: '+54%', dir: 'up', cat: 'sport', sev: 'sev-purple', w: 68 },
-        { label: 'ws.topics.t6', vol: '460K', delta: '+6%', dir: 'up', cat: 'business', sev: 'sev-pos', w: 63 },
-        { label: 'ws.topics.t7', vol: '420K', delta: '-4%', dir: 'down', cat: 'social', sev: 'sev-warn', w: 58 }
-      ],
-      global: [
-        { label: 'ws.global.r1', vol: '812K', delta: '-19%', up: false, sev: 'sev-warn', w: 82 },
-        { label: 'ws.global.r2', vol: '2.1M', delta: '+32%', up: true, sev: 'sev-danger', w: 94 },
-        { label: 'ws.global.r3', vol: '640K', delta: '+11%', up: true, sev: 'sev-blue', w: 76 },
-        { label: 'ws.global.r4', vol: '430K', delta: '+18%', up: true, sev: 'sev-pos', w: 61 },
-        { label: 'ws.global.r5', vol: '520K', delta: '+7%', up: true, sev: 'sev-pos', w: 55 },
-        { label: 'ws.global.r6', vol: '310K', delta: '+5%', up: true, sev: 'sev-purple', w: 48 }
-      ],
-      locations: [
-        { name: 'ws.loc.cairo', score: 94, delta: '+43%', up: true, vol: '24h · 1.2M', w: 94 },
-        { name: 'ws.loc.ale', score: 87, delta: '+31%', up: true, vol: '24h · 640K', w: 87 },
-        { name: 'ws.loc.giza', score: 83, delta: '+27%', up: true, vol: '24h · 580K', w: 83 },
-        { name: 'ws.loc.suez', score: 81, delta: '+38%', up: true, vol: '24h · 520K', w: 81 },
-        { name: 'ws.loc.ps', score: 77, delta: '+22%', up: true, vol: '24h · 460K', w: 77 },
-        { name: 'ws.loc.mans', score: 72, delta: '+14%', up: true, vol: '24h · 410K', w: 72 },
-        { name: 'ws.loc.tanta', score: 69, delta: '+11%', up: true, vol: '24h · 380K', w: 69 },
-        { name: 'ws.loc.aswan', score: 64, delta: '+8%', up: true, vol: '24h · 290K', w: 64 }
-      ],
-      highlights: [
-        { tag: 'ws.hl.t1', cls: 'tag-danger', conf: '97%', text: 'ws.hl.b1', time: 'ws.hl.time1' },
-        { tag: 'ws.hl.t2', cls: 'tag-blue', conf: '89%', text: 'ws.hl.b2', time: 'ws.hl.time2' },
-        { tag: 'ws.hl.t3', cls: 'tag-warn', conf: '81%', text: 'ws.hl.b3', time: 'ws.hl.time3' },
-        { tag: 'ws.hl.t4', cls: 'tag-pos', conf: '86%', text: 'ws.hl.b4', time: 'ws.hl.time4' },
-        { tag: 'ws.hl.t5', cls: 'tag-purple', conf: '78%', text: 'ws.hl.b5', time: 'ws.hl.time5' }
-      ],
-      influencers: [
-        { ini: 'MT', hue: 210, name: 'ws.inf.n1', cat: 'News · 412K reach', score: 94 },
-        { ini: 'CP', hue: 150, name: 'ws.inf.n2', cat: 'Social · 288K reach', score: 91 },
-        { ini: 'AH', hue: 280, name: 'ws.inf.n3', cat: 'Economics · 176K reach', score: 87 },
-        { ini: 'NM', hue: 320, name: 'ws.inf.n4', cat: 'Media · 154K reach', score: 84 },
-        { ini: 'OT', hue: 45, name: 'ws.inf.n5', cat: 'Lifestyle · 121K reach', score: 79 }
-      ],
-      feed: [
-        { src: 'feed-news', tag: 'NEW', text: 'ws.feed.i1', t: ts(2) },
-        { src: 'feed-x', tag: 'X', text: 'ws.feed.i2', t: ts(4) },
-        { src: 'feed-rss', tag: 'RSS', text: 'ws.feed.i3', t: ts(6) },
-        { src: 'feed-fb', tag: 'FB', text: 'ws.feed.i4', t: ts(9) },
-        { src: 'feed-ig', tag: 'IG', text: 'ws.feed.i5', t: ts(12) },
-        { src: 'feed-news', tag: 'NEW', text: 'ws.feed.i6', t: ts(15) },
-        { src: 'feed-x', tag: 'X', text: 'ws.feed.i7', t: ts(18) },
-        { src: 'feed-fb', tag: 'FB', text: 'ws.feed.i8', t: ts(21) },
-        { src: 'feed-rss', tag: 'RSS', text: 'ws.feed.i9', t: ts(24) }
-      ],
-      sources: [
-        { label: 'ws.src.r1', w: 32 }, { label: 'ws.src.r2', w: 26 },
-        { label: 'ws.src.r3', w: 18 }, { label: 'ws.src.r4', w: 12 },
-        { label: 'ws.src.r5', w: 7 }, { label: 'ws.src.r6', w: 5 }
-      ],
-      mediaMix: [
-        { label: 'ws.mix.r1', w: 34 }, { label: 'ws.mix.r2', w: 22 },
-        { label: 'ws.mix.r3', w: 14 }, { label: 'ws.mix.r4', w: 10 },
-        { label: 'ws.mix.r5', w: 11 }, { label: 'ws.mix.r6', w: 9 }
-      ]
-    };
-  }
-
-  /* ----------------------------------------------------------
      ANALYSIS SERVICE — real n8n webhook
      USER INPUT → POST /webhook/trend-analysis → raw response
      ----------------------------------------------------------
@@ -1649,7 +1560,10 @@
     }).then((res) => {
       clearTimeout(timer);
       if (!res.ok) throw new Error('trend-analysis http ' + res.status);
-      return res.json().catch(() => { throw new Error('trend-analysis invalid json'); });
+      return res.text().then((txt) => {
+        if (!txt || !txt.trim()) throw new Error('trend-analysis empty response');
+        try { return JSON.parse(txt); } catch (e) { throw new Error('trend-analysis invalid json'); }
+      });
     }).catch((err) => {
       clearTimeout(timer);
       throw err;
@@ -1684,6 +1598,28 @@
       if (s === 'society') return 'social';
       return CATS.indexOf(s) !== -1 ? s : null;
     };
+    const SRC_TYPE_TOKEN = { news: 1, web: 1, website: 1, article: 1, social: 1, x: 1, twitter: 1, facebook: 1, fb: 1, instagram: 1, ig: 1, rss: 1, feed: 1, google: 1, trends: 1, youtube: 1, newspaper: 1, press: 1, media: 1, unknown: 1 };
+    const isSrcTypeToken = (v) => {
+      if (v == null) return true;
+      const s = String(v).toLowerCase().trim();
+      return !!SRC_TYPE_TOKEN[s] || /^(news|web|article|social|rss|feed|google|trends|youtube|twitter|facebook|instagram|press|newspaper)/i.test(s);
+    };
+    /* Real publisher name beats a bare type token: items carry both
+       `source: "news"` and `author: "BBC News"` — the latter is what
+       the source cards should show. */
+    const pickRealSource = (it) => {
+      const keys = ['source', 'sourceName', 'source_name', 'domain', 'publisher', 'author', 'channel'];
+      let fallback = null;
+      for (let i = 0; i < keys.length; i++) {
+        const v = it ? it[keys[i]] : null;
+        if (v == null) continue;
+        const s = String(v).trim();
+        if (!s) continue;
+        if (!isSrcTypeToken(s)) return s;
+        if (fallback == null) fallback = s;
+      }
+      return fallback;
+    };
 
     const out = {
       query: '', raw: raw, language: null, summary: null, confidence: null, analyzedAt: null,
@@ -1697,7 +1633,7 @@
     out.summary = pick(raw, ['summary', 'aiSummary', 'brief', 'aiBrief', 'answer', 'result'], null);
     const conf = num(pick(raw, ['confidence'], null));
     out.confidence = conf != null ? conf : null;
-    out.analyzedAt = pick(raw, ['analyzedAt', 'timestamp', 'completedAt', 'created_at'], null) || null;
+    out.analyzedAt = pick(raw, ['analyzedAt', 'generatedAt', 'timestamp', 'completedAt', 'created_at'], null) || null;
     out.network = pick(raw, ['network', 'graph', 'entities', 'relations'], null) || null;
     out.globalContext = pick(raw, ['globalContext', 'global', 'global_trends', 'world'], null) || null;
 
@@ -1722,9 +1658,9 @@
         title: pick(it, ITEM_KEYS, null),
         description: pick(it, ['description', 'summary', 'snippet', 'excerpt'], null),
         url: pick(it, ['url', 'link', 'href'], null),
-        source: pick(it, ['source', 'sourceName', 'source_name', 'domain', 'publisher', 'author', 'channel'], null),
+        source: pickRealSource(it),
         sourceType: pick(it, ['sourceType', 'source_type', 'type', 'src', 'medium'], null),
-        publishedAt: pick(it, ['publishedAt', 'published_at', 'published', 'date', 'datetime', 'ts', 'timestamp', 'time', 'observedAt'], null),
+        publishedAt: pick(it, ['publishedAt', 'published_at', 'published', 'date', 'datetime', 'ts', 'timestamp', 'time', 'created', 'createdAt', 'observedAt'], null),
         language: pick(it, ['language', 'lang'], null),
         category: pick(it, ['category', 'cat', 'section', 'group'], null),
         sentiment: pick(it, ['sentiment', 'sentimentLabel', 'sentiment_label', 'label'], null),
@@ -1786,15 +1722,36 @@
     }
 
     /* ---- topics (explicit + aggregated keyword frequency) ---- */
+    const SEV_MAP = { critical: 'sev-danger', high: 'sev-danger', elevated: 'sev-warn', medium: 'sev-warn', moderate: 'sev-warn', low: 'sev-blue', info: 'sev-blue', stable: 'sev-pos', normal: 'sev-pos', down: 'sev-pos', watch: 'sev-purple' };
+    const sevFrom = (v) => {
+      if (v == null) return null;
+      const s = String(v).toLowerCase().trim();
+      return SEV_MAP[s] || v;
+    };
+    const baseDir = (v) => {
+      const s = String(v == null ? '' : v).toLowerCase().trim();
+      if (s === 'higher' || s === 'high' || s === 'up' || s === 'rising' || s === 'increase' || s === 'increasing' || s === 'gain') return 'up';
+      if (s === 'lower' || s === 'low' || s === 'down' || s === 'falling' || s === 'decrease' || s === 'decreasing' || s === 'drop') return 'down';
+      if (s === 'flat' || s === 'stable' || s === 'same' || s === 'even') return 'flat';
+      return null;
+    };
     const tMap = {};
     (Array.isArray(raw.trendingTopics) ? raw.trendingTopics : []).forEach((t, i) => {
       const label = String(pick(t, ['label', 'name', 'topic', 'title'], '') || '').trim();
       if (!label) return;
+      const dir = baseDir(pick(t, ['vsBaseline', 'baseline', 'trend', 'dir', 'up'], null));
+      let delta = pick(t, ['delta', 'change'], null);
+      if (delta == null && dir) {
+        const b = String(pick(t, ['vsBaseline', 'baseline', 'trend'], '') || '').toLowerCase();
+        delta = dir === 'up' ? (b === 'rising' ? 'rising' : b === 'high' ? 'high' : 'higher')
+          : dir === 'down' ? (b === 'falling' ? 'falling' : b === 'low' ? 'low' : 'lower')
+            : 'stable';
+      }
       tMap[label] = {
         label: label, count: num(pick(t, ['vol', 'volume', 'count', 'value', 'mentions'], null)),
-        cat: normCat(pick(t, ['cat', 'category'], null)), sev: pick(t, ['sev', 'severity', 'level'], null),
+        cat: normCat(pick(t, ['cat', 'category'], null)), sev: sevFrom(pick(t, ['sev', 'severity', 'level'], null)),
         w: num(pick(t, ['w', 'weight', 'intensity'], null)),
-        delta: pick(t, ['delta', 'change'], null), dir: pick(t, ['dir', 'up', 'trend'], null), order: i
+        delta: delta, dir: dir, order: i
       };
     });
     out.articles.forEach((a) => {
@@ -1810,6 +1767,12 @@
       const ca = a.count == null ? -1 : a.count, cb = b.count == null ? -1 : b.count;
       return cb - ca;
     });
+    {
+      const tMax = Math.max(1, out.topics.map((t) => num(t.count) || 0).reduce((a, b) => Math.max(a, b), 0));
+      out.topics.forEach((t) => {
+        if (t.w == null) t.w = t.count != null ? Math.round((t.count / tMax) * 100) : null;
+      });
+    }
 
     /* ---- locations (explicit + aggregated geo references) ---- */
     const NATIONAL = ['مصر', 'egypt', 'جمهورية مصر العربية', 'arab republic of egypt'];
@@ -1832,6 +1795,14 @@
       locSeen[n] = { name: n, score: null, count: 1, delta: null, up: null, vol: null, w: null };
     });
     out.locations = Object.keys(locSeen).map((k) => locSeen[k]).sort((a, b) => (b.count || 0) - (a.count || 0));
+    {
+      const lMax = Math.max(1, out.locations.map((l) => l.count || 0).reduce((a, b) => Math.max(a, b), 0));
+      out.locations.forEach((l) => {
+        if (l.score == null) l.score = l.count != null ? l.count : null;
+        if (l.w == null) l.w = l.count != null ? Math.round((l.count / lMax) * 100) : null;
+        if (l.vol == null && l.count != null) l.vol = l.count;
+      });
+    }
 
     /* ---- influencers (explicit, else recurring sources) ---- */
     const infSeen = {};
@@ -1840,14 +1811,14 @@
       if (!name) return;
       infSeen[name] = {
         name: name, ini: pick(f, ['ini', 'initials'], null), hue: num(pick(f, ['hue', 'h'], null)),
-        cat: pick(f, ['cat', 'desc', 'meta', 'category'], null), score: pick(f, ['score', 'reach', 'value', 'rank'], null), order: i
+        cat: pick(f, ['cat', 'desc', 'meta', 'category', 'handle'], null), score: pick(f, ['score', 'reach', 'value', 'rank'], null), order: i
       };
     });
     if (Object.keys(infSeen).length === 0) {
       const srcMap = {};
       out.articles.forEach((a) => {
         const key = a.source ? String(a.source).trim() : '';
-        if (!key) return;
+        if (!key || isSrcTypeToken(key)) return;
         srcMap[key] = (srcMap[key] || 0) + 1;
       });
       Object.keys(srcMap).forEach((k) => {
@@ -1861,13 +1832,15 @@
 
     /* ---- AI highlights ---- */
     (Array.isArray(raw.aiHighlights) ? raw.aiHighlights : []).forEach((h) => {
-      const text = pick(h, ['text', 'summary', 'body', 'title'], null);
+      const title = pick(h, ['title', 'headline', 'name'], null);
+      const text = pick(h, ['text', 'summary', 'body', 'detail', 'description'], null) || title;
       if (!text) return;
       out.highlights.push({
         tag: pick(h, ['tag', 'type', 'kind', 'label'], null),
         cls: pick(h, ['cls', 'class', 'severity'], null),
         conf: num(pick(h, ['conf', 'confidence', 'score', 'pct'], null)),
-        text: String(text), time: pick(h, ['time', 't', 'age', 'when', 'timestamp'], null),
+        text: String(text), title: title != null ? String(title) : null,
+        time: pick(h, ['time', 't', 'age', 'when', 'timestamp'], null),
         cat: normCat(pick(h, ['cat', 'category'], null)) || null,
         relatedTopic: pick(h, ['relatedTopic', 'topic', 'related'], null) || null,
         sourceUrl: pick(h, ['sourceUrl', 'url', 'source_ref'], null) || null
@@ -1876,8 +1849,20 @@
 
     /* ---- timeline (explicit signalVolume, else real timestamps) ---- */
     if (Array.isArray(raw.signalVolume)) {
-      const nums = raw.signalVolume.map(Number).filter((v) => !isNaN(v));
-      out.timeline = nums.length >= 2 ? nums.map((c, i) => ({ bucket: i, count: Math.round(c) })) : null;
+      const pts = [];
+      raw.signalVolume.forEach((sv) => {
+        if (sv && typeof sv === 'object') {
+          const v = num(sv.value != null ? sv.value : sv.count);
+          if (v == null) return;
+          const ts = parseRangeTime(sv.time != null ? sv.time : sv.label);
+          pts.push({ bucket: ts != null ? ts : pts.length, count: Math.max(0, Math.round(v)) });
+        } else {
+          const v = num(sv);
+          if (v == null) return;
+          pts.push({ bucket: pts.length, count: Math.max(0, Math.round(v)) });
+        }
+      });
+      out.timeline = pts.length >= 2 ? pts : null;
     } else {
       out.timeline = deriveTimeline(out.articles);
     }
@@ -1885,6 +1870,28 @@
     out.sources = deriveSources(out.articles);
     out.categories = deriveCategories(out.articles);
     return out;
+  }
+
+  /* Parse a timestamp or a week-range string like "Dec 28, 2025 – Jan 3, 2026"
+     (including mangled variants such as "Aug 2?-?8, 2026") into an epoch ms
+     value for the range's start date. Returns null when nothing parseable. */
+  function parseRangeTime(s) {
+    const t = String(s == null ? '' : s).trim();
+    if (!t) return null;
+    const d = new Date(t);
+    if (!isNaN(d.getTime())) return d.getTime();
+    const MONTHS = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
+    const mn = String(t).match(/([A-Za-z]{3,9})\s+(\d{1,2})(?:[^0-9]{0,8}(\d{2,4}))?/);
+    if (mn) {
+      const mo = MONTHS[mn[1].slice(0, 3).toLowerCase()];
+      if (mo != null) {
+        const day = parseInt(mn[2], 10);
+        const year = mn[3] != null ? parseInt(mn[3], 10) : new Date().getFullYear();
+        const dd = new Date(year, mo, day);
+        if (!isNaN(dd.getTime())) return dd.getTime();
+      }
+    }
+    return null;
   }
 
   /* Timestamp → timeline buckets (hour within a 2-day window, else day). */
@@ -1903,22 +1910,33 @@
     return Object.keys(map).map(Number).sort((a, b) => a - b).map((k) => ({ bucket: k, count: map[k] }));
   }
 
-  /* Source-type distribution from real records (fixed card labels only when present). */
+  /* Source distribution from real records: real publisher names are grouped by
+     name (BBC News, NPR, …); bare type tokens (news/web/…) map to the fixed
+     card labels only when no publisher name exists for a record. */
   function deriveSources(items) {
-    const clsOf = (v) => {
-      if (v == null) return null;
+    const TYPE_LABEL = {
+      'news': 'News desks', 'newspaper': 'News desks', 'press': 'News desks', 'agency': 'News desks',
+      'web': 'Web', 'website': 'Web',
+      'x': 'X (Twitter)', 'twitter': 'X (Twitter)',
+      'facebook': 'Facebook', 'fb': 'Facebook',
+      'instagram': 'Instagram', 'ig': 'Instagram',
+      'rss': 'RSS feeds', 'feed': 'RSS feeds',
+      'google': 'Google Trends', 'trends': 'Google Trends'
+    };
+    const isToken = (v) => {
+      if (v == null) return true;
       const s = String(v).toLowerCase().trim();
-      if (s === 'x' || s === 'twitter') return 'X (Twitter)';
-      if (s === 'facebook' || s === 'fb') return 'Facebook';
-      if (s === 'instagram' || s === 'ig') return 'Instagram';
-      if (/rss|^feed/.test(s)) return 'RSS feeds';
-      if (/google|trends/.test(s)) return 'Google Trends';
-      if (/news|agency|press|newspaper|desk|article/i.test(s)) return 'News desks';
-      return null;
+      return !!TYPE_LABEL[s] || /^(news|web|website|article|social|rss|feed|google|trends|youtube|twitter|facebook|instagram|press|newspaper|x)\b/i.test(s);
     };
     const map = {};
     (items || []).forEach((a) => {
-      const key = clsOf(a.sourceType) || (a.source ? 'News desks' : null);
+      const src = a.source ? String(a.source).trim() : '';
+      let key = null;
+      if (src && !isToken(src)) key = src;
+      else {
+        const tk = src ? src.toLowerCase() : (a.sourceType ? String(a.sourceType).toLowerCase().trim() : '');
+        key = TYPE_LABEL[tk] || null;
+      }
       if (!key) return;
       map[key] = (map[key] || 0) + 1;
     });
@@ -1937,6 +1955,53 @@
     });
     const tot = items && items.length ? items.length : 0;
     return Object.keys(map).map((k) => ({ label: k, count: map[k], pct: tot ? Math.round((map[k] / tot) * 100) : 0 })).sort((a, b) => b.count - a.count);
+  }
+
+  /* Generate an AI brief from the ACTUAL normalized analysis — used only when
+     n8n does not return a summary field. Every sentence is composed from real
+     returned data; empty/missing sections are skipped, and mangled strings
+     (literal '?' runs from backend encoding issues) are filtered out. */
+  function buildBrief(r, lng) {
+    const D = I18N[lng] || I18N.en || {};
+    const F = (k) => (D[k] != null ? D[k] : (I18N.en[k] != null ? I18N.en[k] : k));
+    const stats = (r && r.raw && r.raw.stats) || {};
+    const num = (v) => { const n = parseFloat(v); return isNaN(n) ? null : n; };
+    const cleanNames = (arr, get) => (arr || []).map(get).map((s) => String(s == null ? '' : s).trim()).filter((s) => s && !/^[?]+$/.test(s));
+    const parts = [];
+
+    const total = num(stats.totalPosts);
+    const srcN = Array.isArray(r.articles) ? r.articles.length : 0;
+    if (total != null) {
+      parts.push(srcN > 0
+        ? F('ws.brief.total').split('{n}').join(total).split('{s}').join(srcN)
+        : F('ws.brief.mentions').split('{n}').join(total));
+    }
+
+    const topics = cleanNames(r.topics, (t) => t.label).slice(0, 3);
+    if (topics.length) parts.push(F('ws.brief.topics').split('{t}').join(topics.join(', ')));
+
+    const st = r.sentiment;
+    if (st && st.label) {
+      const label = String(st.label).toLowerCase();
+      const tone = label.indexOf('pos') !== -1 ? F('ws.brief.tone.pos')
+        : label.indexOf('neg') !== -1 ? F('ws.brief.tone.neg')
+          : label.indexOf('neu') !== -1 ? F('ws.brief.tone.neu') : null;
+      parts.push(F('ws.brief.sentiment').split('{l}').join(tone || st.label));
+    }
+
+    const crises = num(stats.emergencyAlerts);
+    if (crises != null) parts.push(F('ws.brief.crises').split('{n}').join(crises));
+
+    const locs = cleanNames(r.locations, (l) => l.name).slice(0, 3);
+    if (locs.length) parts.push(F('ws.brief.locations').split('{l}').join(locs.join(', ')));
+
+    const srcs = cleanNames(r.sources, (s) => s.label).slice(0, 3);
+    if (srcs.length) parts.push(F('ws.brief.sources').split('{l}').join(srcs.join(', ')));
+
+    const hlN = Array.isArray(r.highlights) ? r.highlights.length : 0;
+    if (hlN > 0) parts.push(F('ws.brief.highlights').split('{n}').join(hlN));
+
+    return parts;
   }
 
   /* ----------------------------------------------------------
@@ -2062,6 +2127,7 @@
     labelRGB,
     navigate,
     normalizeAnalysisResponse,
+    buildBrief,
     toast,
     applyTheme,
     getUser,
