@@ -646,7 +646,8 @@
       const label = esc(pick(t, ['label', 'name', 'topic', 'title'], '—'));
       const vol = esc(pick(t, ['vol', 'volume', 'count', 'value'], '—'));
       const dRaw = pick(t, ['delta', 'change'], '');
-      const down = /^-/.test(String(dRaw)) || String(pick(t, ['dir', 'up', 'trend'], '')).toLowerCase() === 'down';
+      const flat = /^(stable|flat|same|even|no change)/i.test(String(dRaw)) || String(pick(t, ['dir', 'up', 'trend'], '')).toLowerCase() === 'flat';
+      const down = !flat && (/^-/.test(String(dRaw)) || String(pick(t, ['dir', 'up', 'trend'], '')).toLowerCase() === 'down');
       const w = Math.max(0, Math.min(100, num(pick(t, ['w', 'weight', 'intensity'], 50)) || 50));
       const sev = sevCls(pick(t, ['sev', 'severity', 'level'], 'sev-blue'));
       const cat = esc(pick(t, ['cat', 'category'], ''));
@@ -655,14 +656,17 @@
         + '<span class="trend-name">' + label + '</span>'
         + '<span class="trend-bar"><i class="' + sev + '" style="--w:' + w + '%"></i></span>'
         + '<span class="trend-vol mono">' + vol + '</span>'
-        + '<span class="trend-delta ' + (down ? 'down' : 'up') + '">' + esc(fmtDelta(dRaw)) + '</span></div>';
+        + '<span class="trend-delta ' + (flat ? 'flat' : down ? 'down' : 'up') + '">' + esc(fmtDelta(dRaw)) + '</span></div>';
     }
     function locationCard(l) {
       const name = esc(pick(l, ['name', 'label', 'city', 'region'], '—'));
       const score = num(pick(l, ['score'], null));
-      const w = Math.max(0, Math.min(100, num(pick(l, ['w', 'weight', 'intensity'], score)) || 0));
+      const count = num(pick(l, ['count'], null));
+      const wv = num(pick(l, ['w', 'weight', 'intensity'], null));
+      const wBase = wv != null ? wv : (score != null ? score : (count != null ? Math.min(100, count) : null));
+      const w = Math.max(0, Math.min(100, wBase || 0));
       const dRaw = pick(l, ['delta', 'change'], '');
-      const vol = esc(pick(l, ['vol', 'volume', 'mentions', '24h', 'value'], '—'));
+      const vol = esc(pick(l, ['vol', 'volume', 'mentions', '24h', 'count', 'value'], '—'));
       return '<div class="region-card">'
         + '<div class="region-top"><span class="region-name">' + name + '</span><span class="region-score">' + (score == null ? '—' : String(Math.round(score))) + '</span></div>'
         + '<div class="region-bar"><i style="--w:' + w + '%"></i></div>'
@@ -695,17 +699,18 @@
         + '</div><p class="hl-text">' + (title && title !== text ? '<strong>' + title + '</strong><br>' : '') + text + '</p>'
         + (time ? '<span class="hl-time mono">' + time + '</span>' : '') + '</div>';
     }
-    const FEED_MAP = { news: 'feed-news', x: 'feed-x', twitter: 'feed-x', rss: 'feed-rss', facebook: 'feed-fb', fb: 'feed-fb', instagram: 'feed-ig', ig: 'feed-ig', google: 'feed-news', trends: 'feed-news' };
+    const FEED_MAP = { news: 'feed-news', web: 'feed-news', x: 'feed-x', twitter: 'feed-x', rss: 'feed-rss', facebook: 'feed-fb', fb: 'feed-fb', instagram: 'feed-ig', ig: 'feed-ig', google: 'feed-news', trends: 'feed-news' };
     function feedItem(f) {
-      const srcRaw = String(pick(f, ['sourceType', 'src', 'source', 'tag', 'type'], '') || '').toLowerCase();
+      const stRaw = String(pick(f, ['sourceType', 'type', 'medium', 'src'], '') || '').toLowerCase();
+      const srcRaw = stRaw || String(pick(f, ['source', 'tag'], '') || '').toLowerCase();
       const cls = FEED_MAP[srcRaw] || 'feed-news';
       const tag = srcRaw === 'x' || srcRaw === 'twitter' ? 'X'
         : srcRaw === 'fb' || srcRaw === 'facebook' ? 'FB'
         : srcRaw === 'ig' || srcRaw === 'instagram' ? 'IG'
         : srcRaw === 'rss' ? 'RSS'
-        : srcRaw === 'news' || srcRaw === 'newspaper' || srcRaw === 'article' || srcRaw === 'press' ? 'NEW'
+        : srcRaw === 'news' || srcRaw === 'newspaper' || srcRaw === 'article' || srcRaw === 'press' || srcRaw === 'web' || srcRaw === 'website' ? 'NEW'
         : srcRaw === 'google' || srcRaw === 'google trends' || srcRaw === 'trends' ? 'GGL'
-        : esc(String(pick(f, ['sourceType', 'src', 'source', 'tag', 'type'], 'NEW') || 'NEW').toUpperCase()).slice(0, 4);
+        : esc(String(stRaw || pick(f, ['sourceType', 'src', 'source', 'tag', 'type'], 'NEW') || 'NEW').toUpperCase()).slice(0, 4);
       const text = esc(pick(f, ['title', 'text', 'content', 'post', 'message', 'description'], '—'));
       const t = timeAgo(pick(f, ['publishedAt', 'published', 'date', 'datetime', 't', 'time', 'ts', 'age'], ''));
       return '<div class="feed-item"><span class="feed-src ' + cls + '">' + tag + '</span>'
@@ -730,7 +735,7 @@
     }
     const NET_COLORS = ['#35D07F', '#5EA2FF', '#7A5CFF', '#F5B84A', '#F45D5D', '#5EC7D0', '#C05EFF', '#FF8A5E'];
     const SRC_MAP = { 'News desks': 'ws.src.r1', 'X (Twitter)': 'ws.src.r2', Facebook: 'ws.src.r3', 'RSS feeds': 'ws.src.r4', Instagram: 'ws.src.r5', 'Google Trends': 'ws.src.r6' };
-    const MIX_MAP = { Economy: 'ws.mix.r1', Politics: 'ws.mix.r2', Sports: 'ws.mix.r3', Culture: 'ws.mix.r4', Tech: 'ws.mix.r5', Weather: 'ws.mix.r6' };
+    const MIX_MAP = { News: 'ws.mix.news', Social: 'ws.mix.social', Government: 'ws.mix.gov', Politics: 'ws.mix.gov', Sports: 'ws.mix.sports', Sport: 'ws.mix.sports', Business: 'ws.mix.business', Economy: 'ws.mix.business', Tech: 'ws.mix.r5', Technology: 'ws.mix.r5', Culture: 'ws.mix.r4', Weather: 'ws.mix.r6' };
     function srcRow(s) {
       const key = SRC_MAP[s.label];
       const pct = num(s.pct);
@@ -889,7 +894,7 @@
         const step = Math.ceil(trendLabels.length / 7);
         trendLabels = trendLabels.map((ll, i) => (i % step === 0 ? ll : ''));
       }
-      trendData = nums.length >= 2 ? nums : null;
+      trendData = nums.length >= 1 ? nums : null;
       if (!trendData) {
         const emptyTrend = $('dbEmptyTrend');
         if (emptyTrend) { emptyTrend.hidden = false; emptyTrend.style.display = ''; }

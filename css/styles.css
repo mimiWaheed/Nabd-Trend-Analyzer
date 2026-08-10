@@ -1465,6 +1465,9 @@ body.ws-loaded .ws-card { animation: wsIn .7s var(--ease) both; animation-delay:
 .sev-purple { background: var(--accent-2); box-shadow: 0 0 7px rgba(122, 92, 255, .7); }
 .trend-vol { font-size: 11px; color: var(--text-muted); text-align: right; }
 .trend-delta { font-size: 10.5px; text-align: right; }
+.trend-delta.up { color: var(--pos); }
+.trend-delta.down { color: var(--neg); }
+.trend-delta.flat { color: var(--text-muted); }
 
 /* sentiment donut */
 .donut-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; flex: 1; }

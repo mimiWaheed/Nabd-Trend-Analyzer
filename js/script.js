@@ -136,10 +136,10 @@
       'ws.nodata': 'No data available',
       'ws.sent.na': 'Sentiment data unavailable',
       'ws.timeline.na': 'Not enough timestamped signals for a timeline',
-      'ws.loc.na': 'Not enough location data for this query.',
+      'ws.loc.na': 'No city-level geographic data available for this query.',
       'ws.national.t': 'National coverage',
       'ws.national.s': 'Egypt-wide signal',
-      'ws.inf.na': 'No identifiable influencers in this analysis',
+      'ws.inf.na': 'No influencers identified in this analysis',
       'ws.hl.na': 'No AI highlights generated for this query.',
       'ws.src.na': 'No source distribution available for this query.',
       'ws.mix.na': 'No category mix available for this query.',
@@ -147,6 +147,8 @@
       'ws.net.na': 'Network relationships unavailable for this analysis.',
       'ws.feed.na': 'No live signals returned for this query.',
       'ws.sum.na': 'No AI brief returned for this query — signals are still displayed below.',
+      'ws.mix.news': 'News', 'ws.mix.social': 'Social', 'ws.mix.gov': 'Government',
+      'ws.mix.sports': 'Sports', 'ws.mix.business': 'Business',
       'ws.src.count': 'sources',
       'ws.updated': 'updated',
       'ws.conf': 'confidence',
@@ -579,10 +581,10 @@
       'ws.nodata': 'لا توجد بيانات',
       'ws.sent.na': 'بيانات المشاعر غير متاحة',
       'ws.timeline.na': 'لا توجد إشارات زمنية كافية لرسم خط زمني',
-      'ws.loc.na': 'لا توجد بيانات مواقع كافية لهذا الاستعلام',
+      'ws.loc.na': 'لا توجد بيانات جغرافية على مستوى المدن لهذا الاستعلام',
       'ws.national.t': 'تغطية وطنية',
       'ws.national.s': 'إشارة على مستوى مصر',
-      'ws.inf.na': 'لا توجد شخصيات مؤثرة يمكن تحديدها في هذا التحليل',
+      'ws.inf.na': 'لم يتم تحديد شخصيات مؤثرة في هذا التحليل',
       'ws.hl.na': 'لم تُنشأ ملخصات ذكاء اصطناعي لهذا الاستعلام.',
       'ws.src.na': 'لا تتوفر توزيعة مصادر لهذا الاستعلام.',
       'ws.mix.na': 'لا يتوفر مزيج فئات لهذا الاستعلام.',
@@ -590,6 +592,8 @@
       'ws.net.na': 'علاقات الشبكة غير متاحة لهذا التحليل.',
       'ws.feed.na': 'لم تُرجع الإشارات الحية نتائج لهذا الاستعلام.',
       'ws.sum.na': 'لم يُرجع الموجز ملخصًا ذكيًا لهذا الاستعلام — الإشارات معروضة أدناه.',
+      'ws.mix.news': 'أخبار', 'ws.mix.social': 'تواصل اجتماعي', 'ws.mix.gov': 'حكومة',
+      'ws.mix.sports': 'رياضة', 'ws.mix.business': 'أعمال',
       'ws.src.count': 'مصدر',
       'ws.updated': 'آخر تحديث',
       'ws.conf': 'ثقة',
@@ -1654,12 +1658,14 @@
     });
     out.articles = rawItems.map((it) => {
       const topics = strList(pick(it, ['topics', 'keywords', 'entities'], null));
+      const srcVal = pick(it, ['source'], null);
+      const srcTok = (srcVal != null && isSrcTypeToken(srcVal)) ? String(srcVal).trim().toLowerCase() : null;
       return {
         title: pick(it, ITEM_KEYS, null),
         description: pick(it, ['description', 'summary', 'snippet', 'excerpt'], null),
         url: pick(it, ['url', 'link', 'href'], null),
         source: pickRealSource(it),
-        sourceType: pick(it, ['sourceType', 'source_type', 'type', 'src', 'medium'], null),
+        sourceType: pick(it, ['sourceType', 'source_type', 'type', 'src', 'medium'], null) || srcTok,
         publishedAt: pick(it, ['publishedAt', 'published_at', 'published', 'date', 'datetime', 'ts', 'timestamp', 'time', 'created', 'createdAt', 'observedAt'], null),
         language: pick(it, ['language', 'lang'], null),
         category: pick(it, ['category', 'cat', 'section', 'group'], null),
@@ -1670,6 +1676,24 @@
         location: pick(it, ['location', 'region', 'city', 'gov', 'governorate'], null),
         engagement: num(pick(it, ['engagement', 'mentions', 'reactions', 'comments', 'shares', 'reach', 'volume'], null))
       };
+    });
+
+    /* ---- categories: derive from the source medium when the feed gives no
+       per-item category (n8n's sampleSources carry `source: "web"`). This keeps
+       the media-mix + category filters populated with real, derivable data. ---- */
+    const CAT_FROM_SRC = {
+      news: 'news', web: 'news', website: 'news', article: 'news', rss: 'news', feed: 'news',
+      google: 'news', trends: 'news', newspaper: 'news', press: 'news', media: 'news',
+      x: 'social', twitter: 'social', facebook: 'social', fb: 'social', instagram: 'social', ig: 'social',
+      youtube: 'social', social: 'social', tiktok: 'social',
+      gov: 'gov', government: 'gov', official: 'gov',
+      sport: 'sport', sports: 'sport',
+      business: 'business', economy: 'business', finance: 'business'
+    };
+    out.articles.forEach((a) => {
+      if (a.category) return;
+      const t = a.sourceType ? String(a.sourceType).toLowerCase().trim() : '';
+      a.category = CAT_FROM_SRC[t] || null;
     });
 
     /* ---- sentiment (aggregate first, else derived per record) ---- */
@@ -1774,14 +1798,44 @@
       });
     }
 
-    /* ---- locations (explicit + aggregated geo references) ---- */
+    /* ---- locations (explicit + aggregated geo references) ----
+       The card is "Governorate intelligence" (city-level). Country-level names
+       are NOT cities — they set the national flag (for Egypt) or are dropped
+       so the UI shows an honest "no city-level data" state instead of listing
+       a country as a governorate. */
     const NATIONAL = ['مصر', 'egypt', 'جمهورية مصر العربية', 'arab republic of egypt'];
+    const isNational = (n) => NATIONAL.indexOf(String(n).toLowerCase().trim()) !== -1;
+    const COUNTRY_NAMES = {
+      'usa': 1, 'united states': 1, 'united states of america': 1, 'america': 1, 'الولايات المتحدة': 1, 'أمريكا': 1, 'امريكا': 1,
+      'uk': 1, 'united kingdom': 1, 'britain': 1, 'england': 1, 'بريطانيا': 1, 'المملكة المتحدة': 1, 'انجلترا': 1,
+      'saudi arabia': 1, 'السعودية': 1, 'المملكة العربية السعودية': 1,
+      'uae': 1, 'united arab emirates': 1, 'الإمارات': 1, 'الامارات': 1, 'دبي': 1, 'dubai': 1, 'أبوظبي': 1, 'abu dhabi': 1,
+      'qatar': 1, 'قطر': 1, 'kuwait': 1, 'الكويت': 1, 'bahrain': 1, 'البحرين': 1, 'oman': 1, 'عمان': 1,
+      'jordan': 1, 'الأردن': 1, 'الاردن': 1, 'iraq': 1, 'العراق': 1, 'syria': 1, 'سوريا': 1, 'lebanon': 1, 'لبنان': 1,
+      'palestine': 1, 'فلسطين': 1, 'israel': 1, 'إسرائيل': 1, 'اسرائيل': 1, 'turkey': 1, 'تركيا': 1, 'iran': 1, 'إيران': 1, 'ايران': 1,
+      'sudan': 1, 'السودان': 1, 'libya': 1, 'ليبيا': 1, 'tunisia': 1, 'تونس': 1, 'algeria': 1, 'الجزائر': 1, 'morocco': 1, 'المغرب': 1,
+      'yemen': 1, 'اليمن': 1, 'china': 1, 'الصين': 1, 'russia': 1, 'روسيا': 1, 'germany': 1, 'ألمانيا': 1, 'المانيا': 1,
+      'france': 1, 'فرنسا': 1, 'spain': 1, 'إسبانيا': 1, 'اسبانيا': 1, 'italy': 1, 'إيطاليا': 1, 'ايطاليا': 1,
+      'india': 1, 'الهند': 1, 'pakistan': 1, 'باكستان': 1, 'canada': 1, 'كندا': 1, 'australia': 1, 'أستراليا': 1, 'استراليا': 1,
+      'brazil': 1, 'البرازيل': 1, 'mexico': 1, 'المكسيك': 1, 'japan': 1, 'اليابان': 1, 'south korea': 1, 'كوريا الجنوبية': 1,
+      'greece': 1, 'اليونان': 1, 'cyprus': 1, 'قبرص': 1, 'ukraine': 1, 'أوكرانيا': 1, 'netherlands': 1, 'هولندا': 1,
+      'switzerland': 1, 'سويسرا': 1, 'austria': 1, 'النمسا': 1, 'sweden': 1, 'السويد': 1, 'norway': 1, 'النرويج': 1,
+      'denmark': 1, 'الدنمارك': 1, 'finland': 1, 'فنلندا': 1, 'poland': 1, 'بولندا': 1, 'romania': 1, 'رومانيا': 1,
+      'south africa': 1, 'جنوب أفريقيا': 1, 'جنوب افريقيا': 1, 'nigeria': 1, 'نيجيريا': 1, 'kenya': 1, 'كينيا': 1,
+      'ethiopia': 1, 'إثيوبيا': 1, 'argentina': 1, 'الأرجنتين': 1, 'chile': 1, 'تشيلي': 1, 'indonesia': 1, 'إندونيسيا': 1,
+      'malaysia': 1, 'ماليزيا': 1, 'singapore': 1, 'سنغافورة': 1, 'thailand': 1, 'تايلاند': 1, 'afghanistan': 1, 'أفغانستان': 1,
+      'azerbaijan': 1, 'أذربيجان': 1, 'armenia': 1, 'أرمينيا': 1, 'georgia': 1, 'جورجيا': 1, 'portugal': 1, 'البرتغال': 1,
+      'ireland': 1, 'أيرلندا': 1, 'scotland': 1, 'wales': 1, 'belgium': 1, 'بلجيكا': 1
+    };
+    const isCountry = (n) => !!COUNTRY_NAMES[String(n).toLowerCase().trim()];
     const locSeen = {};
     (Array.isArray(raw.topLocations) ? raw.topLocations : []).forEach((l) => {
       const name = String(pick(l, ['name', 'label', 'city', 'region'], '') || '').trim();
       if (!name) return;
+      if (isNational(name)) { out.national = true; return; }
+      if (isCountry(name)) return;
       locSeen[name] = {
-        name: name, score: num(pick(l, ['score'], null)),
+        name: name, country: 'Egypt', score: num(pick(l, ['score'], null)),
         count: num(pick(l, ['vol', 'volume', 'count', 'mentions'], null)),
         delta: pick(l, ['delta', 'change'], null), up: pick(l, ['up', 'dir'], null),
         vol: pick(l, ['vol', 'volume', '24h'], null), w: num(pick(l, ['w', 'weight'], null))
@@ -1790,9 +1844,10 @@
     out.articles.forEach((a) => {
       const n = a.location ? String(a.location).trim() : '';
       if (!n) return;
-      if (NATIONAL.indexOf(n.toLowerCase()) !== -1) { out.national = true; return; }
+      if (isNational(n)) { out.national = true; return; }
+      if (isCountry(n)) return;
       if (locSeen[n]) { locSeen[n].count = locSeen[n].count == null ? 0 : locSeen[n].count + 1; return; }
-      locSeen[n] = { name: n, score: null, count: 1, delta: null, up: null, vol: null, w: null };
+      locSeen[n] = { name: n, country: 'Egypt', score: null, count: 1, delta: null, up: null, vol: null, w: null };
     });
     out.locations = Object.keys(locSeen).map((k) => locSeen[k]).sort((a, b) => (b.count || 0) - (a.count || 0));
     {
@@ -1804,7 +1859,8 @@
       });
     }
 
-    /* ---- influencers (explicit, else recurring sources) ---- */
+    /* ---- influencers (explicit data ONLY — news publishers are never
+       presented as influencers) ---- */
     const infSeen = {};
     (Array.isArray(raw.topInfluencers) ? raw.topInfluencers : []).forEach((f, i) => {
       const name = String(pick(f, ['name', 'label', 'title', 'handle'], '') || '').trim();
@@ -1814,17 +1870,6 @@
         cat: pick(f, ['cat', 'desc', 'meta', 'category', 'handle'], null), score: pick(f, ['score', 'reach', 'value', 'rank'], null), order: i
       };
     });
-    if (Object.keys(infSeen).length === 0) {
-      const srcMap = {};
-      out.articles.forEach((a) => {
-        const key = a.source ? String(a.source).trim() : '';
-        if (!key || isSrcTypeToken(key)) return;
-        srcMap[key] = (srcMap[key] || 0) + 1;
-      });
-      Object.keys(srcMap).forEach((k) => {
-        infSeen[k] = { name: k, ini: null, hue: null, cat: null, score: String(srcMap[k]), order: null };
-      });
-    }
     out.influencers = Object.keys(infSeen).map((k) => infSeen[k]).sort((a, b) => {
       if (a.order != null && b.order != null) return a.order - b.order;
       return (parseFloat(b.score) || 0) - (parseFloat(a.score) || 0);
@@ -1862,7 +1907,7 @@
           pts.push({ bucket: pts.length, count: Math.max(0, Math.round(v)) });
         }
       });
-      out.timeline = pts.length >= 2 ? pts : null;
+      out.timeline = pts.length >= 1 ? pts : null;
     } else {
       out.timeline = deriveTimeline(out.articles);
     }
@@ -1881,17 +1926,23 @@
     const d = new Date(t);
     if (!isNaN(d.getTime())) return d.getTime();
     const MONTHS = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
-    const mn = String(t).match(/([A-Za-z]{3,9})\s+(\d{1,2})(?:[^0-9]{0,8}(\d{2,4}))?/);
-    if (mn) {
+    const nowY = new Date().getFullYear();
+    const all = t.match(/([A-Za-z]{3,9})\s+(\d{1,2})/g) || [];
+    let best = null;
+    all.forEach((m) => {
+      const mn = m.match(/([A-Za-z]{3,9})\s+(\d{1,2})/);
+      if (!mn) return;
       const mo = MONTHS[mn[1].slice(0, 3).toLowerCase()];
-      if (mo != null) {
-        const day = parseInt(mn[2], 10);
-        const year = mn[3] != null ? parseInt(mn[3], 10) : new Date().getFullYear();
-        const dd = new Date(year, mo, day);
-        if (!isNaN(dd.getTime())) return dd.getTime();
-      }
-    }
-    return null;
+      if (mo == null) return;
+      const day = parseInt(mn[2], 10);
+      const years = (t.match(/\d{4}/g) || []).map(Number).filter((y) => y >= nowY - 5 && y <= nowY + 2);
+      if (!years.length) return;
+      const year = years[0];
+      const dd = new Date(year, mo, day);
+      if (isNaN(dd.getTime())) return;
+      if (!best || dd.getTime() < best.getTime()) best = dd;
+    });
+    return best ? best.getTime() : null;
   }
 
   /* Timestamp → timeline buckets (hour within a 2-day window, else day). */
@@ -1911,8 +1962,9 @@
   }
 
   /* Source distribution from real records: real publisher names are grouped by
-     name (BBC News, NPR, …); bare type tokens (news/web/…) map to the fixed
-     card labels only when no publisher name exists for a record. */
+     name (جولد بيليون, Masrawy, …); bare type tokens (news/web/…) map to the fixed
+     card labels only when no publisher name exists for a record. Every entry also
+     carries a `type` so the filter buttons (News/Social/…) can match sources. */
   function deriveSources(items) {
     const TYPE_LABEL = {
       'news': 'News desks', 'newspaper': 'News desks', 'press': 'News desks', 'agency': 'News desks',
@@ -1921,12 +1973,27 @@
       'facebook': 'Facebook', 'fb': 'Facebook',
       'instagram': 'Instagram', 'ig': 'Instagram',
       'rss': 'RSS feeds', 'feed': 'RSS feeds',
-      'google': 'Google Trends', 'trends': 'Google Trends'
+      'google': 'Google Trends', 'trends': 'Google Trends',
+      'youtube': 'YouTube', 'social': 'Social media',
+      'gov': 'Government', 'government': 'Government', 'official': 'Government'
+    };
+    const TYPE_OF = {
+      'news': 'news', 'web': 'news', 'website': 'news', 'article': 'news', 'rss': 'news', 'feed': 'news',
+      'google': 'news', 'trends': 'news', 'newspaper': 'news', 'press': 'news', 'media': 'news',
+      'x': 'social', 'twitter': 'social', 'facebook': 'social', 'fb': 'social', 'instagram': 'social',
+      'ig': 'social', 'youtube': 'social', 'social': 'social', 'tiktok': 'social',
+      'gov': 'government', 'government': 'government', 'official': 'government',
+      'sport': 'sports', 'sports': 'sports', 'business': 'business', 'economy': 'business', 'finance': 'business'
     };
     const isToken = (v) => {
       if (v == null) return true;
       const s = String(v).toLowerCase().trim();
-      return !!TYPE_LABEL[s] || /^(news|web|website|article|social|rss|feed|google|trends|youtube|twitter|facebook|instagram|press|newspaper|x)\b/i.test(s);
+      return !!TYPE_LABEL[s] || /^(news|web|website|article|social|rss|feed|google|trends|youtube|twitter|facebook|instagram|press|newspaper|gov|government|official|business|economy|sport|x)\b/i.test(s);
+    };
+    const typeOf = (a) => {
+      if (a.category) return a.category;
+      const t = a.sourceType ? String(a.sourceType).toLowerCase().trim() : '';
+      return TYPE_OF[t] || 'other';
     };
     const map = {};
     (items || []).forEach((a) => {
@@ -1938,15 +2005,27 @@
         key = TYPE_LABEL[tk] || null;
       }
       if (!key) return;
-      map[key] = (map[key] || 0) + 1;
+      const cur = map[key];
+      map[key] = cur ? { count: cur.count + 1, type: cur.type } : { count: 1, type: typeOf(a) };
     });
     const tot = items && items.length ? items.length : 0;
-    return Object.keys(map).map((k) => ({ label: k, count: map[k], pct: tot ? Math.round((map[k] / tot) * 100) : 0 })).sort((a, b) => b.count - a.count);
+    return Object.keys(map).map((k) => ({ label: k, count: map[k].count, type: map[k].type, pct: tot ? Math.round((map[k].count / tot) * 100) : 0 })).sort((a, b) => b.count - a.count);
   }
 
-  /* Category mix (media-mix card) from real record categories. */
+  /* Media-mix (category) distribution. Canonical card categories are News,
+     Social, Government, Sports, Business — derived from real record categories
+     or from the source medium, so `source: "web"` counts as News. */
   function deriveCategories(items) {
-    const MIX = { economy: 'Economy', business: 'Economy', politics: 'Politics', government: 'Politics', gov: 'Politics', sport: 'Sports', sports: 'Sports', culture: 'Culture', tech: 'Tech', technology: 'Tech', science: 'Tech', weather: 'Weather' };
+    const MIX = {
+      news: 'News', web: 'News', website: 'News', article: 'News', rss: 'News', feed: 'News',
+      google: 'News', trends: 'News', newspaper: 'News', press: 'News', media: 'News', agency: 'News',
+      social: 'Social', x: 'Social', twitter: 'Social', facebook: 'Social', fb: 'Social',
+      instagram: 'Social', ig: 'Social', youtube: 'Social', tiktok: 'Social',
+      gov: 'Government', government: 'Government', official: 'Government', politics: 'Government',
+      sport: 'Sports', sports: 'Sports',
+      business: 'Business', economy: 'Business', finance: 'Business',
+      tech: 'Technology', technology: 'Technology', science: 'Technology', culture: 'Culture', weather: 'Weather'
+    };
     const map = {};
     (items || []).forEach((a) => {
       const c = a.category ? MIX[String(a.category).toLowerCase().trim()] : null;
