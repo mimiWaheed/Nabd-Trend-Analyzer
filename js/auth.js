@@ -1,6 +1,7 @@
 /* ============================================================
    NABD (نبض) V3 — auth pages script (signin / signup)
-   validation · password visibility · social mock · submit flow
+   client-side validation · password strength · social (soon) ·
+   submit flow
    ============================================================ */
 (function () {
   'use strict';
@@ -37,14 +38,6 @@
     fillSelect(langSel, ['en', 'ar'], (v) => 'lng.' + v);
     langSel.value = N.lang;
   }
-  document.addEventListener('nabd-lang', () => {
-    if (countrySel) fillSelect(countrySel, COUNTRIES, (v) => 'c.' + v);
-    if (langSel) {
-      fillSelect(langSel, ['en', 'ar'], (v) => 'lng.' + v);
-      langSel.value = N.lang;
-    }
-    if (errEl) errEl.textContent = '';
-  });
 
   /* ----------------------------------------------------------
      PASSWORD VISIBILITY TOGGLES
@@ -59,9 +52,48 @@
   });
 
   /* ----------------------------------------------------------
-     HELPERS
+     VALIDATION HELPERS
      ---------------------------------------------------------- */
-  const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+  const NAME_RE = /^[\p{L}\p{M}'’\s.-]+$/u;
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  const cleanName = (v) => (v || '').trim().replace(/\s+/g, ' ');
+  const cleanPhone = (v) => (v || '').replace(/[\s().-]/g, '');
+
+  function isValidName(v) {
+    const s = cleanName(v);
+    if (!s) return false;
+    if (s.length < 2) return false;
+    if (!NAME_RE.test(s)) return false;
+    if ((s.match(/\p{L}/gu) || []).length < 2) return false;
+    return true;
+  }
+
+  function isValidEmail(v) { return EMAIL_RE.test((v || '').trim()); }
+
+  function isValidPhone(v) {
+    const s = cleanPhone(v);
+    if (!s) return false;
+    return /^\+?\d{7,15}$/.test(s);
+  }
+
+  function passwordScore(v) {
+    let s = 0;
+    if (!v) return 0;
+    if (v.length >= 8) s++;
+    if (v.length >= 12) s++;
+    if (/[A-Z]/.test(v) && /[a-z]/.test(v)) s++;
+    if (/\d/.test(v)) s++;
+    if (/[^A-Za-z0-9]/.test(v)) s++;
+    return s;
+  }
+
+  function passwordLevel(score) {
+    if (score <= 1) return 'weak';
+    if (score <= 3) return 'fair';
+    return 'strong';
+  }
+
   const setError = (msg) => { if (errEl) errEl.textContent = msg || ''; };
 
   const nextParam = (() => {
@@ -84,6 +116,27 @@
   }
 
   /* ----------------------------------------------------------
+     INLINE FIELD STATE
+     ---------------------------------------------------------- */
+  function setFieldState(input, msgEl, msg, ok) {
+    if (input) {
+      input.classList.toggle('field-invalid', !ok);
+      input.setAttribute('aria-invalid', ok ? 'false' : 'true');
+    }
+    if (msgEl) msgEl.textContent = ok ? '' : msg || '';
+    return ok;
+  }
+
+  function wireField(input, msgEl, validator) {
+    if (!input || !msgEl) return;
+    let touched = false;
+    const check = () => validator(input.value);
+    input.addEventListener('blur', () => { touched = true; check(); });
+    input.addEventListener('input', () => { if (touched) check(); });
+    return () => { touched = true; return check(); };
+  }
+
+  /* ----------------------------------------------------------
      SIGN IN
      ---------------------------------------------------------- */
   const signinForm = $('signinForm');
@@ -96,12 +149,33 @@
     const user = N.getUser();
     if (user && user.email && siEmail && !siEmail.value) siEmail.value = user.email;
 
+    const msgEmail = $('siEmailMsg');
+    const msgPwd = $('siPwdMsg');
+
+    const checkSiEmail = wireField(siEmail, msgEmail, (v) => {
+      const empty = !(v || '').trim();
+      const ok = !empty && isValidEmail(v);
+      if (!ok) setFieldState(siEmail, msgEmail, empty ? N.t('auth.err.email') : N.t('auth.err.email'), ok);
+      return ok;
+    });
+    const checkSiPwd = wireField(siPwd, msgPwd, (v) => {
+      const ok = !!(v || '');
+      setFieldState(siPwd, msgPwd, ok ? '' : N.t('auth.err.pass.required'), ok);
+      return ok;
+    });
+
     let busy = false;
     signinForm.addEventListener('submit', (e) => {
       e.preventDefault();
       if (busy) return;
-      if (!isEmail(siEmail.value.trim())) { setError(N.t('auth.err.email')); siEmail.focus(); return; }
-      if (!siPwd.value || siPwd.value.length < 8) { setError(N.t('auth.err.pass')); siPwd.focus(); return; }
+      const okEmail = checkSiEmail();
+      const okPwd = checkSiPwd();
+      if (!okEmail || !okPwd) {
+        setError(N.t('auth.err.req'));
+        if (!okEmail && siEmail) siEmail.focus();
+        else if (!okPwd && siPwd) siPwd.focus();
+        return;
+      }
       busy = true;
       setPending(siSubmit, true);
       N.persistUser({ email: siEmail.value.trim() }, siRemember && siRemember.checked);
@@ -117,31 +191,113 @@
   const suLast = $('suLast');
   const suOrg = $('suOrg');
   const suEmail = $('suEmail');
+  const suPhone = $('suPhone');
   const suPwd = $('suPwd');
   const suPwd2 = $('suPwd2');
   const suTerms = $('suTerms');
   const suSubmit = $('signupSubmit');
+  let renderStrength = null;
 
   if (signupForm) {
+    const mFirst = $('suFirstMsg');
+    const mLast = $('suLastMsg');
+    const mEmail = $('suEmailMsg');
+    const mPhone = $('suPhoneMsg');
+    const mPwd = $('suPwdMsg');
+    const mPwd2 = $('suPwd2Msg');
+    const mTerms = $('suTermsMsg');
+
+    const nameValidator = (input, msgEl) => (v) => {
+      const empty = !cleanName(v);
+      const ok = isValidName(v);
+      const msg = empty ? N.t('auth.err.name') : (ok ? '' : N.t('auth.err.name.invalid'));
+      setFieldState(input, msgEl, msg, ok);
+      return ok;
+    };
+
+    const checkFirst = wireField(suFirst, mFirst, nameValidator(suFirst, mFirst));
+    const checkLast = wireField(suLast, mLast, nameValidator(suLast, mLast));
+
+    const checkEmail = wireField(suEmail, mEmail, (v) => {
+      const empty = !(v || '').trim();
+      const ok = !empty && isValidEmail(v);
+      setFieldState(suEmail, mEmail, ok ? '' : N.t('auth.err.email'), ok);
+      return ok;
+    });
+
+    const checkPhone = wireField(suPhone, mPhone, (v) => {
+      const empty = !(v || '').trim();
+      const ok = !empty && isValidPhone(v);
+      setFieldState(suPhone, mPhone, ok ? '' : N.t('auth.err.phone'), ok);
+      return ok;
+    });
+
+    /* password strength meter */
+    const meter = $('suPwdMeter');
+    const levelEl = $('suPwdLevel');
+    renderStrength = function () {
+      const score = passwordScore(suPwd ? suPwd.value : '');
+      if (!score) {
+        if (meter) { meter.style.width = '0%'; meter.className = ''; }
+        if (levelEl) levelEl.textContent = '';
+        return;
+      }
+      const lvl = passwordLevel(score);
+      const pct = { weak: 33, fair: 66, strong: 100 }[lvl];
+      if (meter) { meter.style.width = pct + '%'; meter.className = 'lvl-' + lvl; }
+      if (levelEl) levelEl.textContent = N.t('auth.pwd.' + lvl);
+    }
+
+    const checkPwd = wireField(suPwd, mPwd, (v) => {
+      const empty = !(v || '');
+      const ok = !empty && v.length >= 8;
+      setFieldState(suPwd, mPwd, empty ? N.t('auth.err.pass.required') : (ok ? '' : N.t('auth.err.pass')), ok);
+      return ok;
+    });
+    if (suPwd) suPwd.addEventListener('input', renderStrength);
+
+    const checkPwd2 = wireField(suPwd2, mPwd2, (v) => {
+      const empty = !(v || '');
+      const ok = !empty && suPwd && v === suPwd.value;
+      setFieldState(suPwd2, mPwd2, empty ? N.t('auth.err.confirm.req') : (ok ? '' : N.t('auth.err.match')), ok);
+      return ok;
+    });
+
     let busy = false;
     signupForm.addEventListener('submit', (e) => {
       e.preventDefault();
       if (busy) return;
-      if (!suFirst.value.trim() || !suLast.value.trim() || !suOrg.value.trim() || !suEmail.value.trim() || !suPwd.value || !suPwd2.value) {
+
+      const okFirst = checkFirst();
+      const okLast = checkLast();
+      const okEmail = checkEmail();
+      const okPhone = checkPhone();
+      const okPwd = checkPwd();
+      const okPwd2 = checkPwd2();
+      const okTerms = !!(suTerms && suTerms.checked);
+      if (mTerms) setFieldState(suTerms, mTerms, okTerms ? '' : N.t('auth.err.terms'), okTerms);
+
+      if (!okFirst || !okLast || !okEmail || !okPhone || !okPwd || !okPwd2 || !okTerms) {
         setError(N.t('auth.err.req'));
+        const firstBad = suFirst;
+        if (!okFirst && firstBad) firstBad.focus();
+        else if (!okLast && suLast) suLast.focus();
+        else if (!okEmail && suEmail) suEmail.focus();
+        else if (!okPhone && suPhone) suPhone.focus();
+        else if (!okPwd && suPwd) suPwd.focus();
+        else if (!okPwd2 && suPwd2) suPwd2.focus();
+        else if (!okTerms && suTerms) suTerms.focus();
         return;
       }
-      if (!isEmail(suEmail.value.trim())) { setError(N.t('auth.err.email')); suEmail.focus(); return; }
-      if (suPwd.value.length < 8) { setError(N.t('auth.err.pass')); suPwd.focus(); return; }
-      if (suPwd.value !== suPwd2.value) { setError(N.t('auth.err.match')); suPwd2.focus(); return; }
-      if (!suTerms.checked) { setError(N.t('auth.err.terms')); return; }
+
       busy = true;
       setPending(suSubmit, true);
       N.persistUser({
-        first: suFirst.value.trim(),
-        last: suLast.value.trim(),
-        org: suOrg.value.trim(),
+        first: cleanName(suFirst.value),
+        last: cleanName(suLast.value),
+        org: (suOrg ? suOrg.value : '').trim(),
         email: suEmail.value.trim(),
+        phone: cleanPhone(suPhone.value),
         country: countrySel ? countrySel.value : '',
         lang: langSel ? langSel.value : ''
       }, true);
@@ -150,16 +306,24 @@
   }
 
   /* ----------------------------------------------------------
-     SOCIAL BUTTONS (mock)
+     SOCIAL BUTTONS — UI only, no auth backend yet
      ---------------------------------------------------------- */
   document.querySelectorAll('[data-social]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      if (btn.dataset.done) return;
-      btn.dataset.done = '1';
-      setPending(btn, true);
-      N.persistUser({ social: btn.dataset.social }, true);
       N.toast(toastEl, N.t('auth.social'));
-      setTimeout(() => N.navigate(nextParam || 'dashboard.html'), 1200);
     });
+  });
+
+  /* ----------------------------------------------------------
+     LANGUAGE SWITCH — keep inline validation state consistent
+     ---------------------------------------------------------- */
+  document.addEventListener('nabd-lang', () => {
+    if (countrySel) fillSelect(countrySel, COUNTRIES, (v) => 'c.' + v);
+    if (langSel) {
+      fillSelect(langSel, ['en', 'ar'], (v) => 'lng.' + v);
+      langSel.value = N.lang;
+    }
+    if (errEl) errEl.textContent = '';
+    renderStrength && renderStrength();
   });
 })();
