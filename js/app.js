@@ -565,12 +565,26 @@
     /* ---------- sentiment donut (real response → existing component) ---------- */
     function renderDonut() {
       const s = lastResult && lastResult.sentiment;
+      const stats = (lastResult && lastResult.raw && lastResult.raw.stats) || {};
       const legendB = donutEl && donutEl.parentElement
         ? Array.prototype.slice.call(donutEl.parentElement.querySelectorAll('.donut-legend b'))
         : [];
       const emptyS = $('dbEmptySentiment');
+      const spar = $('dbSparsityNote');
+      const postN = num(stats.totalPosts);
+      const setSparsity = () => {
+        if (!spar) return;
+        if (postN != null && postN < 10) {
+          spar.hidden = false;
+          const p = spar.querySelector('p') || spar;
+          p.textContent = L('ws.sent.sparse').split('{n}').join(postN);
+        } else {
+          spar.hidden = true;
+        }
+      };
       if (s && Array.isArray(s) && s.length) {
         if (emptyS) emptyS.hidden = true;
+        setSparsity();
         N.buildDonut(donutEl, s, (s[0].v || 0) + '%', L('ws.donut.pos').toUpperCase());
         legendB.forEach((b, i) => { if (s[i]) b.textContent = (s[i].v || 0) + '%'; });
         return;
@@ -580,6 +594,7 @@
         const anyVal = (pos || 0) + (neu || 0) + (neg || 0) > 0;
         if (anyVal) {
           if (emptyS) emptyS.hidden = true;
+          setSparsity();
           const segs = [
             { v: Math.max(0, pos || 0), color: '#35D07F' },
             { v: Math.max(0, neu || 0), color: '#7A8BB5' },
@@ -739,9 +754,11 @@
     function srcRow(s) {
       const key = SRC_MAP[s.label];
       const pct = num(s.pct);
+      const count = num(s.count);
+      const hasRealPct = s.realPct != null;
       return '<div class="src-row"><span>' + (key ? esc(L(key)) : esc(s.label)) + '</span>'
         + '<span class="src-bar"><i style="--w:' + Math.max(0, Math.min(100, pct || 0)) + '%"></i></span>'
-        + '<b class="mono">' + (pct == null ? '—' : pct + '%') + '</b></div>';
+        + '<b class="mono">' + (hasRealPct ? pct + '%' : (count != null ? count + '×' : (pct == null ? '—' : pct + '%'))) + '</b></div>';
     }
     function mixRow(c) {
       const key = MIX_MAP[c.label];
@@ -749,6 +766,23 @@
       return '<div class="src-row"><span>' + (key ? esc(L(key)) : esc(c.label)) + '</span>'
         + '<span class="src-bar"><i style="--w:' + Math.max(0, Math.min(100, pct || 0)) + '%"></i></span>'
         + '<b class="mono">' + (pct == null ? '—' : pct + '%') + '</b></div>';
+    }
+    /* Key data: generic, data-driven rows from the backend's optional
+       dataPoints field. Nothing here is hardcoded per query type — the card
+       renders whatever structured facts n8n actually returned. */
+    function keyDataRow(p) {
+      const val = String(p.value == null ? '' : p.value).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      const unit = p.unit ? ' / ' + esc(String(p.unit)) : '';
+      const cur = p.currency ? ' ' + esc(String(p.currency)) : '';
+      const cat = p.category ? esc(String(p.category).toUpperCase()) : '';
+      const src = p.source ? esc(String(p.source)) + (p.timestamp ? ' · ' + esc(String(p.timestamp)) : '') : (p.timestamp ? esc(String(p.timestamp)) : '');
+      return '<div class="kd-row"><span class="kd-name">' + esc(p.name) + '</span>'
+        + '<span class="kd-value mono">' + val + cur + unit + '</span>'
+        + (cat || src ? '<span class="kd-meta mono">' + (cat ? cat + (src ? ' · ' : '') : '') + src + '</span>' : '') + '</div>';
+    }
+    function renderKeyData(r) {
+      const dps = Array.isArray(r.dataPoints) ? r.dataPoints : [];
+      listWidget($('dbKeyDataList'), $('dbEmptyKeyData'), dps.map(keyDataRow));
     }
     function renderKpis(r) {
       const stats = (r.raw && r.raw.stats) || {};
@@ -826,6 +860,7 @@
       renderKpis(r);
       renderSummary(r);
       renderGlobal(r);
+      renderKeyData(r);
 
       const topics = has(r.topics) ? r.topics : (Array.isArray(r.trendingTopics) ? r.trendingTopics : []);
       const locs = has(r.locations) ? r.locations : (Array.isArray(r.topLocations) ? r.topLocations : []);
@@ -873,15 +908,6 @@
       trendRunning = false;
       trendProgress = 0;
       trendData = null;
-    }
-    function makeSeries(n, drift) {
-      const out = [];
-      let v = 55;
-      for (let i = 0; i < n; i++) {
-        v += N.rand(-drift, drift) + Math.sin(i * 0.16) * 2.4;
-        out.push(Math.max(8, Math.min(96, v)));
-      }
-      return out;
     }
     function initTrend() {
       if (!trendCanvas || trendData) return;
@@ -1010,7 +1036,7 @@
           const label = trendLabels && trendLabels.length ? (trendLabels[idx] || '') : String(parseInt((idx / trendData.length) * 24, 10)).padStart(2, '0') + ':00';
           const tipDiv = Math.max.apply(null, trendData) >= 1000 ? 1000 : 1;
           const vv = Math.round(trendData[idx] / tipDiv);
-          trendTip.textContent = label + ' · ' + vv + (tipDiv > 1 ? 'k ' : ' ') + (N.lang === 'ar' ? 'أحاديث' : 'mentions');
+          trendTip.textContent = label + ' · ' + vv + (tipDiv > 1 ? 'k ' : ' ') + L('ws.timeline.tip');
           trendTip.style.left = px + 'px';
           trendTip.style.top = '6px';
           trendTip.classList.add('visible');

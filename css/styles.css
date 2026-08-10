@@ -1594,6 +1594,27 @@ body.ws-loaded .ws-card { animation: wsIn .7s var(--ease) both; animation-delay:
 }
 .src-row b { font-weight: 500; text-align: right; }
 
+/* key data (generic, data-driven rows) */
+.kd-list { display: flex; flex-direction: column; gap: 10px; flex: 1; justify-content: flex-start; }
+.kd-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 4px 14px;
+  padding: 9px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bg-2) 60%, transparent);
+}
+.kd-name { font-size: .82rem; font-weight: 600; color: var(--text); }
+.kd-value { font-size: .86rem; color: var(--pos); text-align: right; }
+.kd-meta { grid-column: 1 / -1; font-size: .68rem; letter-spacing: .04em; color: var(--text-muted); }
+html[dir="rtl"] .kd-row { direction: rtl; }
+html[dir="rtl"] .kd-value { text-align: left; }
+
+/* sentiment sparsity note */
+.sparsity-note { font-size: .74rem; color: var(--text-muted); text-align: center; max-width: 220px; }
+
 /* network graph */
 .network-wrap { flex: 1; min-height: 250px; position: relative; }
 .network-wrap svg { position: absolute; inset: 0; width: 100%; height: 100%; }

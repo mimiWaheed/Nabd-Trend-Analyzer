@@ -116,7 +116,7 @@
       'ws.sum2': 'In <strong>politics and society</strong>, the New Administrative Capital is trending with strong positive sentiment, while education reform debates are active across the Delta and Upper Egypt. Misinformation risk is elevated around currency rumors — two clusters flagged for review.',
       'ws.sum3': '<strong>Recommended watchlist:</strong> inflation data release, Suez Canal announcements, and the El Clasico build-up across Alexandria and Cairo.',
       'ws.briefchip1': 'Economy', 'ws.briefchip2': 'Politics', 'ws.briefchip3': 'Sports', 'ws.briefchip4': 'Cairo',
-      'ws.kpi1': 'TOTAL MENTIONS', 'ws.kpi2': 'OVERALL SENTIMENT', 'ws.kpi3': 'ACTIVE CRISES', 'ws.kpi4': 'INFLATION TALKS',
+      'ws.kpi1': 'TOTAL SIGNALS', 'ws.kpi2': 'OVERALL SENTIMENT', 'ws.kpi3': 'ACTIVE CRISES', 'ws.kpi4': 'INFLATION TALKS',
       'ws.gov.t': 'Governorate intelligence', 'ws.gov.s': 'TREND INTENSITY BY REGION',
       'ws.loc.cairo': 'Cairo', 'ws.loc.capital': 'New Capital', 'ws.loc.ale': 'Alexandria',
       'ws.loc.giza': 'Giza', 'ws.loc.suez': 'Suez Canal', 'ws.loc.upper': 'Upper Egypt',
@@ -129,13 +129,23 @@
       'ws.topics.t1': 'Egyptian Pound', 'ws.topics.t2': 'Suez Canal', 'ws.topics.t3': 'New Capital',
       'ws.topics.t4': 'Inflation', 'ws.topics.t5': 'El Clasico', 'ws.topics.t6': 'Tourism',
       'ws.topics.t7': 'Education', 'ws.topics.t8': 'Election law debate',
-      'ws.timeline.t': 'Live trend timeline', 'ws.timeline.s': 'EGYPT CONVERSATION VOLUME · 24H',
+      'ws.timeline.t': 'Historical trend strength', 'ws.timeline.s': 'WEEKLY TREND INDEX · SIGNAL VOLUME',
       'ws.tab.day': '24H', 'ws.tab.week': '7D', 'ws.tab.month': '30D',
       'ws.donut.t': 'Sentiment split', 'ws.donut.s': 'EGYPT · LAST 24 HOURS',
       'ws.donut.pos': 'Positive', 'ws.donut.neu': 'Neutral', 'ws.donut.neg': 'Negative',
       'ws.nodata': 'No data available',
       'ws.sent.na': 'Sentiment data unavailable',
-      'ws.timeline.na': 'Not enough timestamped signals for a timeline',
+      'ws.sent.sparse': 'Based on {n} signals — low volume, interpret with caution.',
+      'ws.timeline.na': 'No timestamped historical trend data available for this query.',
+      'ws.timeline.tip': 'index',
+      'ws.keydata.t': 'Key data', 'ws.keydata.s': 'STRUCTURED FACTS FROM ANALYZED SOURCES',
+      'ws.keydata.na': 'No structured data points available for this query.',
+      'ws.keydata.from': 'from', 'ws.keydata.sparse': 'Low signal volume — interpret with caution.',
+      'ws.brief.datapoints': 'Structured data recovered: {d}.',
+      'ws.brief.dp': '{name} at {value} {currency} per {unit}',
+      'ws.brief.dp.plain': '{name} = {value} {currency}',
+      'ws.brief.baseline': 'Trending {v} vs baseline: {t}.',
+      'ws.brief.bl.higher': 'higher', 'ws.brief.bl.elevated': 'elevated', 'ws.brief.bl.lower': 'lower', 'ws.brief.bl.moderate': 'moderate',
       'ws.loc.na': 'No city-level geographic data available for this query.',
       'ws.national.t': 'National coverage',
       'ws.national.s': 'Egypt-wide signal',
@@ -561,7 +571,7 @@
       'ws.sum2': 'في <strong>السياسة والمجتمع</strong>، العاصمة الإدارية الجديدة تتصدر الترند بمشاعر إيجابية قوية، بينما تتصاعد مناقشات إصلاح التعليم في الدلتا والصعيد. خطر التضليل مرتفع حول شائعات العملة — مجموعتان رُصدتا للمراجعة.',
       'ws.sum3': '<strong>قائمة المتابعة المقترحة:</strong> إصدار بيانات التضخم، إعلانات قناة السويس، والاستعدادات للكلاسيكو في الإسكندرية والقاهرة.',
       'ws.briefchip1': 'اقتصاد', 'ws.briefchip2': 'سياسة', 'ws.briefchip3': 'رياضة', 'ws.briefchip4': 'القاهرة',
-      'ws.kpi1': 'إجمالي الأحاديث', 'ws.kpi2': 'المشاعر العامة', 'ws.kpi3': 'أزمات نشطة', 'ws.kpi4': 'نقاشات التضخم',
+      'ws.kpi1': 'إجمالي الإشارات', 'ws.kpi2': 'المشاعر العامة', 'ws.kpi3': 'أزمات نشطة', 'ws.kpi4': 'نقاشات التضخم',
       'ws.gov.t': 'ذكاء المحافظات', 'ws.gov.s': 'كثافة الترندات حسب الإقليم',
       'ws.loc.cairo': 'القاهرة', 'ws.loc.capital': 'العاصمة الجديدة', 'ws.loc.ale': 'الإسكندرية',
       'ws.loc.giza': 'الجيزة', 'ws.loc.suez': 'قناة السويس', 'ws.loc.upper': 'الصعيد',
@@ -574,13 +584,23 @@
       'ws.topics.t1': 'الجنيه المصري', 'ws.topics.t2': 'قناة السويس', 'ws.topics.t3': 'العاصمة الجديدة',
       'ws.topics.t4': 'التضخم', 'ws.topics.t5': 'الكلاسيكو', 'ws.topics.t6': 'السياحة',
       'ws.topics.t7': 'التعليم', 'ws.topics.t8': 'نقاش قانون الانتخابات',
-      'ws.timeline.t': 'الخط الزمني الحي', 'ws.timeline.s': 'حجم الحديث في مصر · 24 ساعة',
+      'ws.timeline.t': 'قوة الترند التاريخي', 'ws.timeline.s': 'مؤشر الترند الأسبوعي · حجم الإشارة',
       'ws.tab.day': '24 س', 'ws.tab.week': '7 أيام', 'ws.tab.month': '30 يومًا',
       'ws.donut.t': 'توزيع المشاعر', 'ws.donut.s': 'مصر · آخر 24 ساعة',
       'ws.donut.pos': 'إيجابي', 'ws.donut.neu': 'محايد', 'ws.donut.neg': 'سلبي',
       'ws.nodata': 'لا توجد بيانات',
       'ws.sent.na': 'بيانات المشاعر غير متاحة',
-      'ws.timeline.na': 'لا توجد إشارات زمنية كافية لرسم خط زمني',
+      'ws.sent.sparse': 'استنادًا إلى {n} إشارة — حجم منخفض، يُفسَّر بحذر.',
+      'ws.timeline.na': 'لا تتوفر بيانات ترند تاريخية بزمن محدد لهذا الاستعلام',
+      'ws.timeline.tip': 'مؤشر',
+      'ws.keydata.t': 'بيانات أساسية', 'ws.keydata.s': 'حقائق منظمة من المصادر المُحلَّلة',
+      'ws.keydata.na': 'لا تتوفر نقاط بيانات منظمة لهذا الاستعلام.',
+      'ws.keydata.from': 'المصدر', 'ws.keydata.sparse': 'حجم إشارات منخفض — ينبغي الحذر عند التفسير.',
+      'ws.brief.datapoints': 'بيانات منظمة مُستخلصة: {d}.',
+      'ws.brief.dp': '{name} بسعر {value} {currency} لكل {unit}',
+      'ws.brief.dp.plain': '{name} = {value} {currency}',
+      'ws.brief.baseline': 'تصاعد {v} مقارنة بالأساس: {t}.',
+      'ws.brief.bl.higher': 'أعلى', 'ws.brief.bl.elevated': 'مرتفع', 'ws.brief.bl.lower': 'أقل', 'ws.brief.bl.moderate': 'متوسط',
       'ws.loc.na': 'لا توجد بيانات جغرافية على مستوى المدن لهذا الاستعلام',
       'ws.national.t': 'تغطية وطنية',
       'ws.national.s': 'إشارة على مستوى مصر',
@@ -1464,22 +1484,6 @@
   });
 
   /* ----------------------------------------------------------
-     WORKSPACE KPI JITTER
-     ---------------------------------------------------------- */
-  const kpiMentions = $('kpiMentions');
-  const kpiCairoSent = $('kpiCairoSent');
-  setInterval(() => {
-    if (kpiMentions && kpiMentions.textContent) {
-      const base = parseFloat(kpiMentions.textContent.replace(/[^\d.]/g, '')) || 1.4;
-      kpiMentions.textContent = (base + rand(0.002, 0.012)).toFixed(1) + 'M+';
-    }
-    if (kpiCairoSent && kpiCairoSent.textContent) {
-      const base = parseFloat(kpiCairoSent.textContent) || 68.4;
-      kpiCairoSent.textContent = Math.max(0, Math.min(100, base + rand(-0.3, 0.3))).toFixed(1);
-    }
-  }, 3200);
-
-  /* ----------------------------------------------------------
      LIVE FEED — seamless loop (workspace)
      ---------------------------------------------------------- */
   const feedTrack = $('feedTrack');
@@ -1628,7 +1632,8 @@
     const out = {
       query: '', raw: raw, language: null, summary: null, confidence: null, analyzedAt: null,
       articles: [], highlights: [], topics: [], locations: [], influencers: [],
-      timeline: null, sentiment: null, network: null, globalContext: null, national: false, sources: [], categories: []
+      timeline: null, sentiment: null, network: null, globalContext: null, national: false, sources: [], categories: [],
+      dataPoints: [], mediaMix: [], liveTimeline: null
     };
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
 
@@ -1859,15 +1864,35 @@
       });
     }
 
-    /* ---- influencers (explicit data ONLY — news publishers are never
-       presented as influencers) ---- */
+    /* ---- influencers (explicit data ONLY — news publishers and websites are
+       never presented as influencers). A backend entry that is clearly a
+       website (domain name) or that is just a source publisher with no real
+       social handle/reach is filtered out so the card stays honest. ---- */
+    const srcNames = {};
+    out.articles.forEach((a) => { if (a.source && !isSrcTypeToken(a.source)) srcNames[String(a.source).toLowerCase().trim()] = 1; });
+    const isWebName = (n) => /\.(com|net|org|io|info|co|me|ru|sa|eg|uk|online|site)([.\s]|$)/i.test(String(n || ''));
+    const isRealReach = (r) => { const v = parseFloat(r); return v != null && !isNaN(v) && v >= 100; };
+    const looksLikeInfluencer = (name, handle, reach) => {
+      const n = String(name || '').toLowerCase().trim();
+      if (isWebName(n)) return false;
+      const h = String(handle || '');
+      const r = String(reach || '');
+      if (h.indexOf('@') !== -1) return true;
+      if (isRealReach(r)) return true;
+      /* publisher with no @ handle and only qualitative reach — a source, not an influencer */
+      if (srcNames[n] && /^(low|medium|high|small|n\/a|\s*)$/i.test(r)) return false;
+      return true;
+    };
     const infSeen = {};
     (Array.isArray(raw.topInfluencers) ? raw.topInfluencers : []).forEach((f, i) => {
       const name = String(pick(f, ['name', 'label', 'title', 'handle'], '') || '').trim();
       if (!name) return;
+      const handle = pick(f, ['handle', 'cat', 'meta'], null);
+      const reach = pick(f, ['reach', 'score', 'value'], null);
+      if (!looksLikeInfluencer(name, handle, reach)) return;
       infSeen[name] = {
         name: name, ini: pick(f, ['ini', 'initials'], null), hue: num(pick(f, ['hue', 'h'], null)),
-        cat: pick(f, ['cat', 'desc', 'meta', 'category', 'handle'], null), score: pick(f, ['score', 'reach', 'value', 'rank'], null), order: i
+        cat: handle, score: reach, order: i
       };
     });
     out.influencers = Object.keys(infSeen).map((k) => infSeen[k]).sort((a, b) => {
@@ -1892,7 +1917,9 @@
       });
     });
 
-    /* ---- timeline (explicit signalVolume, else real timestamps) ---- */
+    /* ---- timeline (explicit signalVolume = HISTORICAL weekly trend index,
+       else real timestamps). This is trend strength over time, NOT a live
+       post count — it is labelled as such in the UI. ---- */
     if (Array.isArray(raw.signalVolume)) {
       const pts = [];
       raw.signalVolume.forEach((sv) => {
@@ -1912,8 +1939,66 @@
       out.timeline = deriveTimeline(out.articles);
     }
 
+    /* ---- live timeline (optional): a real current timestamped volume series.
+       Kept separate from the historical signalVolume — never conflated. ---- */
+    if (Array.isArray(raw.liveVolume) || Array.isArray(raw.liveTimeline)) {
+      const lv = Array.isArray(raw.liveVolume) ? raw.liveVolume : raw.liveTimeline;
+      const pts = [];
+      lv.forEach((sv) => {
+        if (sv && typeof sv === 'object') {
+          const v = num(sv.value != null ? sv.value : sv.count);
+          if (v == null) return;
+          const ts = parseRangeTime(sv.time != null ? sv.time : sv.label) || num(sv.ts);
+          pts.push({ bucket: ts != null ? ts : pts.length, count: Math.max(0, Math.round(v)) });
+        } else {
+          const v = num(sv);
+          if (v == null) return;
+          pts.push({ bucket: pts.length, count: Math.max(0, Math.round(v)) });
+        }
+      });
+      out.liveTimeline = pts.length >= 1 ? pts : null;
+    }
+
+    /* ---- structured data points (OPTIONAL): numeric facts extracted by the
+       backend from the analyzed sources. Never fabricated here — only shown
+       when the backend returns them. ---- */
+    (Array.isArray(raw.dataPoints) ? raw.dataPoints : []).forEach((dp) => {
+      if (!dp || typeof dp !== 'object') return;
+      const value = num(pick(dp, ['value', 'val', 'amount', 'magnitude'], null));
+      if (value == null) return;
+      const name = String(pick(dp, ['name', 'label', 'title'], '') || '').trim();
+      if (!name) return;
+      out.dataPoints.push({
+        category: pick(dp, ['category', 'cat', 'type', 'kind'], null) || 'general',
+        name: name,
+        value: value,
+        currency: pick(dp, ['currency', 'cur'], null) || null,
+        unit: pick(dp, ['unit', 'uom', 'measure'], null) || null,
+        source: pick(dp, ['source', 'sourceName', 'origin'], null) || null,
+        sourceUrl: pick(dp, ['sourceUrl', 'url', 'href'], null) || null,
+        timestamp: pick(dp, ['timestamp', 'ts', 'date', 'observedAt', 'time'], null) || null
+      });
+    });
+
     out.sources = deriveSources(out.articles);
-    out.categories = deriveCategories(out.articles);
+
+    /* ---- media mix: use structured counts when the backend classifies the
+       sources; otherwise derive categories from each record's real source
+       medium. Percentages always come from actual counts. ---- */
+    if (Array.isArray(raw.mediaMix) && raw.mediaMix.length) {
+      const mm = {};
+      raw.mediaMix.forEach((m) => {
+        if (!m || typeof m !== 'object') return;
+        const c = pick(m, ['category', 'label', 'name'], null);
+        const n = num(pick(m, ['count', 'value', 'n'], null));
+        if (c != null && n != null) mm[String(c)] = (mm[String(c)] || 0) + Math.max(0, n);
+      });
+      const tot = Object.keys(mm).reduce((a, k) => a + mm[k], 0);
+      out.mediaMix = Object.keys(mm).map((k) => ({ label: k, count: mm[k], pct: tot ? Math.round((mm[k] / tot) * 100) : 0 })).sort((a, b) => b.count - a.count);
+      out.categories = out.mediaMix;
+    } else {
+      out.categories = deriveCategories(out.articles);
+    }
     return out;
   }
 
@@ -2058,6 +2143,42 @@
 
     const topics = cleanNames(r.topics, (t) => t.label).slice(0, 3);
     if (topics.length) parts.push(F('ws.brief.topics').split('{t}').join(topics.join(', ')));
+
+    /* concrete numeric facts recovered from the analyzed sources (only when
+       the backend actually returned dataPoints — never invented) */
+    const dps = Array.isArray(r.dataPoints) ? r.dataPoints.slice(0, 6) : [];
+    if (dps.length) {
+      const dpTxt = dps.map((p) => {
+        const val = String(p.value).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        const unit = p.unit ? '/' + String(p.unit).trim() : '';
+        const cur = p.currency ? String(p.currency).trim() + ' ' : '';
+        const base = p.name + ' ' + cur + val + unit;
+        return (p.source && String(p.source).trim()) ? String(p.source).trim() + ' — ' + base : base;
+      }).join('; ');
+      parts.push(F('ws.brief.datapoints').split('{d}').join(dpTxt));
+    }
+
+    /* meaningful changes vs baseline — only when topics carry a vsBaseline
+       value other than stable/flat */
+    const baseL = (r.topics || []).filter((t) => {
+      const d = String(t.delta != null ? t.delta : (t.vsBaseline != null ? t.vsBaseline : '')).toLowerCase().trim();
+      return !!d && d !== 'stable' && d !== 'flat' && d !== 'same' && d !== 'no change';
+    }).slice(0, 3);
+    if (baseL.length) {
+      const BL = {
+        higher: F('ws.brief.bl.higher'), high: F('ws.brief.bl.higher'), up: F('ws.brief.bl.higher'),
+        elevated: F('ws.brief.bl.elevated'),
+        lower: F('ws.brief.bl.lower'), low: F('ws.brief.bl.lower'), down: F('ws.brief.bl.lower'),
+        moderate: F('ws.brief.bl.moderate')
+      };
+      const words = baseL.map((t) => {
+        const raw = String(t.delta != null ? t.delta : t.vsBaseline).toLowerCase().trim();
+        return BL[raw] || (t.delta != null ? t.delta : t.vsBaseline);
+      });
+      parts.push(F('ws.brief.baseline')
+        .split('{v}').join(words.join(', '))
+        .split('{t}').join(baseL.map((t) => t.label).join(', ')));
+    }
 
     const st = r.sentiment;
     if (st && st.label) {

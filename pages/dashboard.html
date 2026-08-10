@@ -234,34 +234,34 @@
           <!-- KPIs -->
           <div class="ws-card kpi-card">
             <div class="kpi-head">
-              <span class="kpi-label" data-i18n="ws.kpi1">TOTAL MENTIONS</span>
-              <span class="delta up">+2.4%</span>
+              <span class="kpi-label" data-i18n="ws.kpi1">TOTAL SIGNALS</span>
+              <span class="delta">—</span>
             </div>
-            <div class="kpi-value" id="kpiMentions">1.4M+</div>
+            <div class="kpi-value" id="kpiMentions">—</div>
             <svg class="spark" viewBox="0 0 120 36" data-spark="10,13,12,16,15,19,22,20,24,27,26,30" aria-hidden="true"></svg>
           </div>
           <div class="ws-card kpi-card">
             <div class="kpi-head">
               <span class="kpi-label" data-i18n="ws.kpi2">OVERALL SENTIMENT</span>
-              <span class="delta up">+1.8%</span>
+              <span class="delta">—</span>
             </div>
-            <div class="kpi-value" id="kpiCairoSent">68.4</div>
+            <div class="kpi-value" id="kpiCairoSent">—</div>
             <svg class="spark" viewBox="0 0 120 36" data-spark="14,13,15,14,17,16,18,17,19,20,21,22" aria-hidden="true"></svg>
           </div>
           <div class="ws-card kpi-card">
             <div class="kpi-head">
               <span class="kpi-label" data-i18n="ws.kpi3">ACTIVE CRISES</span>
-              <span class="delta down">-1</span>
+              <span class="delta">—</span>
             </div>
-            <div class="kpi-value" id="kpiCrises">3</div>
+            <div class="kpi-value" id="kpiCrises">—</div>
             <svg class="spark" viewBox="0 0 120 36" data-spark="18,19,17,18,16,17,15,14,12,11,9,8" aria-hidden="true"></svg>
           </div>
           <div class="ws-card kpi-card">
             <div class="kpi-head">
               <span class="kpi-label" data-i18n="ws.kpi4">INFLATION TALKS</span>
-              <span class="delta up">+4.2%</span>
+              <span class="delta">—</span>
             </div>
-            <div class="kpi-value" id="kpiInflation">68.4%</div>
+            <div class="kpi-value" id="kpiInflation">—</div>
             <svg class="spark" viewBox="0 0 120 36" data-spark="8,10,9,12,14,13,16,18,17,20,22,24" aria-hidden="true"></svg>
           </div>
 
@@ -451,19 +451,31 @@
             <div class="empty-state" id="dbEmptyTopics" hidden><p data-i18n="ws.nodata">No data available</p></div>
           </div>
 
-          <!-- Live trend timeline -->
+          <!-- Historical trend strength -->
           <div class="ws-card chart-card timeline-card">
             <div class="card-head">
               <div>
-                <h3 class="card-title" data-i18n="ws.timeline.t">Live trend timeline</h3>
-                <p class="card-sub" data-i18n="ws.timeline.s">EGYPT CONVERSATION VOLUME · 24H</p>
+                <h3 class="card-title" data-i18n="ws.timeline.t">Historical trend strength</h3>
+                <p class="card-sub" data-i18n="ws.timeline.s">WEEKLY TREND INDEX · SIGNAL VOLUME</p>
               </div>
             </div>
             <div class="chart-body">
               <canvas id="trendChart"></canvas>
               <div class="chart-tip" id="trendTip"></div>
-              <div class="empty-state" id="dbEmptyTrend" hidden><p data-i18n="ws.timeline.na">Not enough timestamped signals for a timeline</p></div>
+              <div class="empty-state" id="dbEmptyTrend" hidden><p data-i18n="ws.timeline.na">No timestamped historical trend data available for this query.</p></div>
             </div>
+          </div>
+
+          <!-- Key data -->
+          <div class="ws-card card keydata-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.keydata.t">Key data</h3>
+                <p class="card-sub" data-i18n="ws.keydata.s">STRUCTURED FACTS FROM ANALYZED SOURCES</p>
+              </div>
+            </div>
+            <div class="kd-list" id="dbKeyDataList"></div>
+            <div class="empty-state" id="dbEmptyKeyData" hidden><p data-i18n="ws.keydata.na">No structured data points available for this query.</p></div>
           </div>
 
           <!-- Sentiment donut -->
@@ -477,11 +489,12 @@
             <div class="donut-wrap">
               <div class="donut" id="sentimentDonut"></div>
               <div class="donut-legend">
-                <div class="legend-row"><span class="legend-dot" style="--c:#35D07F"></span> <span data-i18n="ws.donut.pos">Positive</span> <b>62%</b></div>
-                <div class="legend-row"><span class="legend-dot" style="--c:#7A8BB5"></span> <span data-i18n="ws.donut.neu">Neutral</span> <b>24%</b></div>
-                <div class="legend-row"><span class="legend-dot" style="--c:#F45D5D"></span> <span data-i18n="ws.donut.neg">Negative</span> <b>14%</b></div>
+                <div class="legend-row"><span class="legend-dot" style="--c:#35D07F"></span> <span data-i18n="ws.donut.pos">Positive</span> <b>—</b></div>
+                <div class="legend-row"><span class="legend-dot" style="--c:#7A8BB5"></span> <span data-i18n="ws.donut.neu">Neutral</span> <b>—</b></div>
+                <div class="legend-row"><span class="legend-dot" style="--c:#F45D5D"></span> <span data-i18n="ws.donut.neg">Negative</span> <b>—</b></div>
               </div>
               <div class="empty-state" id="dbEmptySentiment" hidden><p data-i18n="ws.sent.na">Sentiment data unavailable</p></div>
+              <div class="sparsity-note" id="dbSparsityNote" hidden><p></p></div>
             </div>
           </div>
 
