@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Create your NABD (نبض) account — Egypt's AI intelligence platform.">
-  <title>Sign Up — NABD (نبض)</title>
+  <meta name="description" content="Sign in to NABD (نبض) — Egypt's AI intelligence platform.">
+  <title>Sign In — NABD (نبض)</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%235EA2FF'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%23070B14'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +21,7 @@
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body class="page-enter auth-page">
 
@@ -38,7 +38,7 @@
   <header class="nav" id="nav">
     <div class="container">
       <div class="nav-inner">
-        <a class="brand" href="index.html" data-page="index.html" aria-label="NABD home">
+        <a class="brand" href="../index.html" data-page="../index.html" aria-label="NABD home">
           <span class="brand-orb"><span class="brand-orb-core"></span></span>
           <span class="brand-name" data-i18n="brand">NABD</span>
         </a>
@@ -54,72 +54,40 @@
   </header>
 
   <!-- ============================================================ -->
-  <!--  SIGN UP                                                      -->
+  <!--  SIGN IN                                                      -->
   <!-- ============================================================ -->
   <div class="auth-panel">
     <div class="auth-card glass">
-      <a class="auth-logo" href="index.html" data-page="index.html" aria-label="NABD home">
+      <a class="auth-logo" href="../index.html" data-page="../index.html" aria-label="NABD home">
         <span class="brand-orb"><span class="brand-orb-core"></span></span>
         <span class="brand-name" data-i18n="brand">NABD</span>
       </a>
-      <h1 class="auth-title" data-i18n="auth.signup.title">Create your account</h1>
-      <p class="auth-sub" data-i18n="auth.signup.sub">Start watching Egypt's pulse in minutes.</p>
+      <h1 class="auth-title" data-i18n="auth.signin.title">Welcome back</h1>
+      <p class="auth-sub" data-i18n="auth.signin.sub">Sign in to your NABD workspace.</p>
 
-      <form id="signupForm" novalidate>
-        <div class="field-row" style="margin:0 0 18px;">
-          <div class="field" style="flex:1;margin:0;">
-            <label for="suFirst" data-i18n="auth.first">First name</label>
-            <input type="text" id="suFirst" name="first" autocomplete="given-name" spellcheck="false">
-          </div>
-          <div class="field" style="flex:1;margin:0;">
-            <label for="suLast" data-i18n="auth.last">Last name</label>
-            <input type="text" id="suLast" name="last" autocomplete="family-name" spellcheck="false">
-          </div>
+      <form id="signinForm" novalidate>
+        <div class="field">
+          <label for="siEmail" data-i18n="auth.email">Email address</label>
+          <input type="email" id="siEmail" name="email" autocomplete="email" spellcheck="false">
         </div>
         <div class="field">
-          <label for="suOrg" data-i18n="auth.org">Organization</label>
-          <input type="text" id="suOrg" name="organization" autocomplete="organization" spellcheck="false">
-        </div>
-        <div class="field">
-          <label for="suEmail" data-i18n="auth.email">Email address</label>
-          <input type="email" id="suEmail" name="email" autocomplete="email" spellcheck="false">
-        </div>
-        <div class="field">
-          <label for="suPwd" data-i18n="auth.pass">Password</label>
+          <label for="siPwd" data-i18n="auth.pass">Password</label>
           <div class="pwd-wrap">
-            <input type="password" id="suPwd" name="password" autocomplete="new-password">
-            <button type="button" class="pwd-toggle" data-pwd-toggle="suPwd" aria-label="Show password">
+            <input type="password" id="siPwd" name="password" autocomplete="current-password">
+            <button type="button" class="pwd-toggle" data-pwd-toggle="siPwd" aria-label="Show password">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
         </div>
-        <div class="field">
-          <label for="suPwd2" data-i18n="auth.confirm">Confirm password</label>
-          <div class="pwd-wrap">
-            <input type="password" id="suPwd2" name="password2" autocomplete="new-password">
-            <button type="button" class="pwd-toggle" data-pwd-toggle="suPwd2" aria-label="Show password">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="field-row" style="margin:0 0 18px;">
-          <div class="field" style="flex:1;margin:0;">
-            <label for="suCountry" data-i18n="auth.country">Country</label>
-            <select id="suCountry" name="country"></select>
-          </div>
-          <div class="field" style="flex:1;margin:0;">
-            <label for="suLang" data-i18n="auth.lang">Language</label>
-            <select id="suLang" name="lang"></select>
-          </div>
-        </div>
-        <div class="field auth-terms">
+        <div class="field-row">
           <label class="check">
-            <input type="checkbox" id="suTerms">
-            <span data-i18n="auth.terms">I agree to the Terms & Privacy Policy</span>
+            <input type="checkbox" id="siRemember">
+            <span data-i18n="auth.remember">Remember me</span>
           </label>
+          <a class="link-soft" href="#top" data-i18n="auth.forgot">Forgot password?</a>
         </div>
         <p class="auth-error" id="authError"></p>
-        <button type="submit" class="btn btn-primary auth-submit" id="signupSubmit" data-i18n="auth.signup.submit">Create account</button>
+        <button type="submit" class="btn btn-primary auth-submit" id="signinSubmit" data-i18n="auth.submit">Sign In</button>
       </form>
 
       <p class="auth-alt" data-i18n="auth.alt">or continue with</p>
@@ -134,8 +102,8 @@
         </button>
       </div>
 
-      <p class="auth-switch" data-i18n-html="auth.signin.switch">Already have an account? <a class="link-soft" href="signin.html" data-page="signin.html">Sign in</a></p>
-      <p class="auth-switch"><a class="link-soft" href="index.html" data-page="index.html" data-i18n="auth.back">Back to home</a></p>
+      <p class="auth-switch" data-i18n-html="auth.signup.switch">Don't have an account? <a class="link-soft" href="signup.html" data-page="signup.html">Sign up</a></p>
+      <p class="auth-switch"><a class="link-soft" href="../index.html" data-page="../index.html" data-i18n="auth.back">Back to home</a></p>
     </div>
   </div>
 
@@ -153,8 +121,8 @@
       <div class="art-bars"><span class="art-bar"></span><span class="art-bar"></span><span class="art-bar"></span><span class="art-bar"></span><span class="art-bar"></span><span class="art-bar"></span><span class="art-bar"></span></div>
     </div>
     <div class="art-caption">
-      <h3 data-i18n="auth.art2.t">Your intelligence command center</h3>
-      <p data-i18n="auth.art2.b">Trends, sentiment, crises and live feeds across every Egyptian governorate — in one live workspace.</p>
+      <h3 data-i18n="auth.art1.t">Your intelligence command center</h3>
+      <p data-i18n="auth.art1.b">Trends, sentiment, crises and live feeds across every Egyptian governorate — in one live workspace.</p>
     </div>
     <div class="art-skyline">
       <svg class="sk-svg" viewBox="0 0 400 230">
@@ -216,7 +184,7 @@
 
   <div class="toast" id="authToast" role="status"></div>
 
-  <script src="script.js"></script>
-  <script src="auth.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="../js/auth.js"></script>
 </body>
 </html>

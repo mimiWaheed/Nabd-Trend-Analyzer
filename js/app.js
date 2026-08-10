@@ -194,7 +194,7 @@
         } else if (it.dataset.menu === 'signout') {
           N.clearUser();
           T('app.toast.signedout');
-          setTimeout(() => N.navigate('index.html'), 700);
+          setTimeout(() => N.navigate('../index.html'), 700);
         }
         menu.classList.remove('open');
       });
@@ -1272,7 +1272,7 @@
       if (window.confirm(L('set.danger.sub'))) {
         N.clearUser();
         try { localStorage.removeItem('nabd-set'); } catch (e) {}
-        N.navigate('index.html');
+        N.navigate('../index.html');
       }
     });
   }

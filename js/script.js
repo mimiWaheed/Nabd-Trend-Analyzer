@@ -1001,9 +1001,12 @@
   /* ----------------------------------------------------------
      PAGE TRANSITIONS (multi-page routing)
      ---------------------------------------------------------- */
+  /* app pages live in pages/ — resolve relative to the current page's directory */
+  const PAGE_DIR = location.pathname.split('/').pop() === 'index.html' ? 'pages/' : '';
+
   function navigate(url) {
     const cur = location.pathname.split('/').pop();
-    const target = url.split(/[?#]/)[0];
+    const target = url.split(/[?#]/)[0].split('/').pop();
     if (target === cur) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
@@ -1346,7 +1349,7 @@
         searchInput.value = q;
         placeholder.style.opacity = '0';
       }
-      navigate('dashboard.html?view=analysis&q=' + encodeURIComponent(q));
+      navigate(PAGE_DIR + 'dashboard.html?view=analysis&q=' + encodeURIComponent(q));
     });
   });
 
@@ -1357,7 +1360,7 @@
 
   function submitSearch() {
     const q = (searchInput.value || '').trim() || QUERIES[lang][0];
-    navigate('dashboard.html?view=analysis&q=' + encodeURIComponent(q));
+    navigate(PAGE_DIR + 'dashboard.html?view=analysis&q=' + encodeURIComponent(q));
   }
 
   /* ----------------------------------------------------------
