@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NABD (نبض) - connections: fuse Facebook, RSS, Google News, Google Trends, NewsAPI, SerpAPI and Groq into one intelligence layer.">
+  <title>Connections - NABD (نبض)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%235EA2FF'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%23070B14'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('nabd-theme') || 'dark';
+        if (t === 'system') t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+        var l = localStorage.getItem('nabd-lang') || 'en';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('lang', l);
+        document.documentElement.setAttribute('dir', l === 'ar' ? 'rtl' : 'ltr');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="app-page" data-page="connections">
+
+  <div id="appShell"></div>
+
+  <main class="app-main">
+    <div class="app-head">
+      <div>
+        <h1 data-i18n="app.title.connections">Connections</h1>
+        <p data-i18n="app.sub.connections">Fuse your sources into one intelligence layer.</p>
+      </div>
+    </div>
+
+    <div class="conn-grid">
+      <div class="conn-card" data-conn="fb">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:#1877F2">f</span>
+          <div><div class="conn-name">Facebook</div><div class="conn-desc" data-i18n="conn.fb.d">Page audience analysis</div></div>
+        </div>
+        <span class="status-chip conn-chip ok"><span class="d"></span><span data-i18n="conn.status.ok">Connected</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">2m ago</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>98%</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:98%"></div></div>
+        </div>
+        <div class="conn-tools">
+          <button class="btn btn-ghost btn-sm" data-ca="dis" data-i18n="conn.disconnect">Disconnect</button>
+          <button class="btn btn-ghost btn-sm" data-ca="rec" data-i18n="conn.reconnect">Reconnect</button>
+        </div>
+      </div>
+
+      <div class="conn-card" data-conn="rss">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:linear-gradient(135deg,#FF9A5C,#FF5C7A)">RSS</span>
+          <div><div class="conn-name">RSS Sources</div><div class="conn-desc" data-i18n="conn.rss.d">Custom RSS feeds</div></div>
+        </div>
+        <span class="status-chip conn-chip ok"><span class="d"></span><span data-i18n="conn.status.ok">Connected</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">5m ago</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>100%</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+        </div>
+        <div class="conn-tools">
+          <button class="btn btn-ghost btn-sm" data-ca="dis" data-i18n="conn.disconnect">Disconnect</button>
+          <button class="btn btn-ghost btn-sm" data-ca="rec" data-i18n="conn.reconnect">Reconnect</button>
+        </div>
+      </div>
+
+      <div class="conn-card" data-conn="gnews">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:#4285F4">G</span>
+          <div><div class="conn-name">Google News</div><div class="conn-desc" data-i18n="conn.gn.d">Global headlines</div></div>
+        </div>
+        <span class="status-chip conn-chip neu"><span class="d"></span><span data-i18n="conn.status.off">Disconnected</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">—</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>—</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:0"></div></div>
+        </div>
+        <div class="conn-tools">
+          <button class="btn btn-primary btn-sm" data-ca="con" data-i18n="conn.connect">Connect</button>
+        </div>
+      </div>
+
+      <div class="conn-card" data-conn="gtrends">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:#EA4335">G</span>
+          <div><div class="conn-name">Google Trends</div><div class="conn-desc" data-i18n="conn.gt.d">Search interest curves</div></div>
+        </div>
+        <span class="status-chip conn-chip neu"><span class="d"></span><span data-i18n="conn.status.off">Disconnected</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">—</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>—</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:0"></div></div>
+        </div>
+        <div class="conn-tools">
+          <button class="btn btn-primary btn-sm" data-ca="con" data-i18n="conn.connect">Connect</button>
+        </div>
+      </div>
+
+      <div class="conn-card" data-conn="newsapi">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:linear-gradient(135deg,#5CFFB1,#5EA2FF)">N</span>
+          <div><div class="conn-name">NewsAPI</div><div class="conn-desc" data-i18n="conn.na.d">News API aggregation</div></div>
+        </div>
+        <span class="status-chip conn-chip neu"><span class="d"></span><span data-i18n="conn.status.off">Disconnected</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">—</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>—</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:0"></div></div>
+        </div>
+        <div class="conn-tools">
+          <button class="btn btn-primary btn-sm" data-ca="con" data-i18n="conn.connect">Connect</button>
+        </div>
+      </div>
+
+      <div class="conn-card" data-conn="ig">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:linear-gradient(135deg,#FFC75C,#FF5C7A)">IG</span>
+          <div><div class="conn-name">Instagram</div><div class="conn-desc" data-i18n="conn.ig.d">Instagram insights</div></div>
+        </div>
+        <span class="status-chip conn-chip neu"><span class="d"></span><span data-i18n="conn.status.soon">Coming soon</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">—</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>—</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:0"></div></div>
+        </div>
+        <div class="conn-tools"><span class="status-chip neu"><span class="d"></span><span data-i18n="app.soon">Coming soon</span></span></div>
+      </div>
+
+      <div class="conn-card" data-conn="sp">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:#34A853">S</span>
+          <div><div class="conn-name">SerpAPI</div><div class="conn-desc" data-i18n="conn.sp.d">Search engine results</div></div>
+        </div>
+        <span class="status-chip conn-chip neu"><span class="d"></span><span data-i18n="conn.status.soon">Coming soon</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">—</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>—</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:0"></div></div>
+        </div>
+        <div class="conn-tools"><span class="status-chip neu"><span class="d"></span><span data-i18n="app.soon">Coming soon</span></span></div>
+      </div>
+
+      <div class="conn-card" data-conn="gq">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:linear-gradient(135deg,#7A5CFF,#5EA2FF)">GQ</span>
+          <div><div class="conn-name">Groq</div><div class="conn-desc" data-i18n="conn.gq.d">Ultra-fast inference for AI</div></div>
+        </div>
+        <span class="status-chip conn-chip neu"><span class="d"></span><span data-i18n="conn.status.soon">Coming soon</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">—</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>—</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:0"></div></div>
+        </div>
+        <div class="conn-tools"><span class="status-chip neu"><span class="d"></span><span data-i18n="app.soon">Coming soon</span></span></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

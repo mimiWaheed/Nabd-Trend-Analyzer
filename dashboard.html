@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NABD (نبض) - user dashboard: live Egyptian intelligence, analysis launcher, trends, sentiment and AI briefs.">
+  <title>Dashboard - NABD (نبض)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%235EA2FF'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%23070B14'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('nabd-theme') || 'dark';
+        if (t === 'system') t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+        var l = localStorage.getItem('nabd-lang') || 'en';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('lang', l);
+        document.documentElement.setAttribute('dir', l === 'ar' ? 'rtl' : 'ltr');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="app-page" data-page="dashboard">
+
+  <div id="appShell"></div>
+
+  <main class="app-main">
+    <div class="app-head" id="dbAppHead">
+      <div>
+        <h1 data-i18n="app.title.dashboard">Dashboard</h1>
+        <p data-i18n="app.sub.dashboard">Your intelligence hub — briefing, trends and everything you pinned in one place.</p>
+      </div>
+    </div>
+
+    <div class="qa-grid" style="margin-bottom:22px" id="dbQuick">
+      <div class="qa-card" data-qa="new">
+        <span class="qa-ic"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
+        <span class="qa-label" data-i18n="dash.qa.new">New analysis</span>
+      </div>
+      <div class="qa-card" data-qa="saved">
+        <span class="qa-ic"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></svg></span>
+        <span class="qa-label" data-i18n="dash.qa.saved">Run saved search</span>
+      </div>
+      <div class="qa-card" data-qa="export">
+        <span class="qa-ic"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg></span>
+        <span class="qa-label" data-i18n="dash.qa.export">Export report</span>
+      </div>
+      <div class="qa-card" data-qa="alert">
+        <span class="qa-ic"><svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6M10 19a2 2 0 0 0 4 0"/></svg></span>
+        <span class="qa-label" data-i18n="dash.qa.alert">Create alert</span>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         EMBEDDED ANALYSIS WORKSPACE (single in-app experience)
+         ============================================================ -->
+    <div class="db-dock" id="dbDock">
+
+      <!-- Facebook connection — compact, directly above the query box -->
+      <div class="db-fbrow" id="dbFbRow">
+        <button type="button" class="btn btn-ghost btn-sm" id="dbFbBtn" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          <span data-i18n="db.fb.off">Connect Facebook</span>
+        </button>
+        <span class="status-chip ok" id="dbFbChip" hidden>
+          <span class="d"></span>
+          <span class="fb-n"><span data-i18n="db.fb.on">Facebook connected</span><span class="fb-acct mono" id="dbFbAcct"></span></span>
+        </span>
+        <button type="button" class="btn btn-ghost btn-sm" id="dbFbDis" hidden data-i18n="db.fb.disconnect">Disconnect</button>
+      </div>
+
+      <!-- Analysis query box -->
+      <div class="db-query">
+        <div class="search-box" id="dbSearchBox">
+          <span class="search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+          </span>
+          <div class="search-input-wrap">
+            <textarea id="dbSearchInput" rows="1" autocomplete="off" spellcheck="false" data-i18n-ph="search.ph" placeholder="Ask NABD about Egypt…" aria-label="Ask NABD about Egypt"></textarea>
+          </div>
+          <button class="btn-search" id="dbSearchBtn" type="button">
+            <span class="btn-search-label" data-i18n="search.btn">Analyze</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- STATE A — restrained intelligence preview -->
+      <div class="db-preview" id="dbPreview">
+        <div class="db-preview-head">
+          <span class="card-title" data-i18n="db.preview.t">Live signals — what NABD tracks right now</span>
+          <span class="card-sub mono" data-i18n="ws.meta3">confidence 94%</span>
+        </div>
+        <div class="ws-grid db-preview-grid">
+          <div class="ws-card kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label" data-i18n="ws.kpi1">EGYPT MENTIONS</span>
+              <span class="delta up">+2.4%</span>
+            </div>
+            <div class="kpi-value">1.4M+</div>
+            <svg class="spark" viewBox="0 0 120 36" data-spark="10,13,12,16,15,19,22,20,24,27,26,30" aria-hidden="true"></svg>
+          </div>
+          <div class="ws-card kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label" data-i18n="ws.kpi2">CAIRO SENTIMENT</span>
+              <span class="delta up">+1.8%</span>
+            </div>
+            <div class="kpi-value">68.4</div>
+            <svg class="spark" viewBox="0 0 120 36" data-spark="14,13,15,14,17,16,18,17,19,20,21,22" aria-hidden="true"></svg>
+          </div>
+          <div class="ws-card kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label" data-i18n="ws.kpi3">ACTIVE SIGNALS</span>
+              <span class="delta down">-1</span>
+            </div>
+            <div class="kpi-value">3</div>
+            <svg class="spark" viewBox="0 0 120 36" data-spark="18,19,17,18,16,17,15,14,12,11,9,8" aria-hidden="true"></svg>
+          </div>
+          <div class="ws-card kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label" data-i18n="ws.kpi4">TREND MOVEMENT</span>
+              <span class="delta up">+4.2%</span>
+            </div>
+            <div class="kpi-value">68.4%</div>
+            <svg class="spark" viewBox="0 0 120 36" data-spark="8,10,9,12,14,13,16,18,17,20,22,24" aria-hidden="true"></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATE B — analyzing -->
+      <div class="db-loading" id="dbLoading" hidden aria-busy="true">
+        <div class="db-glow" aria-hidden="true"><i></i><i></i></div>
+        <div class="db-load-query" id="dbLoadQuery" aria-live="polite"></div>
+        <div class="db-load-center">
+          <div class="db-load-orb"><span>◉</span></div>
+          <div class="db-scan mono" id="dbScanText" data-i18n="db.loading.1" aria-live="polite">Scanning news sources…</div>
+          <div class="db-scan-steps" id="dbScanSteps">
+            <span class="step" data-i18n="db.loading.1">Scanning news sources</span>
+            <span class="step" data-i18n="db.loading.2">Cross-referencing social signals</span>
+            <span class="step" data-i18n="db.loading.3">Detecting emerging topics</span>
+            <span class="step" data-i18n="db.loading.4">Measuring sentiment</span>
+            <span class="step" data-i18n="db.loading.5">Mapping geographic signals</span>
+            <span class="step" data-i18n="db.loading.6">Building intelligence brief</span>
+          </div>
+          <div class="db-progress" aria-hidden="true">
+            <i id="dbProgressFill"></i>
+            <span class="mono" id="dbProgressPct">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATE E — analysis interrupted -->
+      <div class="db-error" id="dbError" hidden role="alert">
+        <div class="db-error-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.2 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.2a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        </div>
+        <div class="db-error-t" data-i18n="db.error.t">Something interrupted the analysis.</div>
+        <p class="db-error-s" data-i18n="db.error.s">Your signals are still safe — try running the analysis again.</p>
+        <button class="btn btn-primary btn-sm" id="dbRetryBtn" data-i18n="db.error.retry">Try again</button>
+      </div>
+
+      <!-- STATE C — full analysis results (canonical workspace view) -->
+      <div class="db-results" id="dbResults" hidden>
+
+        <div class="ws-header">
+          <div class="ws-queryline">
+            <div class="ws-query">
+              <span class="ws-query-label mono" data-i18n="ws.querylabel">TRACKING</span>
+              <span class="ws-query-text" id="dbQuery">Egypt</span>
+            </div>
+            <span class="status-chip warn" id="dbPrivateBadge" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+              <span data-i18n="ws.private.badge"></span>
+            </span>
+            <div class="seg db-seg" id="dbPrivSeg" role="group" aria-label="Analysis visibility">
+              <button type="button" class="seg-btn" data-priv="public" data-i18n="db.priv.pub">Public</button>
+              <button type="button" class="seg-btn" data-priv="private" data-i18n="db.priv.priv">Private</button>
+            </div>
+            <div class="ws-actions">
+              <button class="btn btn-ghost btn-sm" id="dbResetBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+                <span data-i18n="ws.new">New analysis</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-bar" id="dbFilterBar">
+          <span class="filter-label mono" data-i18n="filters.label">FILTER</span>
+          <button class="filter-chip active" data-filter="all" data-i18n="filters.all">All</button>
+          <button class="filter-chip" data-filter="news" data-i18n="filters.news">News</button>
+          <button class="filter-chip" data-filter="social" data-i18n="filters.social">Social</button>
+          <button class="filter-chip" data-filter="gov" data-i18n="filters.gov">Government</button>
+          <button class="filter-chip" data-filter="sport" data-i18n="filters.sport">Sports</button>
+          <button class="filter-chip" data-filter="business" data-i18n="filters.business">Business</button>
+        </div>
+
+        <div class="ws-grid">
+
+          <!-- AI summary -->
+          <div class="ws-card summary-card">
+            <div class="summary-orb" aria-hidden="true">
+              <span></span><span></span><span></span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12a10 10 0 0 1 10-10"/><path d="M2 12a10 10 0 0 0 10 10"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 2a10 10 0 0 0 0 20"/></svg>
+            </div>
+            <div class="summary-body">
+              <div class="summary-head">
+                <h2 class="card-title" id="dbBriefTitle">Egypt — live brief</h2>
+                <div class="summary-meta mono">
+                  <span class="live-badge"><span class="live-dot"></span> <span data-i18n="ws.brief">AI BRIEF</span></span>
+                  <span id="dbMeta1" data-i18n="ws.meta1">14 sources</span>
+                  <span id="dbMeta2" data-i18n="ws.meta2">updated 2m ago</span>
+                  <span id="dbMeta3" data-i18n="ws.meta3">confidence 94%</span>
+                </div>
+              </div>
+              <div class="summary-text" id="dbSummaryText">
+                <p data-i18n-html="ws.sum1">Egypt's conversation is moving on three fronts today. <strong>Economy</strong> dominates: Egyptian Pound discussions are up sharply, inflation expectations are the top topic in Cairo, and Suez Canal traffic numbers are drawing international attention.</p>
+                <p data-i18n-html="ws.sum2">In <strong>politics and society</strong>, the New Administrative Capital is trending with strong positive sentiment, while education reform debates are active across the Delta and Upper Egypt. Misinformation risk is elevated around currency rumors — two clusters flagged for review.</p>
+                <p data-i18n-html="ws.sum3"><strong>Recommended watchlist:</strong> inflation data release, Suez Canal announcements, and the El Clasico build-up across Alexandria and Cairo.</p>
+              </div>
+              <div class="empty-state" id="dbEmptySummary" hidden><p data-i18n="ws.sum.na">No AI brief returned for this query — signals are still displayed below.</p></div>
+              <div class="summary-chips" id="dbChips">
+                <span class="chip"><span class="chip-pulse" aria-hidden="true"></span> <span data-i18n="ws.briefchip1">Economy</span></span>
+                <span class="chip" data-i18n="ws.briefchip2">Politics</span>
+                <span class="chip" data-i18n="ws.briefchip3">Sports</span>
+                <span class="chip" data-i18n="ws.briefchip4">Cairo</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPIs -->
+          <div class="ws-card kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label" data-i18n="ws.kpi1">EGYPT MENTIONS</span>
+              <span class="delta up">+2.4%</span>
+            </div>
+            <div class="kpi-value" id="kpiMentions">1.4M+</div>
+            <svg class="spark" viewBox="0 0 120 36" data-spark="10,13,12,16,15,19,22,20,24,27,26,30" aria-hidden="true"></svg>
+          </div>
+          <div class="ws-card kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label" data-i18n="ws.kpi2">CAIRO SENTIMENT</span>
+              <span class="delta up">+1.8%</span>
+            </div>
+            <div class="kpi-value" id="kpiCairoSent">68.4</div>
+            <svg class="spark" viewBox="0 0 120 36" data-spark="14,13,15,14,17,16,18,17,19,20,21,22" aria-hidden="true"></svg>
+          </div>
+          <div class="ws-card kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label" data-i18n="ws.kpi3">ACTIVE CRISES</span>
+              <span class="delta down">-1</span>
+            </div>
+            <div class="kpi-value" id="kpiCrises">3</div>
+            <svg class="spark" viewBox="0 0 120 36" data-spark="18,19,17,18,16,17,15,14,12,11,9,8" aria-hidden="true"></svg>
+          </div>
+          <div class="ws-card kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label" data-i18n="ws.kpi4">INFLATION TALKS</span>
+              <span class="delta up">+4.2%</span>
+            </div>
+            <div class="kpi-value" id="kpiInflation">68.4%</div>
+            <svg class="spark" viewBox="0 0 120 36" data-spark="8,10,9,12,14,13,16,18,17,20,22,24" aria-hidden="true"></svg>
+          </div>
+
+          <!-- Governorate intelligence -->
+          <div class="ws-card card gov-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.gov.t">Governorate intelligence</h3>
+                <p class="card-sub" data-i18n="ws.gov.s">TREND INTENSITY BY REGION</p>
+              </div>
+            </div>
+            <div class="region-grid" id="regionGrid">
+              <div class="region-card">
+                <div class="region-top">
+                  <span class="region-name" data-i18n="ws.loc.cairo">Cairo</span>
+                  <span class="region-score">94</span>
+                </div>
+                <div class="region-bar"><i style="--w:94%"></i></div>
+                <div class="region-meta mono"><span class="up">+43%</span><span>24h · 1.2M</span></div>
+              </div>
+              <div class="region-card">
+                <div class="region-top">
+                  <span class="region-name" data-i18n="ws.loc.ale">Alexandria</span>
+                  <span class="region-score">87</span>
+                </div>
+                <div class="region-bar"><i style="--w:87%"></i></div>
+                <div class="region-meta mono"><span class="up">+31%</span><span>24h · 640K</span></div>
+              </div>
+              <div class="region-card">
+                <div class="region-top">
+                  <span class="region-name" data-i18n="ws.loc.giza">Giza</span>
+                  <span class="region-score">83</span>
+                </div>
+                <div class="region-bar"><i style="--w:83%"></i></div>
+                <div class="region-meta mono"><span class="up">+27%</span><span>24h · 580K</span></div>
+              </div>
+              <div class="region-card">
+                <div class="region-top">
+                  <span class="region-name" data-i18n="ws.loc.capital">New Capital</span>
+                  <span class="region-score">79</span>
+                </div>
+                <div class="region-bar"><i style="--w:79%"></i></div>
+                <div class="region-meta mono"><span class="up">+52%</span><span>24h · 410K</span></div>
+              </div>
+              <div class="region-card">
+                <div class="region-top">
+                  <span class="region-name" data-i18n="ws.loc.suez">Suez Canal</span>
+                  <span class="region-score">74</span>
+                </div>
+                <div class="region-bar"><i style="--w:74%"></i></div>
+                <div class="region-meta mono"><span class="up">+38%</span><span>24h · 390K</span></div>
+              </div>
+              <div class="region-card">
+                <div class="region-top">
+                  <span class="region-name" data-i18n="ws.loc.upper">Upper Egypt</span>
+                  <span class="region-score">66</span>
+                </div>
+                <div class="region-bar"><i style="--w:66%"></i></div>
+                <div class="region-meta mono"><span class="down">-6%</span><span>24h · 240K</span></div>
+              </div>
+            </div>
+            <div class="empty-state" id="dbNational" hidden><p data-i18n="ws.national.t">National coverage</p><p class="mono" data-i18n="ws.national.s">Egypt-wide signal</p></div>
+            <div class="empty-state" id="dbEmptyLocations" hidden><p data-i18n="ws.loc.na">Not enough location data for this query.</p></div>
+          </div>
+
+          <!-- Global context -->
+          <div class="ws-card card global-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.global.t">Global context</h3>
+                <p class="card-sub" data-i18n="ws.global.s">WORLD SIGNALS · EGYPT WATCH</p>
+              </div>
+            </div>
+            <div class="trend-list" id="dbGlobalList">
+              <div class="trend-item">
+                <span class="trend-rank">01</span>
+                <span class="trend-name" data-i18n="ws.global.r1">Global recession watch</span>
+                <span class="trend-bar"><i class="sev-warn" style="--w:82%"></i></span>
+                <span class="trend-vol mono">812K</span>
+                <span class="trend-delta down">-19%</span>
+              </div>
+              <div class="trend-item">
+                <span class="trend-rank">02</span>
+                <span class="trend-name" data-i18n="ws.global.r2">Gaza ceasefire talks</span>
+                <span class="trend-bar"><i class="sev-danger" style="--w:94%"></i></span>
+                <span class="trend-vol mono">2.1M</span>
+                <span class="trend-delta up">+32%</span>
+              </div>
+              <div class="trend-item">
+                <span class="trend-rank">03</span>
+                <span class="trend-name" data-i18n="ws.global.r3">Energy markets</span>
+                <span class="trend-bar"><i class="sev-blue" style="--w:76%"></i></span>
+                <span class="trend-vol mono">640K</span>
+                <span class="trend-delta up">+11%</span>
+              </div>
+              <div class="trend-item">
+                <span class="trend-rank">04</span>
+                <span class="trend-name" data-i18n="ws.global.r4">Gulf investment flows</span>
+                <span class="trend-bar"><i class="sev-pos" style="--w:61%"></i></span>
+                <span class="trend-vol mono">430K</span>
+                <span class="trend-delta up">+18%</span>
+              </div>
+              <div class="trend-item">
+                <span class="trend-rank">05</span>
+                <span class="trend-name" data-i18n="ws.global.r5">Global tourism recovery</span>
+                <span class="trend-bar"><i class="sev-pos" style="--w:55%"></i></span>
+                <span class="trend-vol mono">520K</span>
+                <span class="trend-delta up">+7%</span>
+              </div>
+              <div class="trend-item">
+                <span class="trend-rank">06</span>
+                <span class="trend-name" data-i18n="ws.global.r6">BRICS coordination</span>
+                <span class="trend-bar"><i class="sev-purple" style="--w:48%"></i></span>
+                <span class="trend-vol mono">310K</span>
+                <span class="trend-delta up">+5%</span>
+              </div>
+            </div>
+            <div class="empty-state" id="dbEmptyGlobal" hidden><p data-i18n="ws.global.na">No global context available for this query.</p></div>
+          </div>
+
+          <!-- Trending topics -->
+          <div class="ws-card card topics-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.topics.t">Trending topics</h3>
+                <p class="card-sub" data-i18n="ws.topics.s">BY SEVERITY · EGYPT</p>
+              </div>
+            </div>
+            <div class="trend-list" id="dbTrendList">
+              <div class="trend-item" data-cat="business">
+                <span class="trend-rank">01</span>
+                <span class="trend-name" data-i18n="ws.topics.t1">Egyptian Pound</span>
+                <span class="trend-bar"><i class="sev-warn" style="--w:96%"></i></span>
+                <span class="trend-vol mono">1.2M</span>
+                <span class="trend-delta up">+38%</span>
+              </div>
+              <div class="trend-item" data-cat="business">
+                <span class="trend-rank">02</span>
+                <span class="trend-name" data-i18n="ws.topics.t4">Inflation</span>
+                <span class="trend-bar"><i class="sev-danger" style="--w:92%"></i></span>
+                <span class="trend-vol mono">980K</span>
+                <span class="trend-delta up">+17%</span>
+              </div>
+              <div class="trend-item" data-cat="news">
+                <span class="trend-rank">03</span>
+                <span class="trend-name" data-i18n="ws.topics.t2">Suez Canal</span>
+                <span class="trend-bar"><i class="sev-blue" style="--w:88%"></i></span>
+                <span class="trend-vol mono">760K</span>
+                <span class="trend-delta up">+12%</span>
+              </div>
+              <div class="trend-item" data-cat="news">
+                <span class="trend-rank">04</span>
+                <span class="trend-name" data-i18n="ws.topics.t3">New Capital</span>
+                <span class="trend-bar"><i class="sev-pos" style="--w:74%"></i></span>
+                <span class="trend-vol mono">540K</span>
+                <span class="trend-delta up">+21%</span>
+              </div>
+              <div class="trend-item" data-cat="gov">
+                <span class="trend-rank">05</span>
+                <span class="trend-name" data-i18n="ws.topics.t8">Election law debate</span>
+                <span class="trend-bar"><i class="sev-purple" style="--w:71%"></i></span>
+                <span class="trend-vol mono">390K</span>
+                <span class="trend-delta up">+9%</span>
+              </div>
+              <div class="trend-item" data-cat="sport">
+                <span class="trend-rank">06</span>
+                <span class="trend-name" data-i18n="ws.topics.t5">El Clasico</span>
+                <span class="trend-bar"><i class="sev-purple" style="--w:68%"></i></span>
+                <span class="trend-vol mono">610K</span>
+                <span class="trend-delta up">+54%</span>
+              </div>
+              <div class="trend-item" data-cat="business">
+                <span class="trend-rank">07</span>
+                <span class="trend-name" data-i18n="ws.topics.t6">Tourism</span>
+                <span class="trend-bar"><i class="sev-pos" style="--w:63%"></i></span>
+                <span class="trend-vol mono">460K</span>
+                <span class="trend-delta up">+6%</span>
+              </div>
+              <div class="trend-item" data-cat="social">
+                <span class="trend-rank">08</span>
+                <span class="trend-name" data-i18n="ws.topics.t7">Education</span>
+                <span class="trend-bar"><i class="sev-warn" style="--w:58%"></i></span>
+                <span class="trend-vol mono">420K</span>
+                <span class="trend-delta down">-4%</span>
+              </div>
+            </div>
+            <div class="empty-state" id="dbEmptyTopics" hidden><p data-i18n="ws.nodata">No data available</p></div>
+          </div>
+
+          <!-- Live trend timeline -->
+          <div class="ws-card chart-card timeline-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.timeline.t">Live trend timeline</h3>
+                <p class="card-sub" data-i18n="ws.timeline.s">EGYPT CONVERSATION VOLUME · 24H</p>
+              </div>
+            </div>
+            <div class="chart-body">
+              <canvas id="trendChart"></canvas>
+              <div class="chart-tip" id="trendTip"></div>
+              <div class="empty-state" id="dbEmptyTrend" hidden><p data-i18n="ws.timeline.na">Not enough timestamped signals for a timeline</p></div>
+            </div>
+          </div>
+
+          <!-- Sentiment donut -->
+          <div class="ws-card card donut-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.donut.t">Sentiment split</h3>
+                <p class="card-sub" data-i18n="ws.donut.s">EGYPT · LAST 24 HOURS</p>
+              </div>
+            </div>
+            <div class="donut-wrap">
+              <div class="donut" id="sentimentDonut"></div>
+              <div class="donut-legend">
+                <div class="legend-row"><span class="legend-dot" style="--c:#35D07F"></span> <span data-i18n="ws.donut.pos">Positive</span> <b>62%</b></div>
+                <div class="legend-row"><span class="legend-dot" style="--c:#7A8BB5"></span> <span data-i18n="ws.donut.neu">Neutral</span> <b>24%</b></div>
+                <div class="legend-row"><span class="legend-dot" style="--c:#F45D5D"></span> <span data-i18n="ws.donut.neg">Negative</span> <b>14%</b></div>
+              </div>
+              <div class="empty-state" id="dbEmptySentiment" hidden><p data-i18n="ws.sent.na">Sentiment data unavailable</p></div>
+            </div>
+          </div>
+
+          <!-- Live feed -->
+          <div class="ws-card card feed-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.feed.t">Live feed</h3>
+                <p class="card-sub" data-i18n="ws.feed.s">NEWS · SOCIAL · RSS</p>
+              </div>
+            </div>
+            <span class="live-badge mono" style="margin-top:-2px"><span class="live-dot"></span> LIVE</span>
+            <div class="feed">
+              <div class="feed-track" id="dbFeedTrack">
+                <div class="feed-item">
+                  <span class="feed-src feed-news">NEW</span>
+                  <p class="feed-text" data-i18n="ws.feed.i1">Finance minister to discuss subsidy reforms in economic council session</p>
+                  <span class="feed-time mono">2m</span>
+                </div>
+                <div class="feed-item">
+                  <span class="feed-src feed-x">X</span>
+                  <p class="feed-text" data-i18n="ws.feed.i2">Egyptian Pound jumps on record investment inflows</p>
+                  <span class="feed-time mono">4m</span>
+                </div>
+                <div class="feed-item">
+                  <span class="feed-src feed-rss">RSS</span>
+                  <p class="feed-text" data-i18n="ws.feed.i3">Suez Canal authority reports record quarterly transit numbers</p>
+                  <span class="feed-time mono">6m</span>
+                </div>
+                <div class="feed-item">
+                  <span class="feed-src feed-fb">FB</span>
+                  <p class="feed-text" data-i18n="ws.feed.i4">Wide discussion on staple prices in governorate groups</p>
+                  <span class="feed-time mono">9m</span>
+                </div>
+                <div class="feed-item">
+                  <span class="feed-src feed-ig">IG</span>
+                  <p class="feed-text" data-i18n="ws.feed.i5">New Capital events draw interest as openings announced</p>
+                  <span class="feed-time mono">12m</span>
+                </div>
+                <div class="feed-item">
+                  <span class="feed-src feed-news">NEW</span>
+                  <p class="feed-text" data-i18n="ws.feed.i6">Weather: fog warnings on desert roads for the morning</p>
+                  <span class="feed-time mono">15m</span>
+                </div>
+                <div class="feed-item">
+                  <span class="feed-src feed-x">X</span>
+                  <p class="feed-text" data-i18n="ws.feed.i7">Analysts split on winter tourism outlook</p>
+                  <span class="feed-time mono">18m</span>
+                </div>
+                <div class="feed-item">
+                  <span class="feed-src feed-fb">FB</span>
+                  <p class="feed-text" data-i18n="ws.feed.i8">Community beach-cleanup initiatives grow in Alexandria</p>
+                  <span class="feed-time mono">21m</span>
+                </div>
+                <div class="feed-item">
+                  <span class="feed-src feed-rss">RSS</span>
+                  <p class="feed-text" data-i18n="ws.feed.i9">EGX closes higher on foreign buying</p>
+                  <span class="feed-time mono">24m</span>
+                </div>
+              </div>
+              <div class="empty-state" id="dbEmptyFeed" hidden><p data-i18n="ws.feed.na">No live signals returned for this query.</p></div>
+            </div>
+          </div>
+
+          <!-- AI highlights -->
+          <div class="ws-card card hl-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.hl.t">AI highlights</h3>
+                <p class="card-sub" data-i18n="ws.hl.s">GENERATED THIS CYCLE</p>
+              </div>
+            </div>
+            <div class="hl-list" id="dbHlList">
+              <div class="hl-card">
+                <div class="hl-top">
+                  <span class="hl-tag tag-danger" data-i18n="ws.hl.t1">BREAKING EVENT</span>
+                  <span class="hl-conf mono">97%</span>
+                </div>
+                <p class="hl-text" data-i18n="ws.hl.b1">Suez Canal transit figures released — volumes beat expectations.</p>
+                <span class="hl-time mono" data-i18n="ws.hl.time1">12m ago</span>
+              </div>
+              <div class="hl-card">
+                <div class="hl-top">
+                  <span class="hl-tag tag-blue" data-i18n="ws.hl.t2">EMERGING PATTERN</span>
+                  <span class="hl-conf mono">89%</span>
+                </div>
+                <p class="hl-text" data-i18n="ws.hl.b2">Pound-related discussions up 43% across Cairo within 3 hours.</p>
+                <span class="hl-time mono" data-i18n="ws.hl.time2">8m ago</span>
+              </div>
+              <div class="hl-card">
+                <div class="hl-top">
+                  <span class="hl-tag tag-warn" data-i18n="ws.hl.t3">MISINFORMATION RISK</span>
+                  <span class="hl-conf mono">81%</span>
+                </div>
+                <p class="hl-text" data-i18n="ws.hl.b3">Currency devaluation rumors lack primary sources; reach accelerating.</p>
+                <span class="hl-time mono" data-i18n="ws.hl.time3">6m ago</span>
+              </div>
+              <div class="hl-card">
+                <div class="hl-top">
+                  <span class="hl-tag tag-pos" data-i18n="ws.hl.t4">OPPORTUNITY</span>
+                  <span class="hl-conf mono">86%</span>
+                </div>
+                <p class="hl-text" data-i18n="ws.hl.b4">New Capital property interest rising among Gulf investors.</p>
+                <span class="hl-time mono" data-i18n="ws.hl.time4">4m ago</span>
+              </div>
+              <div class="hl-card">
+                <div class="hl-top">
+                  <span class="hl-tag tag-purple" data-i18n="ws.hl.t5">PUBLIC REACTION</span>
+                  <span class="hl-conf mono">78%</span>
+                </div>
+                <p class="hl-text" data-i18n="ws.hl.b5">Education reform debate polarized — strong support in Upper Egypt.</p>
+                <span class="hl-time mono" data-i18n="ws.hl.time5">2m ago</span>
+              </div>
+            </div>
+            <div class="empty-state" id="dbEmptyHighlights" hidden><p data-i18n="ws.hl.na">No AI highlights generated for this query.</p></div>
+          </div>
+
+          <!-- Influencers -->
+          <div class="ws-card card inf-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.inf.t">Influencers</h3>
+                <p class="card-sub" data-i18n="ws.inf.s">TOP VOICES THIS HOUR</p>
+              </div>
+            </div>
+            <div class="rank-list" id="dbRankList">
+              <div class="rank-row">
+                <span class="rank-avatar" style="--h:210deg">MT</span>
+                <div class="rank-meta"><b data-i18n="ws.inf.n1">Masr Today</b><span class="mono">News · 412K reach</span></div>
+                <span class="rank-score mono">94</span>
+              </div>
+              <div class="rank-row">
+                <span class="rank-avatar" style="--h:150deg">CP</span>
+                <div class="rank-meta"><b data-i18n="ws.inf.n2">Cairo Pulse</b><span class="mono">Social · 288K reach</span></div>
+                <span class="rank-score mono">91</span>
+              </div>
+              <div class="rank-row">
+                <span class="rank-avatar" style="--h:280deg">AH</span>
+                <div class="rank-meta"><b data-i18n="ws.inf.n3">Dr. Ahmed Hassan</b><span class="mono">Economics · 176K reach</span></div>
+                <span class="rank-score mono">87</span>
+              </div>
+              <div class="rank-row">
+                <span class="rank-avatar" style="--h:320deg">NM</span>
+                <div class="rank-meta"><b data-i18n="ws.inf.n4">Nour Media</b><span class="mono">Media · 154K reach</span></div>
+                <span class="rank-score mono">84</span>
+              </div>
+              <div class="rank-row">
+                <span class="rank-avatar" style="--h:45deg">OT</span>
+                <div class="rank-meta"><b data-i18n="ws.inf.n5">Omnia Tarek</b><span class="mono">Lifestyle · 121K reach</span></div>
+                <span class="rank-score mono">79</span>
+              </div>
+            </div>
+            <div class="empty-state" id="dbEmptyInfluencers" hidden><p data-i18n="ws.inf.na">No identifiable influencers in this analysis</p></div>
+          </div>
+
+          <!-- Sources -->
+          <div class="ws-card card src-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.src.t">Sources</h3>
+                <p class="card-sub" data-i18n="ws.src.s">SIGNAL SHARE · 24H</p>
+              </div>
+            </div>
+            <div class="src-list" id="dbSrcList">
+              <div class="src-row">
+                <span data-i18n="ws.src.r1">News desks</span>
+                <span class="src-bar"><i style="--w:32%"></i></span>
+                <b class="mono">32%</b>
+              </div>
+              <div class="src-row">
+                <span data-i18n="ws.src.r2">X (Twitter)</span>
+                <span class="src-bar"><i style="--w:26%"></i></span>
+                <b class="mono">26%</b>
+              </div>
+              <div class="src-row">
+                <span data-i18n="ws.src.r3">Facebook</span>
+                <span class="src-bar"><i style="--w:18%"></i></span>
+                <b class="mono">18%</b>
+              </div>
+              <div class="src-row">
+                <span data-i18n="ws.src.r4">RSS feeds</span>
+                <span class="src-bar"><i style="--w:12%"></i></span>
+                <b class="mono">12%</b>
+              </div>
+              <div class="src-row">
+                <span data-i18n="ws.src.r5">Instagram</span>
+                <span class="src-bar"><i style="--w:7%"></i></span>
+                <b class="mono">7%</b>
+              </div>
+              <div class="src-row">
+                <span data-i18n="ws.src.r6">Google Trends</span>
+                <span class="src-bar"><i style="--w:5%"></i></span>
+                <b class="mono">5%</b>
+              </div>
+            </div>
+            <div class="empty-state" id="dbEmptySources" hidden><p data-i18n="ws.src.na">No source distribution available for this query.</p></div>
+          </div>
+
+          <!-- Network graph -->
+          <div class="ws-card card net-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.net.t">Network graph</h3>
+                <p class="card-sub" data-i18n="ws.net.s">TOPICS · INSTITUTIONS · VOICES</p>
+              </div>
+            </div>
+            <div class="network-wrap">
+              <svg id="dbNetSvg" viewBox="0 0 400 280" aria-label="Network graph of topics, institutions and voices" role="img">
+                <defs>
+                  <linearGradient id="dbEdgeGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#5EA2FF" stop-opacity=".4"/>
+                    <stop offset="100%" stop-color="#7A5CFF" stop-opacity=".4"/>
+                  </linearGradient>
+                </defs>
+                <g class="edges">
+                  <line x1="200" y1="140" x2="200" y2="38"/>
+                  <line x1="200" y1="140" x2="309" y2="69"/>
+                  <line x1="200" y1="140" x2="336" y2="156"/>
+                  <line x1="200" y1="140" x2="272" y2="236"/>
+                  <line x1="200" y1="140" x2="128" y2="236"/>
+                  <line x1="200" y1="140" x2="64" y2="156"/>
+                  <line x1="200" y1="140" x2="91" y2="69"/>
+                </g>
+                <g class="node node-core">
+                  <circle cx="200" cy="140" r="26"/>
+                  <text class="node-label" x="200" y="144">NABD</text>
+                </g>
+                <g class="node">
+                  <circle cx="200" cy="38" r="13" style="--nc:#35D07F"/>
+                  <text class="node-label" x="200" y="18">CBE</text>
+                </g>
+                <g class="node">
+                  <circle cx="309" cy="69" r="13" style="--nc:#5EA2FF"/>
+                  <text class="node-label" x="309" y="52">SCA</text>
+                </g>
+                <g class="node">
+                  <circle cx="336" cy="156" r="13" style="--nc:#7A5CFF"/>
+                  <text class="node-label" x="336" y="140">New Cap.</text>
+                </g>
+                <g class="node">
+                  <circle cx="272" cy="236" r="13" style="--nc:#F5B84A"/>
+                  <text class="node-label" x="272" y="262">Al-Ahly</text>
+                </g>
+                <g class="node">
+                  <circle cx="128" cy="236" r="13" style="--nc:#F45D5D"/>
+                  <text class="node-label" x="128" y="262">Media</text>
+                </g>
+                <g class="node">
+                  <circle cx="64" cy="156" r="13" style="--nc:#5EA2FF"/>
+                  <text class="node-label" x="64" y="140">Pound</text>
+                </g>
+                <g class="node">
+                  <circle cx="91" cy="69" r="13" style="--nc:#35D07F"/>
+                  <text class="node-label" x="91" y="52">Tourism</text>
+                </g>
+                <g class="node">
+                  <circle cx="236" cy="76" r="13" style="--nc:#7A5CFF"/>
+                  <text class="node-label" x="236" y="60">Edu</text>
+                </g>
+              </svg>
+              <div class="empty-state" id="dbEmptyNet" hidden><p data-i18n="ws.net.na">Network relationships unavailable for this analysis.</p></div>
+            </div>
+          </div>
+
+          <!-- Media mix -->
+          <div class="ws-card card mix-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.mix.t">Media mix</h3>
+                <p class="card-sub" data-i18n="ws.mix.s">SIGNAL SHARE BY CATEGORY</p>
+              </div>
+            </div>
+            <div class="src-list" id="dbMixList">
+              <div class="src-row">
+                <span data-i18n="ws.mix.r1">Economy</span>
+                <span class="src-bar"><i style="--w:34%"></i></span>
+                <b class="mono">34%</b>
+              </div>
+              <div class="src-row">
+                <span data-i18n="ws.mix.r2">Politics</span>
+                <span class="src-bar"><i style="--w:22%"></i></span>
+                <b class="mono">22%</b>
+              </div>
+              <div class="src-row">
+                <span data-i18n="ws.mix.r3">Sports</span>
+                <span class="src-bar"><i style="--w:14%"></i></span>
+                <b class="mono">14%</b>
+              </div>
+              <div class="src-row">
+                <span data-i18n="ws.mix.r4">Culture</span>
+                <span class="src-bar"><i style="--w:10%"></i></span>
+                <b class="mono">10%</b>
+              </div>
+              <div class="src-row">
+                <span data-i18n="ws.mix.r5">Tech</span>
+                <span class="src-bar"><i style="--w:11%"></i></span>
+                <b class="mono">11%</b>
+              </div>
+              <div class="src-row">
+                <span data-i18n="ws.mix.r6">Weather</span>
+                <span class="src-bar"><i style="--w:9%"></i></span>
+                <b class="mono">9%</b>
+              </div>
+            </div>
+            <div class="empty-state" id="dbEmptyMix" hidden><p data-i18n="ws.mix.na">No category mix available for this query.</p></div>
+          </div>
+
+        </div>
+
+        <footer class="ws-foot">
+          <p class="mono" data-i18n="ws.foot">LIVE INTELLIGENCE · REFRESHED EVERY 60 SECONDS · 14 SOURCE TYPES</p>
+        </footer>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NABD (نبض) - analysis history: search, filter, sort and re-run every previous analysis.">
+  <title>Analysis History - NABD (نبض)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%235EA2FF'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%23070B14'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('nabd-theme') || 'dark';
+        if (t === 'system') t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+        var l = localStorage.getItem('nabd-lang') || 'en';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('lang', l);
+        document.documentElement.setAttribute('dir', l === 'ar' ? 'rtl' : 'ltr');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="app-page" data-page="history">
+
+  <div id="appShell"></div>
+
+  <main class="app-main">
+    <div class="app-head">
+      <div>
+        <h1 data-i18n="app.title.history">Analysis History</h1>
+        <p data-i18n="app.sub.history">Every analysis you ran, searchable and sorted.</p>
+      </div>
+      <div class="app-head-actions">
+        <span class="status-chip neu"><span class="d"></span><span id="histCount">8 analyses</span></span>
+      </div>
+    </div>
+
+    <div class="app-toolbar">
+      <div class="toolbar-group" id="histFilters">
+        <button class="filter-chip active" data-f="all" data-i18n="hist.filter.all">All</button>
+        <button class="filter-chip" data-f="public" data-i18n="hist.filter.public">Public</button>
+        <button class="filter-chip" data-f="private" data-i18n="hist.filter.private">Private</button>
+        <button class="filter-chip" data-f="exported" data-i18n="hist.filter.exported">Exported</button>
+        <button class="filter-chip" data-f="fav" data-i18n="hist.filter.fav">Favorited</button>
+      </div>
+      <div class="app-search">
+        <input id="histSearch" type="text" data-i18n-ph="hist.search.ph" placeholder="Search analyses…">
+        <svg viewBox="0 0 24 24"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-4-4"/></svg>
+      </div>
+      <div class="toolbar-group" style="margin-inline-start:auto">
+        <select class="select-soft" id="histSort">
+          <option value="recent" data-i18n="hist.sort.recent">Newest</option>
+          <option value="popular" data-i18n="hist.sort.popular">Most popular</option>
+        </select>
+        <div class="seg" id="histView">
+          <button class="seg-btn active" data-view="list" data-i18n="hist.view.list">List</button>
+          <button class="seg-btn" data-view="grid" data-i18n="hist.view.grid">Grid</button>
+          <button class="seg-btn" data-view="timeline" data-i18n="hist.view.timeline">Timeline</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="histList"></div>
+    <div id="histGrid" class="hist-grid" style="display:none"></div>
+    <div id="histTimeline" class="timeline" style="display:none"></div>
+    <div class="empty-state hist-empty" id="histEmpty">
+      <div class="e-ic">⌕</div>
+      <p data-i18n="notif.empty">Nothing here yet.</p>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

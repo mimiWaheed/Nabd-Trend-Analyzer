@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NABD (نبض) - API & developer settings: keys, webhooks, request logs and usage.">
+  <title>API & Developer - NABD (نبض)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%235EA2FF'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%23070B14'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('nabd-theme') || 'dark';
+        if (t === 'system') t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+        var l = localStorage.getItem('nabd-lang') || 'en';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('lang', l);
+        document.documentElement.setAttribute('dir', l === 'ar' ? 'rtl' : 'ltr');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="app-page" data-page="api">
+
+  <div id="appShell"></div>
+
+  <main class="app-main">
+    <div class="app-head">
+      <div>
+        <h1 data-i18n="app.title.api">API & Developer</h1>
+        <p data-i18n="app.sub.api">Programmatic access for advanced teams.</p>
+      </div>
+      <div class="app-head-actions">
+        <button class="btn btn-primary btn-sm" id="apiCreate" data-i18n="api.keys.create">Create key</button>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="ws-card sp-8">
+        <div class="card-head"><span class="card-title" data-i18n="api.keys">API keys</span></div>
+        <div id="apiKeys" style="padding:8px 22px 22px">
+          <div class="app-row key-row">
+            <span class="key-prefix">nbd_live_9f2a…c1e4</span>
+            <div class="grow"><div class="row-title" data-i18n="api.k1">Production key</div><div class="row-sub" data-i18n="api.k1.s">prod · created 40 days ago</div></div>
+            <div class="key-actions">
+              <button class="icon-btn sm" data-key="copy" title="Copy"><svg viewBox="0 0 24 24"><path d="M8 8h12v12H8zM4 16V4h12"/></svg></button>
+              <button class="btn btn-ghost btn-sm" data-key="revoke" data-i18n="api.keys.revoke">Revoke</button>
+            </div>
+          </div>
+          <div class="app-row key-row">
+            <span class="key-prefix">nbd_test_7b3d…a9f1</span>
+            <div class="grow"><div class="row-title" data-i18n="api.k2">Staging key</div><div class="row-sub" data-i18n="api.k2.s">staging · created 6 days ago</div></div>
+            <div class="key-actions">
+              <button class="icon-btn sm" data-key="copy" title="Copy"><svg viewBox="0 0 24 24"><path d="M8 8h12v12H8zM4 16V4h12"/></svg></button>
+              <button class="btn btn-ghost btn-sm" data-key="revoke" data-i18n="api.keys.revoke">Revoke</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ws-card sp-4">
+        <div class="card-head"><span class="card-title" data-i18n="api.usage">Usage</span></div>
+        <div style="padding:6px 22px 22px;display:flex;flex-direction:column;gap:13px">
+          <div class="note-row"><span data-i18n="api.usage.req">Requests today</span><b>8,412</b></div>
+          <div class="note-row"><span data-i18n="api.usage.limit">Rate limit</span><b>10,000 / day</b></div>
+          <div class="note-row"><span data-i18n="api.usage.env">Environment</span><b><span class="status-chip ok"><span class="d"></span><span data-i18n="api.usage.env.v">Production</span></span></b></div>
+          <div style="margin-top:4px">
+            <div class="note-row"><span data-i18n="api.usage.end">Endpoints</span><b></b></div>
+            <div class="note-row" style="border:none"><span></span><b class="mono" style="font-size:.78rem">/v1/analyze · /v1/trends · /v1/crisis</b></div>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:84%"></div></div>
+          <span style="font-size:.75rem;color:var(--text-muted)">8,412 / 10,000 requests</span>
+        </div>
+      </div>
+
+      <div class="ws-card sp-6">
+        <div class="card-head">
+          <span class="card-title" data-i18n="api.webhooks">Webhooks</span>
+          <button class="btn btn-ghost btn-sm" id="apiAddWh" data-i18n="api.add">Add webhook</button>
+        </div>
+        <div id="apiWebhooks" style="padding:8px 22px 22px">
+          <div class="app-row webhook-row">
+            <span class="row-icon"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></span>
+            <div class="grow"><div class="row-title" data-i18n="api.w1">Crisis alerts</div><div class="row-sub mono" style="font-size:.75rem">https://hooks.example.com/nabd/crisis</div></div>
+            <button class="icon-btn sm" data-wh="del">✕</button>
+          </div>
+          <div class="app-row webhook-row">
+            <span class="row-icon"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></span>
+            <div class="grow"><div class="row-title" data-i18n="api.w2">Report completion</div><div class="row-sub mono" style="font-size:.75rem">https://hooks.example.com/nabd/reports</div></div>
+            <button class="icon-btn sm" data-wh="del">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ws-card sp-6">
+        <div class="card-head"><span class="card-title" data-i18n="api.logs">Request logs</span></div>
+        <div style="padding:8px 22px 22px">
+          <div class="log-row head"><span>TIME</span><span data-i18n="set.k.action">Action</span><span>STATUS</span><span class="ms">MS</span></div>
+          <div class="log-row"><span class="mono">09:42:11</span><span class="mono" style="font-size:.76rem" data-i18n="api.log1">POST /v1/analyze</span><span class="code-200 mono">200</span><span class="ms mono">812</span></div>
+          <div class="log-row"><span class="mono">09:41:58</span><span class="mono" style="font-size:.76rem" data-i18n="api.log2">GET /v1/trends</span><span class="code-200 mono">200</span><span class="ms mono">244</span></div>
+          <div class="log-row"><span class="mono">09:40:03</span><span class="mono" style="font-size:.76rem" data-i18n="api.log3">GET /v1/crisis</span><span class="code-5 mono">503</span><span class="ms mono">—</span></div>
+          <div class="log-row"><span class="mono">09:37:44</span><span class="mono" style="font-size:.76rem" data-i18n="api.log4">POST /v1/export</span><span class="code-200 mono">200</span><span class="ms mono">1,204</span></div>
+        </div>
+      </div>
+
+      <div class="ws-card sp-12">
+        <div class="card-head"><span class="card-title" data-i18n="api.future">Future integrations</span></div>
+        <div style="padding:8px 22px 22px;display:flex;gap:10px;flex-wrap:wrap">
+          <span class="status-chip neu"><span class="d"></span>Slack</span>
+          <span class="status-chip neu"><span class="d"></span>Telegram</span>
+          <span class="status-chip neu"><span class="d"></span>n8n</span>
+          <span class="status-chip neu"><span class="d"></span>Webhooks v2</span>
+          <span class="status-chip neu"><span class="d"></span>GraphQL</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NABD (نبض) - notification center: AI alerts, trend spikes, system updates, reports and exports.">
+  <title>Notifications - NABD (نبض)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%235EA2FF'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%23070B14'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('nabd-theme') || 'dark';
+        if (t === 'system') t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+        var l = localStorage.getItem('nabd-lang') || 'en';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('lang', l);
+        document.documentElement.setAttribute('dir', l === 'ar' ? 'rtl' : 'ltr');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="app-page" data-page="notifications">
+
+  <div id="appShell"></div>
+
+  <main class="app-main">
+    <div class="app-head">
+      <div>
+        <h1 data-i18n="app.title.notifications">Notifications</h1>
+        <p data-i18n="app.sub.notifications">Alerts and updates across the platform.</p>
+      </div>
+      <div class="app-head-actions">
+        <span class="status-chip neu"><span class="d"></span><span id="notifUnread">4</span>&nbsp;<span data-i18n="notif.unread">unread</span></span>
+        <button class="btn btn-ghost btn-sm" id="notifMark" data-i18n="notif.mark">Mark all read</button>
+      </div>
+    </div>
+
+    <div class="app-toolbar">
+      <div class="toolbar-group">
+        <button class="filter-chip active" data-nf="all" data-i18n="notif.f.all">All</button>
+        <button class="filter-chip" data-nf="ai" data-i18n="notif.f.ai">AI alerts</button>
+        <button class="filter-chip" data-nf="trend" data-i18n="notif.f.trend">Trend spikes</button>
+        <button class="filter-chip" data-nf="system" data-i18n="notif.f.system">System</button>
+        <button class="filter-chip" data-nf="reports" data-i18n="notif.f.reports">Reports</button>
+        <button class="filter-chip" data-nf="conn" data-i18n="notif.f.conn">Connections</button>
+        <button class="filter-chip" data-nf="export" data-i18n="notif.f.export">Exports</button>
+      </div>
+    </div>
+
+    <div id="notifList">
+      <div class="notif-item" data-nid="n1" data-cat="ai">
+        <span class="n-dot"></span>
+        <span class="alert-ic danger">!</span>
+        <div class="alert-body"><div class="notif-title" data-i18n="notif.t1">Crisis detected — currency rumor cluster</div><div class="notif-sub" data-i18n="notif.s1">Escalation risk: elevated misinformation around currency rumors in Delta groups.</div><div class="notif-time">12 min ago</div></div>
+      </div>
+      <div class="notif-item" data-nid="n2" data-cat="trend">
+        <span class="n-dot"></span>
+        <span class="alert-ic pos">▲</span>
+        <div class="alert-body"><div class="notif-title" data-i18n="notif.t2">Trend spike: Suez Canal</div><div class="notif-sub" data-i18n="notif.s2">Conversation volume tripled in the last 3 hours.</div><div class="notif-time">41 min ago</div></div>
+      </div>
+      <div class="notif-item" data-nid="n3" data-cat="reports">
+        <span class="n-dot"></span>
+        <span class="alert-ic neu">PDF</span>
+        <div class="alert-body"><div class="notif-title" data-i18n="notif.t3">Weekly Egypt Brief is ready</div><div class="notif-sub" data-i18n="notif.s3">Generated from 14 sources — available as PDF and CSV.</div><div class="notif-time">2h ago</div></div>
+      </div>
+      <div class="notif-item" data-nid="n4" data-cat="conn">
+        <span class="n-dot"></span>
+        <span class="alert-ic neu">f</span>
+        <div class="alert-body"><div class="notif-title" data-i18n="notif.t4">Facebook page connected</div><div class="notif-sub" data-i18n="notif.s4">Page: NABD Analytics — audience sync started.</div><div class="notif-time">4h ago</div></div>
+      </div>
+      <div class="notif-item" data-nid="n5" data-cat="export">
+        <span class="n-dot"></span>
+        <span class="alert-ic pos">CSV</span>
+        <div class="alert-body"><div class="notif-title" data-i18n="notif.t5">Export finished — Suez dataset</div><div class="notif-sub" data-i18n="notif.s5">CSV ready to download in Reports.</div><div class="notif-time">6h ago</div></div>
+      </div>
+      <div class="notif-item" data-nid="n6" data-cat="trend">
+        <span class="n-dot"></span>
+        <span class="alert-ic warn">◈</span>
+        <div class="alert-body"><div class="notif-title" data-i18n="notif.t6">Inflation topic crossed threshold</div><div class="notif-sub" data-i18n="notif.s6">Inflation discussion crossed its 24-hour threshold.</div><div class="notif-time">Yesterday</div></div>
+      </div>
+      <div class="notif-item" data-nid="n7" data-cat="system">
+        <span class="n-dot"></span>
+        <span class="alert-ic warn">◷</span>
+        <div class="alert-body"><div class="notif-title" data-i18n="notif.t7">Scheduled report failed — source timeout</div><div class="notif-sub" data-i18n="notif.s7">One source timed out — the report will retry automatically.</div><div class="notif-time">Yesterday</div></div>
+      </div>
+      <div class="notif-item" data-nid="n8" data-cat="system">
+        <span class="alert-ic neu">✦</span>
+        <div class="alert-body"><div class="notif-title" data-i18n="notif.t8">New feature: narrative maps</div><div class="notif-sub" data-i18n="notif.s8">Try it under Settings → Experimental.</div><div class="notif-time">3 days ago</div></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

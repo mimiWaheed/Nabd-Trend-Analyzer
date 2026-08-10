@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NABD (نبض) - account settings: general, appearance, language, notifications, privacy, security and more.">
+  <title>Settings - NABD (نبض)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%235EA2FF'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%23070B14'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('nabd-theme') || 'dark';
+        if (t === 'system') t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+        var l = localStorage.getItem('nabd-lang') || 'en';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('lang', l);
+        document.documentElement.setAttribute('dir', l === 'ar' ? 'rtl' : 'ltr');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="app-page" data-page="settings">
+
+  <div id="appShell"></div>
+
+  <main class="app-main">
+    <div class="app-head">
+      <div>
+        <h1 data-i18n="app.title.settings">Settings</h1>
+        <p data-i18n="app.sub.settings">Account, appearance, security and everything in between.</p>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="ws-card sp-7 set-card">
+        <div class="card-head"><span class="card-title" data-i18n="set.general">General</span></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+          <div class="field"><label data-i18n="set.g.name">Full name</label><input type="text" value="Nour Badea"></div>
+          <div class="field"><label data-i18n="set.g.org">Organization</label><input type="text" value="Delta Digital Group"></div>
+          <div class="field"><label data-i18n="set.g.email">Email</label><input type="email" value="nour@deltadigital.eg"></div>
+          <div><button class="btn btn-primary" id="setGeneralSave" data-i18n="set.g.save">Save changes</button></div>
+        </div>
+      </div>
+
+      <div class="ws-card sp-5 set-card">
+        <div class="card-head"><span class="card-title" data-i18n="set.appearance">Appearance</span></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:16px">
+          <div class="set-row" style="padding-top:4px">
+            <div><div class="st-title" data-i18n="set.app.theme">Theme</div><div class="st-sub" data-i18n="set.app.sub">Applies instantly and is saved on this device.</div></div>
+<div class="seg">
+              <button class="seg-btn" data-theme-set="dark" data-i18n="set.app.dark">Dark</button>
+              <button class="seg-btn" data-theme-set="light" data-i18n="set.app.light">Light</button>
+              <button class="seg-btn" data-theme-set="system" data-i18n="set.app.system">System</button>
+            </div>
+          </div>
+          <div class="set-row">
+            <div><div class="st-title" data-i18n="set.lang">Language</div><div class="st-sub" data-i18n="set.lang.sub">Interface language — content translation is applied instantly.</div></div>
+            <select class="select-soft" id="setLang">
+              <option value="en" data-i18n="lng.en">English</option>
+              <option value="ar" data-i18n="lng.ar">العربية</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="ws-card sp-6 set-card">
+        <div class="card-head"><span class="card-title" data-i18n="set.an.title">Analysis preferences</span></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:16px">
+          <div class="set-row">
+            <div><div class="st-title" data-i18n="set.an.scope">Default analysis scope</div><div class="st-sub" data-i18n="set.an.sub">Defaults apply to every new analysis.</div></div>
+            <select class="select-soft" id="setAnScope">
+              <option value="all" data-i18n="set.an.s1">All topics</option>
+              <option value="news" data-i18n="set.an.s2">News</option>
+              <option value="business" data-i18n="set.an.s3">Business</option>
+              <option value="social" data-i18n="set.an.s4">Social</option>
+              <option value="sport" data-i18n="set.an.s5">Sports</option>
+              <option value="gov" data-i18n="set.an.s6">Government</option>
+            </select>
+          </div>
+          <div class="set-row" style="flex-direction:column;align-items:flex-start">
+            <div><div class="st-title" data-i18n="set.an.src">Default sources</div><div class="st-sub" data-i18n="set.an.sub">Defaults apply to every new analysis.</div></div>
+            <div class="chip-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+              <button type="button" class="filter-chip active" data-an-src="news" data-i18n="set.an.src1">News</button>
+              <button type="button" class="filter-chip active" data-an-src="social" data-i18n="set.an.src2">Social media</button>
+              <button type="button" class="filter-chip" data-an-src="rss" data-i18n="set.an.src3">RSS feeds</button>
+              <button type="button" class="filter-chip" data-an-src="search" data-i18n="set.an.src4">Web search</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ws-card sp-6 set-card">
+        <div class="card-head"><span class="card-title" data-i18n="set.notif">Notifications</span></div>
+        <div class="card-body">
+          <div class="set-row"><div><div class="st-title" data-i18n="set.n1.t">Breaking event alerts</div><div class="st-sub" data-i18n="set.n1.s">Push alerts for crisis detection</div></div><label class="switch" data-set="n1"><input type="checkbox"><span class="track"></span></label></div>
+          <div class="set-row"><div><div class="st-title" data-i18n="set.n2.t">Trend spikes</div><div class="st-sub" data-i18n="set.n2.s">Notify when a topic crosses its volume threshold</div></div><label class="switch" data-set="n2"><input type="checkbox"><span class="track"></span></label></div>
+          <div class="set-row"><div><div class="st-title" data-i18n="set.n3.t">Report ready</div><div class="st-sub" data-i18n="set.n3.s">Email when a scheduled report finishes</div></div><label class="switch" data-set="n3"><input type="checkbox"><span class="track"></span></label></div>
+          <div class="set-row"><div><div class="st-title" data-i18n="set.n4.t">Connection issues</div><div class="st-sub" data-i18n="set.n4.s">Warn when a source fails to sync</div></div><label class="switch" data-set="n4"><input type="checkbox"><span class="track"></span></label></div>
+          <div class="set-row"><div><div class="st-title" data-i18n="set.n5.t">Weekly digest</div><div class="st-sub" data-i18n="set.n5.s">A Saturday summary of your week</div></div><label class="switch" data-set="n5"><input type="checkbox"><span class="track"></span></label></div>
+        </div>
+      </div>
+
+      <div class="ws-card sp-6 set-card">
+        <div class="card-head"><span class="card-title" data-i18n="set.privacy">Privacy</span></div>
+        <div class="card-body">
+          <div class="set-row"><div><div class="st-title" data-i18n="set.p1.t">Private by default</div><div class="st-sub" data-i18n="set.p1.s">New analyses are not shared with the team</div></div><label class="switch" data-set="p1"><input type="checkbox"><span class="track"></span></label></div>
+          <div class="set-row"><div><div class="st-title" data-i18n="set.p2.t">Hide export metadata</div><div class="st-sub" data-i18n="set.p2.s">Strip timestamps from exported files</div></div><label class="switch" data-set="p2"><input type="checkbox"><span class="track"></span></label></div>
+          <div class="set-row"><div><div class="st-title" data-i18n="set.p3.t">Anonymize social data</div><div class="st-sub" data-i18n="set.p3.s">Remove handles from analysis views</div></div><label class="switch" data-set="p3"><input type="checkbox"><span class="track"></span></label></div>
+        </div>
+      </div>
+
+      <div class="ws-card sp-6 set-card">
+        <div class="card-head"><span class="card-title" data-i18n="set.security">Security</span></div>
+        <div class="card-body">
+          <div class="set-row"><div><div class="st-title" data-i18n="set.sec1.t">Change password</div><div class="st-sub" data-i18n="set.sec1.s">Last changed 42 days ago</div></div><button class="btn btn-ghost btn-sm" data-i18n="set.sec1.b">Change</button></div>
+          <div class="set-row"><div><div class="st-title" data-i18n="set.sec2.t">Two-factor authentication</div><div class="st-sub" data-i18n="set.sec2.s">Add an authenticator app</div></div><label class="switch" data-set="sec2"><input type="checkbox"><span class="track"></span></label></div>
+        </div>
+      </div>
+
+      <div class="ws-card sp-6 set-card">
+        <div class="card-head"><span class="card-title" data-i18n="set.shortcuts">Shortcuts</span></div>
+        <div class="card-body">
+          <div class="log-row head"><span data-i18n="set.k">Shortcut</span><span data-i18n="set.k.action">Action</span><span></span></div>
+          <div class="log-row"><span class="key-prefix">N</span><span data-i18n="set.shk1">New analysis</span></div>
+          <div class="log-row"><span class="key-prefix">S</span><span data-i18n="set.shk2">Run saved search</span></div>
+          <div class="log-row"><span class="key-prefix">E</span><span data-i18n="set.shk3">Export report</span></div>
+          <div class="log-row"><span class="key-prefix">?</span><span data-i18n="set.shk4">Open settings</span></div>
+          <div class="log-row"><span class="key-prefix">T</span><span data-i18n="set.shk5">Toggle theme</span></div>
+        </div>
+      </div>
+
+      <div class="ws-card sp-12 set-card">
+        <div class="card-head"><span class="card-title" data-i18n="set.experimental">Experimental features</span></div>
+        <div class="card-body">
+          <div class="set-row"><div><div class="st-title" data-i18n="set.exp1.t">Narrative maps</div><div class="st-sub" data-i18n="set.exp1.s">Visual story-of-the-story graphs</div></div><label class="switch" data-set="e1"><input type="checkbox"><span class="track"></span></label></div>
+          <div class="set-row"><div><div class="st-title" data-i18n="set.exp2.t">Voice briefings</div><div class="st-sub" data-i18n="set.exp2.s">Listen to your daily briefing</div></div><label class="switch" data-set="e2"><input type="checkbox"><span class="track"></span></label></div>
+          <div class="set-row"><div><div class="st-title" data-i18n="set.exp3.t">Live collaborator cursors</div><div class="st-sub" data-i18n="set.exp3.s">Multi-seat realtime presence</div></div><label class="switch" data-set="e3"><input type="checkbox"><span class="track"></span></label></div>
+        </div>
+      </div>
+
+      <div class="ws-card sp-12 set-card danger-zone">
+        <div class="card-head"><span class="card-title" style="color:var(--danger)" data-i18n="set.danger">Danger zone</span></div>
+        <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+          <div><div class="st-title" style="color:var(--text)" data-i18n="set.danger.sub">Delete your account, analyses and exports. This cannot be undone.</div></div>
+          <button class="btn btn-sm" id="setDanger" style="background:var(--danger);color:#fff;border:none" data-i18n="set.danger.b">Delete account</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
