@@ -273,8 +273,32 @@ html { scrollbar-width: thin; scrollbar-color: var(--thumb) transparent; }
 .delta.down { color: var(--danger); background: rgba(244, 93, 93, .09); }
 
 /* ------------------------------------------------------------
-   4. PAGE TRANSITIONS — removed; navigation is instant
+   4. PAGE TRANSITIONS — soft fade only (no slide, no movement)
+   Uses cross-document View Transitions: the page/content view
+   crossfades in the same position. The sidebar + topbar opt out
+   via a named "chrome" group that never animates, so only the
+   content view fades. Back/forward is covered automatically.
    ------------------------------------------------------------ */
+@view-transition { navigation: auto; }
+
+::view-transition-group(root) { animation-duration: .22s; animation-timing-function: ease-in-out; }
+::view-transition-old(root) { animation-name: nabd-fade-out; }
+::view-transition-new(root) { animation-name: nabd-fade-in; }
+
+/* App shell chrome stays put — sidebar, topbar, controls are never animated */
+.app-side,
+.app-top { view-transition-name: nabd-chrome; }
+::view-transition-old(nabd-chrome),
+::view-transition-new(nabd-chrome) { animation: none; }
+
+@keyframes nabd-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes nabd-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
 /* ------------------------------------------------------------
    5. NAVIGATION
@@ -1700,6 +1724,10 @@ html[dir="rtl"] .field select {
   .reveal { opacity: 1; transform: none; }
   .preview-card { animation: none !important; opacity: 1; }
   .ws-card { opacity: 1; }
+  /* Page fade disabled — navigate normally */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation: none !important; }
 }
 
 /* ============================================================
@@ -2915,6 +2943,9 @@ html[dir="rtl"] .db-results .summary-body .empty-state { text-align: right; }
     animation: none !important;
     transition: none !important;
   }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation: none !important; }
 }
 
 @media (max-width: 1180px) {
