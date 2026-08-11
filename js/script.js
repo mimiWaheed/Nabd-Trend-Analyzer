@@ -1587,27 +1587,78 @@
      invented: fields that cannot be derived stay null and the
      dashboard renders a meaningful unavailable state instead.
      ---------------------------------------------------------- */
-  function normalizeAnalysisResponse(raw) {
-    /* ---- transport unwrap: the deployed n8n workflow wraps the analysis as
-       { text: "<json string>" } and may also array-wrap it ([ {...} ]).
-       Peel those layers so every consumer reads the same object. The original
-       HTTP body is preserved on the returned result as `.raw`. ---- */
-    let data = raw;
-    for (let guard = 0; guard < 3; guard++) {
-      if (typeof data === 'string') { try { data = JSON.parse(data); } catch (e) { break; } }
+
+  /* ---- transport extraction: safely locate the actual analysis object
+     inside whatever wrapper the backend produced — direct object,
+     array-wrapped, { text: "<json string>" }, { response/result/body },
+     code-fenced and prose-prefixed JSON. The wrapper itself is never
+     returned, so raw JSON dumps can never be treated as the analysis. */
+  const ANALYSIS_KEYS = ['query', 'stats', 'sentiment', 'trendingTopics', 'aiBrief', 'aiHighlights', 'topLocations', 'topInfluencers', 'sampleSources', 'signalVolume', 'generatedAt', 'ok'];
+  const hasAnalysisShape = (o) => o != null && typeof o === 'object' && ANALYSIS_KEYS.some((k) => o[k] != null);
+  const parseEmbeddedJson = (s) => {
+    const t = String(s == null ? '' : s).trim();
+    if (!t) return null;
+    try { return JSON.parse(t); } catch (e) { /* fall through to brace scan */ }
+    const st = t.indexOf('{');
+    const sa = t.indexOf('[');
+    const s2 = st === -1 ? sa : (sa === -1 ? st : Math.min(st, sa));
+    if (s2 === -1) return null;
+    let depth = 0, quote = false, esc = false, end = -1;
+    for (let i = s2; i < t.length; i++) {
+      const c = t.charAt(i);
+      if (quote) {
+        if (esc) esc = false;
+        else if (c === '\\') esc = true;
+        else if (c === '"') quote = false;
+        continue;
+      }
+      if (c === '"') { quote = true; continue; }
+      if (c === '{' || c === '[') depth++;
+      else if (c === '}' || c === ']') { depth--; if (depth === 0) { end = i; break; } }
+    }
+    if (end > s2) {
+      try { return JSON.parse(t.slice(s2, end + 1)); } catch (e2) { return null; }
+    }
+    return null;
+  };
+  const extractAnalysisPayload = (response) => {
+    let data = response;
+    for (let guard = 0; guard < 4; guard++) {
+      if (typeof data === 'string') {
+        const inner = parseEmbeddedJson(data);
+        if (inner && typeof inner === 'object') { data = inner; continue; }
+        break;
+      }
       if (Array.isArray(data)) { data = data[0] || null; continue; }
-      if (data && typeof data === 'object' && typeof data.text === 'string' && data.text.trim()) {
-        const t = data.text.trim();
-        if (t.charAt(0) === '{' || t.charAt(0) === '[') {
-          try {
-            const inner = JSON.parse(t);
-            if (inner && typeof inner === 'object') { data = inner; continue; }
-          } catch (e) { /* not JSON text — treat the object as-is */ }
+      if (data && typeof data === 'object') {
+        if (hasAnalysisShape(data)) break;
+        const s = data.text || data.response || data.result || data.body;
+        if (typeof s === 'string' && s.trim()) {
+          const inner = parseEmbeddedJson(s);
+          if (inner && typeof inner === 'object') { data = inner; continue; }
         }
+        break;
       }
       break;
     }
-    raw = data;
+    return data;
+  };
+  /* A text value must never surface as the AI brief while it is still a
+     JSON dump — true for fenced, array-wrapped, or prose-prefixed JSON. */
+  const looksLikeJson = (s) => {
+    let t = String(s == null ? '' : s).trim();
+    if (!t) return false;
+    t = t.replace(/```[a-z]*/gi, '').replace(/`/g, '').trim();
+    if (t.charAt(0) === '{' || t.charAt(0) === '[') return true;
+    if (/^("(query|ok|stats|sentiment|trendingTopics|aiBrief|aiHighlights|topLocations|topInfluencers|sampleSources|signalVolume|generatedAt)"\s*:)/i.test(t)) return true;
+    const v = t.replace(/^(json|javascript|js)[\s:]*/i, '').trim();
+    return v !== t && (v.charAt(0) === '{' || v.charAt(0) === '[');
+  };
+
+  function normalizeAnalysisResponse(raw) {
+    /* ---- transport unwrap: peel every wrapper layer so consumers read the
+       same object. The extracted payload is preserved on `.raw`. ---- */
+    raw = extractAnalysisPayload(raw);
     const pick = (o, keys, dflt) => {
       for (let i = 0; i < keys.length; i++) if (o && o[keys[i]] != null && o[keys[i]] !== '') return o[keys[i]];
       return dflt;
@@ -1666,8 +1717,10 @@
     else if (raw.brief && typeof raw.brief === 'object' && !Array.isArray(raw.brief)) aiBriefObj = raw.brief;
     let sumVal = pick(raw, ['summary', 'aiSummary', 'brief', 'aiBrief', 'answer', 'result', 'text'], null);
     if (sumVal && typeof sumVal === 'object' && !Array.isArray(sumVal)) {
-      sumVal = pick(sumVal, ['summary', 'text', 'content', 'brief'], null) || JSON.stringify(sumVal);
+      sumVal = pick(sumVal, ['summary', 'text', 'content', 'brief'], null);
+      if (sumVal && typeof sumVal === 'object') sumVal = null;
     }
+    if (typeof sumVal === 'string' && looksLikeJson(sumVal)) sumVal = null;
     out.summary = sumVal;
     let conf = num(pick(raw, ['confidence'], null));
     if (conf == null && aiBriefObj) conf = num(aiBriefObj.confidence);
@@ -1756,17 +1809,16 @@
     if (sAgg) {
       const pos = num(sAgg.positive), neu = num(sAgg.neutral), neg = num(sAgg.negative);
       if (pos != null || neu != null || neg != null) {
+        /* real percentages or real counts — a genuine 0 stays 0 */
         out.sentiment = {
-          positive: Math.max(0, pos || 0), neutral: Math.max(0, neu || 0), negative: Math.max(0, neg || 0),
-          label: sAgg.label || null, fromCount: (pos || 0) + (neu || 0) + (neg || 0), derived: false
+          positive: pos, neutral: neu, negative: neg,
+          label: sAgg.label != null ? String(sAgg.label) : null,
+          fromCount: [pos, neu, neg].filter((v) => v != null).length, derived: false
         };
       } else if (sAgg.label || sAgg.score != null) {
-        const sc = num(sAgg.score);
-        const cls = sc != null ? (sc > 0.2 ? 'positive' : sc < -0.2 ? 'negative' : 'neutral')
-          : String(sAgg.label).toLowerCase().indexOf('pos') !== -1 ? 'positive'
-            : String(sAgg.label).toLowerCase().indexOf('neg') !== -1 ? 'negative' : 'neutral';
-        out.sentiment = { positive: 0, neutral: 0, negative: 0, label: sAgg.label || null, derived: false, fromCount: 1 };
-        out.sentiment[cls] = 1;
+        /* label/score only: never invent a 0/100/0 split. Keep percentages
+           null so the UI shows the returned label without fabricated bars. */
+        out.sentiment = { positive: null, neutral: null, negative: null, label: sAgg.label != null ? String(sAgg.label) : null, derived: false, fromCount: 1 };
       }
     }
     if (!out.sentiment) {
@@ -1789,14 +1841,25 @@
     }
     if (out.sentiment) {
       const s = out.sentiment;
-      const tot = s.positive + s.neutral + s.negative;
-      if (tot > 0) {
-        const rawPct = [s.positive / tot * 100, s.neutral / tot * 100, s.negative / tot * 100];
-        const floors = rawPct.map(Math.floor);
-        let rem = 100 - floors[0] - floors[1] - floors[2];
-        const order = [0, 1, 2].sort((a, b) => (rawPct[b] - Math.floor(rawPct[b])) - (rawPct[a] - Math.floor(rawPct[a])));
-        for (let i = 0; i < rem; i++) floors[order[i % 3]] += 1;
-        s.positive = floors[0]; s.neutral = floors[1]; s.negative = floors[2];
+      const hasAny = s.positive != null || s.neutral != null || s.negative != null;
+      if (hasAny) {
+        const p = Math.max(0, s.positive != null ? s.positive : 0);
+        const n = Math.max(0, s.neutral != null ? s.neutral : 0);
+        const g = Math.max(0, s.negative != null ? s.negative : 0);
+        const tot = p + n + g;
+        if (tot > 0) {
+          const rawPct = [p / tot * 100, n / tot * 100, g / tot * 100];
+          const floors = rawPct.map(Math.floor);
+          let rem = 100 - floors[0] - floors[1] - floors[2];
+          const order = [0, 1, 2].sort((a, b) => (rawPct[b] - Math.floor(rawPct[b])) - (rawPct[a] - Math.floor(rawPct[a])));
+          for (let i = 0; i < rem; i++) floors[order[i % 3]] += 1;
+          s.positive = floors[0]; s.neutral = floors[1]; s.negative = floors[2];
+        } else {
+          s.positive = 0; s.neutral = 0; s.negative = 0;
+        }
+      }
+      if (s.label == null || !String(s.label).trim()) {
+        s.label = s.negative > s.positive ? 'negative' : s.positive > s.negative ? 'positive' : 'neutral';
       }
     }
 
@@ -1976,7 +2039,7 @@
         if (sv && typeof sv === 'object') {
           const v = num(sv.value != null ? sv.value : sv.count);
           if (v == null) return;
-          const ts = parseRangeTime(sv.time != null ? sv.time : sv.label);
+          const ts = parseRangeTime(sv.time != null ? sv.time : (sv.period != null ? sv.period : sv.label));
           pts.push({ bucket: ts != null ? ts : pts.length, count: Math.max(0, Math.round(v)) });
         } else {
           const v = num(sv);
@@ -2313,7 +2376,7 @@
   function buildBrief(r, lng) {
     const D = I18N[lng] || I18N.en || {};
     const F = (k) => (D[k] != null ? D[k] : (I18N.en[k] != null ? I18N.en[k] : k));
-    const stats = (r && r.raw && r.raw.stats) || {};
+    const stats = (r && r.stats) || (r && r.raw && r.raw.stats) || {};
     const num = (v) => { const n = parseFloat(v); return isNaN(n) ? null : n; };
     const cleanNames = (arr, get) => (arr || []).map(get).map((s) => String(s == null ? '' : s).trim()).filter((s) => s && !/^[?]+$/.test(s));
     const parts = [];
@@ -2613,6 +2676,8 @@
     labelRGB,
     navigate,
     normalizeAnalysisResponse,
+    extractAnalysisPayload,
+    looksLikeJson,
     buildBrief,
     hasData,
     isAvailable,

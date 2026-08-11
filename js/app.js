@@ -616,7 +616,7 @@
     /* ---------- sentiment donut (real response → existing component) ---------- */
     function renderDonut() {
       const s = lastResult && lastResult.sentiment;
-      const stats = (lastResult && lastResult.raw && lastResult.raw.stats) || {};
+      const stats = (lastResult && lastResult.stats) || (lastResult && lastResult.raw && lastResult.raw.stats) || {};
       const legendB = donutEl && donutEl.parentElement
         ? Array.prototype.slice.call(donutEl.parentElement.querySelectorAll('.donut-legend b'))
         : [];
@@ -860,11 +860,14 @@
     }
     function renderSummary(r) {
       const title = $('dbBriefTitle');
-      if (title) title.textContent = esc(query) + ' — ' + L('ws.brief');
+      if (title) {
+        const briefTitle = r.briefMeta && String(r.briefMeta.title || '').trim();
+        title.textContent = esc(briefTitle || query) + ' — ' + L('ws.brief');
+      }
       const st = $('dbSummaryText');
       const es = $('dbEmptySummary');
       let paras = null;
-      if (r.summary && String(r.summary).trim()) {
+      if (r.summary && String(r.summary).trim() && !(N.looksLikeJson && N.looksLikeJson(r.summary))) {
         paras = String(r.summary).split(/\n+/).map((p) => p.trim()).filter(Boolean);
       } else if (N.buildBrief) {
         paras = N.buildBrief(r, N.lang);
