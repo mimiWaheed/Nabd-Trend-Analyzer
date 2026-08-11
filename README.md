@@ -80,7 +80,16 @@ Authentication is a frontend demo (localStorage-backed) for the time being. `N.s
 Private analysis (`scope: "private"`) connects a user's Meta Page and Instagram Business account through a real OAuth flow handled by the Vercel routes under `api/meta/`:
 
 1. `api/meta/start.js` builds the Meta authorization dialog URL.
-2. `api/meta/callback.js` exchanges the authorization code for a token server-side (the App Secret never leaves the server), resolves the first Page + Instagram business account, and hands the result back to the opener via `postMessage`.
+2. `api/meta/callback.js` exchanges the authorization code for a token server-side (the App Secret never leaves the server), resolves the connected Page + Instagram business account, converts the user token into a **page access token** (the new Pages experience requires a page token for `/{pageId}/posts`), and hands the result back to the opener via `postMessage`.
 3. `api/meta/revoke.js` clears the token on disconnect.
 
-Required environment variables (see `.env.example`): `NABD_WEBHOOK_URL`, `META_APP_ID`, `META_APP_SECRET`, `META_REDIRECT_URI`. The access token is kept only in `sessionStorage` and never in `localStorage`. If Meta variables are missing, the UI shows a clear setup error instead of pretending the account is connected. Public analysis never sends Facebook credentials.
+Required environment variables (see `.env.example`): `NABD_WEBHOOK_URL`, `META_APP_ID`, `META_APP_SECRET`, `META_REDIRECT_URI`. Optional: `META_DEFAULT_PAGE_ID` (page to analyze when the account manages several pages; defaults to the first page Meta returns). The access token is kept only in `sessionStorage` and never in `localStorage`. If Meta variables are missing, the UI shows a clear setup error instead of pretending the account is connected. Public analysis never sends Facebook credentials.
+
+### One-time Meta Developer Console setup
+
+For the OAuth popup to succeed, the Facebook app must be configured:
+
+1. In the [Meta Developer Console](https://developers.facebook.com/apps/), open the app with `META_APP_ID` and add **Facebook Login** as a product.
+2. Under **Facebook Login > Settings**, add the exact callback URL (`META_REDIRECT_URI`, e.g. `https://your-project.vercel.app/api/meta/callback`) to **Valid OAuth Redirect URIs**.
+3. Confirm the app has the permissions used by `api/meta/start.js`: `pages_show_list`, `pages_read_engagement`, `read_insights`, `business_management`, `instagram_basic`, `instagram_content_publish`.
+4. The app must be in **Live** mode (Development mode only works for app admins/testers). Use the app-mode toggle in the console, then submit the required permissions for review if the app is used by other people.

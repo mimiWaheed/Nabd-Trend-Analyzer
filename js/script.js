@@ -2610,6 +2610,7 @@
             if (d.error) { this.toastKey('db.meta.error'); this.emit({ connected: false, accountName: '', connectedAt: 0 }); return; }
             const meta = {
               accessToken: String(d.accessToken || ''),
+              userToken: d.userToken ? String(d.userToken) : '',
               accountId: String(d.accountId || ''),
               pageId: String(d.accountId || ''),
               igUserId: d.igUserId ? String(d.igUserId) : '',
@@ -2653,12 +2654,14 @@
       this.write(state);
       this.emit(state);
       if (meta && meta.accessToken) {
-        /* best-effort server-side token revocation — never blocks the UI */
+        /* best-effort server-side token revocation — never blocks the UI.
+           Revoke the user token when we have it (page tokens cannot be
+           revoked through /me/permissions). */
         try {
           fetch('/api/meta/revoke', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: meta.accessToken })
+            body: JSON.stringify({ token: meta.userToken || meta.accessToken })
           }).catch(() => {});
         } catch (e) {}
       }
