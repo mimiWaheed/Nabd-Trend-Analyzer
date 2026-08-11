@@ -1478,6 +1478,26 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
 }
 .src-row b { font-weight: 500; text-align: right; }
 
+/* deterministic analytics widgets */
+.ht-wrap { display: flex; flex-wrap: wrap; gap: 8px; flex: 1; align-content: flex-start; }
+.ht-chip { cursor: default; }
+.health-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; flex: 1; }
+.health-item {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-1);
+}
+.health-label { font-size: 9px; letter-spacing: .12em; color: var(--text-muted); }
+.health-value { font-size: 1rem; color: var(--text); text-transform: capitalize; }
+.health-sub { font-size: 10px; color: var(--text-muted); }
+.health-pos .health-value { color: var(--pos); }
+.health-neg .health-value { color: var(--danger); }
+.health-warn .health-value { color: var(--warn); }
+.health-neutral .health-value { color: var(--text); }
+.health-muted .health-value { color: var(--text-muted); }
+
 /* key data (generic, data-driven rows) */
 .kd-list { display: flex; flex-direction: column; gap: 10px; flex: 1; justify-content: flex-start; }
 .kd-row {

@@ -828,6 +828,62 @@
         + '<span class="src-bar"><i style="--w:' + Math.max(0, Math.min(100, n || 0)) + '%"></i></span>'
         + '<b class="mono">' + (n != null ? N.formatNumber(n) + '×' : '—') + '</b></div>';
     }
+    /* deterministic analytics widgets — fed by the backend's
+       Generate Dashboard Metrics node, never fabricated on the client. */
+    function barRow(label, count, max) {
+      const n = num(count);
+      const w = max > 0 && n != null ? Math.max(2, Math.min(100, Math.round((n / max) * 100))) : 0;
+      return '<div class="src-row"><span>' + esc(label) + '</span>'
+        + '<span class="src-bar"><i style="--w:' + w + '%"></i></span>'
+        + '<b class="mono">' + (n != null ? N.formatNumber(n) + '×' : '—') + '</b></div>';
+    }
+    function healthCard(label, value, sub, tone) {
+      return '<div class="health-item' + (tone ? ' health-' + tone : '') + '">'
+        + '<span class="health-label mono">' + esc(label) + '</span>'
+        + '<b class="health-value">' + esc(String(value == null ? '—' : value)) + '</b>'
+        + (sub ? '<span class="health-sub mono">' + esc(sub) + '</span>' : '') + '</div>';
+    }
+    const HEALTH_TONE = { rising: 'pos', falling: 'neg', stable: 'neutral', insufficient_data: 'muted', high: 'pos', medium: 'warn', low: 'muted', 'Very Strong': 'pos', Strong: 'pos', Moderate: 'warn', Weak: 'muted', Fresh: 'pos', Mixed: 'warn', Historical: 'muted' };
+    function renderDashboardMetrics(r) {
+      const D = r.dashboard && typeof r.dashboard === 'object' ? r.dashboard : null;
+      if (!D) {
+        listWidget($('dbKwList'), $('dbEmptyKeywords'), []);
+        listWidget($('dbPhList'), $('dbEmptyPhrases'), []);
+        listWidget($('dbHtList'), $('dbEmptyHashtags'), []);
+        listWidget($('dbHealthGrid'), null, []);
+        return;
+      }
+      const kws = Array.isArray(D.keywords) ? D.keywords : [];
+      const phs = Array.isArray(D.phrases) ? D.phrases : [];
+      const hts = Array.isArray(D.hashtags) ? D.hashtags : [];
+      const kwMax = kws.reduce((m, k) => Math.max(m, num(k.count) || 0), 0);
+      const phMax = phs.reduce((m, p) => Math.max(m, num(p.count) || 0), 0);
+      listWidget($('dbKwList'), $('dbEmptyKeywords'), kws.slice(0, 10).map((k) => barRow(k.keyword, k.count, kwMax)));
+      listWidget($('dbPhList'), $('dbEmptyPhrases'), phs.slice(0, 8).map((p) => barRow(p.phrase, p.count, phMax)));
+      const htHtml = hts.slice(0, 16).map((h) => {
+        const n = num(h.count);
+        return '<span class="chip ht-chip"><span class="chip-pulse" aria-hidden="true"></span> <span>' + esc(h.tag || h.hashtag || '') + (n != null ? ' · ' + N.formatNumber(n, true) : '') + '</span></span>';
+      });
+      const htWrap = $('dbHtList');
+      if (htWrap) { htWrap.style.display = htHtml.length ? '' : 'none'; htWrap.innerHTML = htHtml.join(''); }
+      const htEmpty = $('dbEmptyHashtags');
+      if (htEmpty) { htEmpty.hidden = htHtml.length > 0; htEmpty.style.display = ''; }
+
+      const items = [];
+      const mom = D.momentum && typeof D.momentum === 'object' ? D.momentum : null;
+      if (mom) items.push(healthCard('Momentum', mom.label || mom.direction || '—', (mom.score != null ? 'Score ' + Math.round(mom.score) + ' · ' : '') + (mom.growthRate != null ? N.formatNumber(mom.growthRate) + '%' : ''), HEALTH_TONE[mom.direction]));
+      const ss = D.signalStrength && typeof D.signalStrength === 'object' ? D.signalStrength : null;
+      if (ss) items.push(healthCard('Signal strength', ss.label || '—', ss.score != null ? 'Score ' + Math.round(ss.score) : '', HEALTH_TONE[ss.label]));
+      const sd = D.sourceDiversity && typeof D.sourceDiversity === 'object' ? D.sourceDiversity : null;
+      if (sd) items.push(healthCard('Source diversity', sd.label || '—', (sd.uniqueSources != null ? sd.uniqueSources + ' sources' : '') + (sd.topSourceShare != null ? ' · top ' + sd.topSourceShare + '%' : ''), HEALTH_TONE[sd.label]));
+      const fs = D.freshness && typeof D.freshness === 'object' ? D.freshness : null;
+      if (fs) items.push(healthCard('Freshness', fs.label || '—', (fs.averageDaysOld != null ? 'avg ' + fs.averageDaysOld + 'd' : '') + (fs.recentPercentage != null ? ' · ' + Math.round(fs.recentPercentage) + '% recent' : ''), HEALTH_TONE[fs.label]));
+      const rl = D.relevance && typeof D.relevance === 'object' ? D.relevance : null;
+      if (rl) items.push(healthCard('Relevance', rl.average != null ? Math.round(rl.average) : '—', 'H ' + rl.high + ' · M ' + rl.medium + ' · L ' + rl.low));
+      const cv = D.coverage && typeof D.coverage === 'object' ? D.coverage : null;
+      if (cv) items.push(healthCard('Coverage', cv.corroborationLevel || '—', cv.sourceCount + ' sources / ' + cv.articleCount + ' articles'));
+      listWidget($('dbHealthGrid'), null, items);
+    }
     function renderKpis(r) {
       const stats = (r.stats) || (r.raw && r.raw.stats) || {};
       const kpiM = $('kpiMentions');
@@ -936,6 +992,7 @@
 
       renderKpis(r);
       renderSummary(r);
+      renderDashboardMetrics(r);
 
       const topics = has(r.topics) ? r.topics : (Array.isArray(r.trendingTopics) ? r.trendingTopics : []);
       const locs = has(r.locations) ? r.locations : (Array.isArray(r.topLocations) ? r.topLocations : []);
@@ -968,16 +1025,22 @@
       }
       listWidget($('dbRankList'), $('dbEmptyInfluencers'), infs.map(influencerRow));
 
-      /* sources = real publishers deduplicated from the actual returned articles */
-      const countBy = {};
-      feed.forEach((f) => {
-        const label = N.getSourceLabel(f);
-        if (label) countBy[label] = (countBy[label] || 0) + 1;
-      });
-      const srcs = Object.keys(countBy)
-        .map((label) => ({ label: label, count: countBy[label] }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 8);
+      /* sources: deterministic publisher analytics first, else the real
+         publishers deduplicated from the actual returned signals */
+      let srcs;
+      if (has(r.sources)) {
+        srcs = r.sources.slice(0, 8);
+      } else {
+        const countBy = {};
+        feed.forEach((f) => {
+          const label = N.getSourceLabel(f);
+          if (label) countBy[label] = (countBy[label] || 0) + 1;
+        });
+        srcs = Object.keys(countBy)
+          .map((label) => ({ label: label, count: countBy[label] }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 8);
+      }
       listWidget($('dbSrcList'), $('dbEmptySources'), srcs.map(sourceRow));
     }
     function renderLive() {

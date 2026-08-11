@@ -134,6 +134,10 @@
       'ws.hl.t4': 'OPPORTUNITY', 'ws.hl.t5': 'PUBLIC REACTION',
       'ws.inf.t': 'Influencers', 'ws.inf.s': 'TOP VOICES THIS HOUR',
       'ws.src.t': 'Sources',
+      'ws.kw.t': 'Top keywords', 'ws.kw.s': 'DETERMINISTIC · COMPUTED FROM AGGREGATION',
+      'ws.ph.t': 'Top phrases', 'ws.ph.s': 'EMERGING 2–3 WORD PHRASES',
+      'ws.ht.t': 'Hashtags', 'ws.ht.s': 'EXTRACTED FROM SIGNALS',
+      'ws.health.t': 'Signal health', 'ws.health.s': 'MOMENTUM · STRENGTH · DIVERSITY · FRESHNESS · RELEVANCE · COVERAGE',
       'ws.foot': 'NABD INTELLIGENCE · REAL-TIME ANALYSIS',
       'ws.src.s2': 'PUBLISHERS FROM THIS ANALYSIS',
       'ws.toast.new': 'New analysis ready — workspace refreshed',
@@ -572,6 +576,10 @@
       'ws.hl.t4': 'فرصة', 'ws.hl.t5': 'تفاعل جماهيري',
       'ws.inf.t': 'المؤثرون', 'ws.inf.s': 'أبرز الأصوات هذه الساعة',
       'ws.src.t': 'المصادر',
+      'ws.kw.t': 'الكلمات المفتاحية', 'ws.kw.s': 'حتمية · محسوبة من التجميع',
+      'ws.ph.t': 'أبرز العبارات', 'ws.ph.s': 'عبارات ناشئة من 2–3 كلمات',
+      'ws.ht.t': 'الوسوم', 'ws.ht.s': 'مستخرجة من الإشارات',
+      'ws.health.t': 'صحة الإشارة', 'ws.health.s': 'الزخم · القوة · التنوع · الحداثة · الصلة · التغطية',
       'ws.foot': 'ذكاء نبض · تحليل لحظي',
       'ws.src.s2': 'الناشرون من هذا التحليل',
       'ws.toast.new': 'تحليل جديد جاهز — أُعيد تحديث مساحة العمل',
@@ -1702,15 +1710,54 @@
       return fallback;
     };
 
+    /* ---- NEW dashboard contract: {query, dashboard, intelligence, meta}.
+       The dashboard block is deterministic (aggregation-level analytics); the
+       intelligence block is the separated AI output. Flatten both back onto
+       the legacy top-level keys so every existing consumer keeps working —
+       but the deterministic totals always take precedence over any AI-guessed
+       counter (e.g. the old "totalPosts: 8"). ---- */
+    if (raw && typeof raw === 'object' && raw.dashboard && typeof raw.dashboard === 'object' && raw.intelligence && typeof raw.intelligence === 'object') {
+      const D = raw.dashboard;
+      const I = raw.intelligence;
+      const ov = D.overview && typeof D.overview === 'object' ? D.overview : {};
+      const iStats = I.stats && typeof I.stats === 'object' ? I.stats : {};
+      const detTotal = num(ov.totalResults) != null ? num(ov.totalResults)
+        : num(ov.relevantResults) != null ? num(ov.relevantResults)
+        : num(iStats.totalPosts);
+      raw = Object.assign({}, raw, {
+        stats: Object.assign({}, iStats, {
+          totalPosts: detTotal != null ? detTotal : 0,
+          activeTopics: num(iStats.activeTopics) != null ? num(iStats.activeTopics) : null
+        }),
+        sentiment: I.sentiment && typeof I.sentiment === 'object' ? I.sentiment : null,
+        trendingTopics: Array.isArray(I.trendingTopics) ? I.trendingTopics : [],
+        aiBrief: I.aiBrief && typeof I.aiBrief === 'object' ? I.aiBrief : null,
+        aiHighlights: Array.isArray(I.aiHighlights) ? I.aiHighlights : [],
+        topLocations: Array.isArray(I.topLocations) ? I.topLocations : [],
+        results: Array.isArray(D.sampleSignals) && D.sampleSignals.length
+          ? D.sampleSignals
+          : (Array.isArray(raw.results) ? raw.results : null),
+        signalVolume: Array.isArray(D.timeline) && D.timeline.length
+          ? D.timeline.map((p) => ({ time: p && p.date, value: p && p.count })).filter((p) => p.time != null)
+          : (Array.isArray(raw.signalVolume) ? raw.signalVolume : null),
+        generatedAt: (raw.meta && raw.meta.generatedAt) || raw.generatedAt || null,
+        dashboard: D,
+        intelligence: I,
+        meta: raw.meta || null
+      });
+    }
+
     const out = {
       query: '', scope: null, raw: raw, language: null, summary: null, confidence: null, analyzedAt: null,
       articles: [], highlights: [], topics: [], locations: [], influencers: [],
       timeline: null, sentiment: null, network: null, globalContext: null, national: false, sources: [], categories: [],
-      dataPoints: [], mediaMix: [], liveTimeline: null, stats: null
+      dataPoints: [], mediaMix: [], liveTimeline: null, stats: null, dashboard: null, meta: null
     };
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
 
     out.query = String(pick(raw, ['query', 'q', 'search', 'userQuery'], '') || '');
+    out.dashboard = raw.dashboard && typeof raw.dashboard === 'object' ? raw.dashboard : null;
+    out.meta = raw.meta && typeof raw.meta === 'object' ? raw.meta : null;
     out.scope = String(pick(raw, ['scope'], '') || '').toLowerCase() || null;
     out.language = pick(raw, ['language', 'lang'], null) || null;
     let aiBriefObj = null;
@@ -2095,6 +2142,20 @@
     });
 
     out.sources = deriveSources(out.articles);
+
+    /* ---- deterministic source analytics (from Generate Dashboard Metrics)
+       beat the derived feed breakdown whenever the backend computed them. ---- */
+    if (out.dashboard && Array.isArray(out.dashboard.sources) && out.dashboard.sources.length) {
+      out.sources = out.dashboard.sources
+        .map((s) => ({
+          label: String(s.source || s.label || s.name || '').trim(),
+          count: num(s.count) != null ? Math.max(0, Math.round(num(s.count))) : 0,
+          pct: num(s.percentage) != null ? Math.round(num(s.percentage)) : null,
+          type: 'news'
+        }))
+        .filter((s) => s.label)
+        .sort((a, b) => b.count - a.count);
+    }
 
     /* ---- media mix: use structured counts when the backend classifies the
        sources; otherwise derive categories from each record's real source

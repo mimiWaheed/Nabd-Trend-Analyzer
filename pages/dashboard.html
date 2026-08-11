@@ -250,6 +250,42 @@
             <div class="empty-state" id="dbEmptyTopics" hidden><p data-i18n="ws.nodata">No data available</p></div>
           </div>
 
+          <!-- Top keywords (deterministic, from aggregation) -->
+          <div class="ws-card card kw-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.kw.t">Top keywords</h3>
+                <p class="card-sub" data-i18n="ws.kw.s">DETERMINISTIC · COMPUTED FROM AGGREGATION</p>
+              </div>
+            </div>
+            <div class="src-list" id="dbKwList"></div>
+            <div class="empty-state" id="dbEmptyKeywords" hidden><p data-i18n="ws.nodata">No data available</p></div>
+          </div>
+
+          <!-- Top phrases (deterministic n-grams) -->
+          <div class="ws-card card ph-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.ph.t">Top phrases</h3>
+                <p class="card-sub" data-i18n="ws.ph.s">EMERGING 2–3 WORD PHRASES</p>
+              </div>
+            </div>
+            <div class="src-list" id="dbPhList"></div>
+            <div class="empty-state" id="dbEmptyPhrases" hidden><p data-i18n="ws.nodata">No data available</p></div>
+          </div>
+
+          <!-- Hashtags (extracted, never invented) -->
+          <div class="ws-card card ht-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.ht.t">Hashtags</h3>
+                <p class="card-sub" data-i18n="ws.ht.s">EXTRACTED FROM SIGNALS</p>
+              </div>
+            </div>
+            <div class="ht-wrap" id="dbHtList"></div>
+            <div class="empty-state" id="dbEmptyHashtags" hidden><p data-i18n="ws.nodata">No data available</p></div>
+          </div>
+
           <!-- Historical trend strength -->
           <div class="ws-card chart-card timeline-card">
             <div class="card-head">
@@ -334,6 +370,18 @@
             </div>
             <div class="src-list" id="dbSrcList"></div>
             <div class="empty-state" id="dbEmptySources" hidden><p data-i18n="ws.src.na">No source data available for this analysis.</p></div>
+          </div>
+
+          <!-- Signal health (deterministic strength / momentum / diversity) -->
+          <div class="ws-card card health-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.health.t">Signal health</h3>
+                <p class="card-sub" data-i18n="ws.health.s">MOMENTUM · STRENGTH · DIVERSITY · FRESHNESS · RELEVANCE · COVERAGE</p>
+              </div>
+            </div>
+            <div class="health-grid" id="dbHealthGrid"></div>
+            <div class="empty-state" id="dbEmptyHealth" hidden><p data-i18n="ws.nodata">No data available</p></div>
           </div>
 
         </div>

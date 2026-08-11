@@ -28,7 +28,28 @@ const validation = node('Post-AI Validation');
 assert(!!validation, 'Post-AI Validation node exists');
 assert(validation.type === 'n8n-nodes-base.code', 'Post-AI Validation is a Code node');
 assert(wf.connections['AI Intelligence Analyst'].main[0][0].node === 'Post-AI Validation', 'AI -> Post-AI Validation connected');
-assert(wf.connections['Post-AI Validation'].main[0][0].node === 'Respond to Dashboard', 'Post-AI Validation -> Respond to Dashboard connected');
+
+const metrics = node('Generate Dashboard Metrics');
+assert(!!metrics, 'Generate Dashboard Metrics node exists');
+assert(metrics.type === 'n8n-nodes-base.code', 'Generate Dashboard Metrics is a Code node');
+assert(metrics.parameters.jsCode.includes('dashboardMetrics'), 'metrics node emits dashboardMetrics');
+
+const merge = node('Final Dashboard Merge');
+assert(!!merge, 'Final Dashboard Merge node exists');
+assert(merge.type === 'n8n-nodes-base.code', 'Final Dashboard Merge is a Code node');
+assert(merge.parameters.jsCode.includes('dashboard') && merge.parameters.jsCode.includes('intelligence'), 'merge node builds dashboard + intelligence contract');
+
+// aggregate fans out to BOTH the AI path and the deterministic metrics path
+const aggOuts = wf.connections['Aggregate Signals1'].main[0].map((c) => c.node);
+assert(aggOuts.indexOf('AI Intelligence Analyst') !== -1, 'Aggregate Signals1 still feeds the AI path');
+assert(aggOuts.indexOf('Generate Dashboard Metrics') !== -1, 'Aggregate Signals1 feeds Generate Dashboard Metrics');
+
+// final merge combines both branches and terminates at the webhook response
+assert(wf.connections['Generate Dashboard Metrics'].main[0][0].node === 'Final Dashboard Merge', 'Generate Dashboard Metrics -> Final Dashboard Merge');
+assert(wf.connections['Post-AI Validation'].main[0][0].node === 'Final Dashboard Merge', 'Post-AI Validation -> Final Dashboard Merge');
+assert(wf.connections['Final Dashboard Merge'].main[0][0].node === 'Respond to Dashboard', 'Final Dashboard Merge -> Respond to Dashboard');
+assert(wf.connections['Generate Dashboard Metrics'].main[0][0].index === 0, 'metrics arrives on merge input 0');
+assert(wf.connections['Post-AI Validation'].main[0][0].index === 1, 'AI arrives on merge input 1');
 
 // ---- simulate the validation logic ----
 const jsCode = validation.parameters.jsCode;
