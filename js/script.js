@@ -1032,11 +1032,10 @@
     const cur = location.pathname.split('/').pop();
     const target = url.split(/[?#]/)[0].split('/').pop();
     if (target === cur) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo(0, 0);
       return;
     }
-    document.body.classList.add('page-leave');
-    setTimeout(() => { location.href = url; }, 420);
+    location.href = url;
   }
 
   document.addEventListener('click', (e) => {
