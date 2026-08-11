@@ -103,8 +103,7 @@
     holder.innerHTML =
       '<aside class="app-side" id="appSide">'
       + '<div class="app-side-head">'
-      + '<a class="app-brand" href="index.html" data-page="index.html"><span class="app-logo">' + (N.lang === 'ar' ? 'نبض' : 'N') + '</span><span class="app-brand-name" data-i18n="brand"></span></a>'
-      + '<button class="collapse-btn" id="sideCollapse" aria-label="collapse">‹</button>'
+      + '<button class="collapse-btn" id="sideCollapse" aria-label="' + (N.lang === 'ar' ? 'طي الشريط الجانبي' : 'Collapse sidebar') + '">‹</button>'
       + '</div>'
       + '<nav class="app-nav">' + navHtml + '</nav>'
       + '<div class="app-side-foot">'
@@ -114,12 +113,25 @@
       + '</aside>'
       + '<div class="side-backdrop" id="sideBackdrop"></div>'
       + '<header class="app-top">'
-      + '<button class="mobile-menu-btn" id="sideBurger" aria-label="menu">' + svg(IC.burger) + '</button>'
-      + '<div class="app-top-left"><span class="app-top-title" data-i18n="app.title.' + page + '">' + L('app.title.' + page) + '</span><span class="app-top-crumb">' + L('app.crumb.app') + ' / ' + L('app.title.' + page) + '</span></div>'
+      + '<button class="mobile-menu-btn" id="sideBurger" aria-label="' + (N.lang === 'ar' ? 'القائمة' : 'Menu') + '" aria-expanded="false" aria-controls="appSide">' + svg(IC.burger) + '</button>'
+      + '<div class="app-top-cluster">'
+      + '<a class="app-brand app-brand-top" href="../index.html" data-page="../index.html" aria-label="NABD home">'
+      + '<span class="app-logo">' + (N.lang === 'ar' ? 'نبض' : 'N') + '</span>'
+      + '<span class="app-brand-name" data-i18n="brand"></span>'
+      + '</a>'
+      + '<div class="app-top-sep" aria-hidden="true"></div>'
+      + '<div class="app-top-left">'
+      + '<span class="app-top-title" data-i18n="app.title.' + page + '">' + L('app.title.' + page) + '</span>'
+      + '<span class="app-top-crumb"><span data-i18n="app.crumb.app"></span> / <span data-i18n="app.title.' + page + '"></span></span>'
+      + '</div>'
+      + '</div>'
       + '<div class="app-top-actions">'
+      + '<div class="lang-seg" id="topLang" role="group" aria-label="Language">'
+      + '<button type="button" class="lang-seg-btn" data-lang="en" aria-label="English">EN</button>'
+      + '<button type="button" class="lang-seg-btn" data-lang="ar" aria-label="العربية">عربي</button>'
+      + '</div>'
       + '<button class="icon-btn" id="topTheme" aria-label="theme">' + svg(IC.sun) + '</button>'
-      + '<button class="lang-toggle" id="topLang"></button>'
-      + '<button class="avatar-btn" id="userMenuBtn" aria-label="menu"><span class="avatar">' + initials() + '</span></button>'
+      + '<button class="avatar-btn" id="userMenuBtn" aria-label="' + (N.lang === 'ar' ? 'قائمة المستخدم' : 'Open user menu') + '" aria-haspopup="menu" aria-expanded="false" aria-controls="userMenu"><span class="avatar">' + initials() + '</span></button>'
       + '<div class="user-menu" id="userMenu">' + menuHtml
       + '<div class="menu-sep"></div>'
       + '<button class="menu-item danger" data-menu="signout">' + svg(IC.logout) + '<span data-i18n="app.menu.signout">' + L('app.menu.signout') + '</span></button>'
@@ -144,11 +156,21 @@
   function updateThemeBtn() {
     const dark = document.documentElement.getAttribute('data-theme') !== 'light';
     const b = $('topTheme');
-    if (b) b.innerHTML = svg(dark ? IC.sun : IC.moon);
+    if (b) {
+      b.innerHTML = svg(dark ? IC.sun : IC.moon);
+      b.setAttribute('aria-label', dark ? L('app.theme.light') : L('app.theme.dark'));
+    }
   }
   function updateLangBtn() {
-    const b = $('topLang');
-    if (b) b.textContent = N.lang === 'ar' ? 'EN' : 'العربية';
+    const seg = $('topLang');
+    if (seg) {
+      seg.querySelectorAll('.lang-seg-btn').forEach((b) => {
+        const on = b.dataset.lang === N.lang;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+    }
+    document.querySelectorAll('.app-logo').forEach((el) => { el.textContent = N.lang === 'ar' ? 'نبض' : 'N'; });
   }
 
   function bindShell() {
@@ -164,24 +186,26 @@
     const burger = $('sideBurger');
     const backdrop = $('sideBackdrop');
     if (burger && backdrop) {
-      const closeSide = () => { side.classList.remove('mobile-open'); backdrop.classList.remove('show'); };
+      const closeSide = () => { side.classList.remove('mobile-open'); backdrop.classList.remove('show'); burger.setAttribute('aria-expanded', 'false'); };
       burger.addEventListener('click', () => {
         side.classList.add('mobile-open');
         backdrop.classList.add('show');
+        burger.setAttribute('aria-expanded', 'true');
       });
       backdrop.addEventListener('click', closeSide);
     }
     const btn = $('userMenuBtn');
     const menu = $('userMenu');
     if (btn && menu) {
+      const setOpen = (on) => { menu.classList.toggle('open', on); btn.setAttribute('aria-expanded', String(on)); };
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        menu.classList.toggle('open');
+        setOpen(!menu.classList.contains('open'));
       });
       document.addEventListener('click', (e) => {
-        if (!menu.contains(e.target) && e.target !== btn) menu.classList.remove('open');
+        if (!menu.contains(e.target) && e.target !== btn) setOpen(false);
       });
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') menu.classList.remove('open'); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
       menu.addEventListener('click', (e) => {
         const it = e.target.closest('[data-menu]');
         if (!it) return;
@@ -196,7 +220,7 @@
           T('app.toast.signedout');
           setTimeout(() => N.navigate('../index.html'), 700);
         }
-        menu.classList.remove('open');
+        setOpen(false);
       });
     }
     const th = $('topTheme');
@@ -205,8 +229,13 @@
       N.applyTheme(next);
       updateThemeBtn();
     });
-    const tl = $('topLang');
-    if (tl) tl.addEventListener('click', () => setLang(N.lang === 'ar' ? 'en' : 'ar'));
+    const seg = $('topLang');
+    if (seg) {
+      seg.querySelectorAll('.lang-seg-btn').forEach((b) => {
+        b.addEventListener('click', () => setLang(b.dataset.lang));
+      });
+    }
+    document.addEventListener('nabd-theme', updateThemeBtn);
     updateThemeBtn();
     updateLangBtn();
   }
@@ -214,6 +243,7 @@
   function setLang(next) {
     N.applyLang(next);
     updateLangBtn();
+    updateThemeBtn();
     updateBadge();
     document.dispatchEvent(new window.CustomEvent('app-render'));
   }
