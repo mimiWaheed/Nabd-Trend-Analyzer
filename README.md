@@ -21,12 +21,17 @@ A dependency-free static web app. No build step, no framework — plain HTML, CS
 ├── index.html            Landing page
 ├── pages/                Application pages (dashboard, workspace, signin, ...)
 ├── js/                   Shared JavaScript
-│   ├── script.js         Core: i18n, themes, navigation, landing widgets
+│   ├── script.js         Core: i18n, themes, navigation, API layer, helpers
 │   ├── app.js            App shell + page modules (protected routes, auth guard)
 │   ├── auth.js           Sign-in / sign-up logic
-│   └── workspace.js      Analysis workspace logic
+│   └── workspace.js      Analysis workspace logic (dead — workspace.html redirects)
+├── api/                  Vercel serverless routes
+│   ├── config.js         Serves the configurable n8n webhook URL
+│   └── meta/             Meta OAuth (start / callback / revoke)
 ├── css/
 │   └── styles.css        Full design system (dark/light, RTL-ready)
+├── vercel.json           Vercel deployment config
+├── .env.example          Documented environment variables (copy to .env)
 └── assets/               Images / icons (currently unused)
 ```
 
@@ -58,13 +63,24 @@ Then open `http://localhost:8000`. No environment variables or build tools are r
 
 The analysis flow is wired to a production **n8n** workflow that performs the real data gathering and AI analysis.
 
-- The webhook endpoint is defined once as `NABD_WEBHOOK` in `js/script.js` and is the only outbound request in the app.
+- The webhook endpoint is defined once as `DEFAULT_WEBHOOK` in `js/script.js`. In a Vercel deployment it can be overridden with the `NABD_WEBHOOK_URL` environment variable, served through `api/config.js`.
 - When a user submits an analysis, the frontend `POST`s the query to the n8n webhook and waits for the raw response.
-- A normalization layer then maps the raw response into the `NormalizedAnalysis` shape used by the dashboard, workspace and reports.
+- A normalization layer maps the raw response into the `NormalizedAnalysis` shape used by the dashboard, reports and saved searches.
+- Every metric respects the `null`/`undefined` = unavailable vs `0` = real-zero distinction; unavailable values render as "—" and missing sections collapse into compact intentional empty states — the dashboard never shows fake data or huge empty placeholder cards.
 - The response is persisted in `localStorage` so history and saved searches keep working offline against the last result.
 
-The webhook itself is hosted at `https://n8n.addme.solutions/webhook/trend-analysis`. Do not replace or rename it — the integration depends on that exact endpoint.
+The webhook is hosted at `https://mimiwi.app.n8n.cloud/webhook/trend-analysis`. Do not replace or rename it — the integration depends on that exact endpoint. The n8n workflow itself is read-only reference; the frontend only consumes its contract.
 
 ## Authentication
 
 Authentication is a frontend demo (localStorage-backed) for the time being. `N.setUser()`/`N.getUser()` in `script.js` power the sign-in/sign-up flow and the protected-route guard. No credentials are stored or transmitted beyond the current page session.
+
+## Meta (Facebook) private analysis
+
+Private analysis (`scope: "private"`) connects a user's Meta Page and Instagram Business account through a real OAuth flow handled by the Vercel routes under `api/meta/`:
+
+1. `api/meta/start.js` builds the Meta authorization dialog URL.
+2. `api/meta/callback.js` exchanges the authorization code for a token server-side (the App Secret never leaves the server), resolves the first Page + Instagram business account, and hands the result back to the opener via `postMessage`.
+3. `api/meta/revoke.js` clears the token on disconnect.
+
+Required environment variables (see `.env.example`): `NABD_WEBHOOK_URL`, `META_APP_ID`, `META_APP_SECRET`, `META_REDIRECT_URI`. The access token is kept only in `sessionStorage` and never in `localStorage`. If Meta variables are missing, the UI shows a clear setup error instead of pretending the account is connected. Public analysis never sends Facebook credentials.

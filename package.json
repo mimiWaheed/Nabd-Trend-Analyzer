@@ -1,0 +1,13 @@
+{
+  "name": "nabd-trend-analyzer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NABD (نبض) — static frontend with Vercel serverless routes (config + Meta OAuth).",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "devDependencies": {
+    "vercel": "^34.0.0"
+  }
+}

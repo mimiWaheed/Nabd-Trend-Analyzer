@@ -73,6 +73,7 @@
       'uc.c6.t': 'Security teams', 'uc.c6.b': 'Crisis signals, geopolitical risk and coordinated-activity detection.',
       'uc.c7.t': 'Marketing', 'uc.c7.b': 'Emerging conversations, audience sentiment and cultural timing for campaigns.',
       'uc.c8.t': 'Public relations', 'uc.c8.b': 'Reaction tracking, narrative drift and reputation-risk early warnings.',
+      'brand': 'NABD',
       'cta.eyebrow': 'GET STARTED',
       'cta.title': 'Start understanding<br>Egypt\'s <span class="grad">pulse</span>.',
       'cta.sub': 'Join intelligence teams across Egypt and 30+ countries watching the world in real time.',
@@ -93,35 +94,16 @@
       'ws.back': 'Home', 'ws.new': 'New analysis', 'ws.querylabel': 'TRACKING', 'ws.private.badge': 'Private Analysis',
       'ws.brief': 'AI BRIEF', 'ws.meta1': '14 sources', 'ws.meta2': 'updated 2m ago', 'ws.meta3': 'confidence 94%',
       'ws.brieftitle': 'Egypt — live brief',
-      'ws.sum1': 'Egypt\'s conversation is moving on three fronts today. <strong>Economy</strong> dominates: Egyptian Pound discussions are up sharply, inflation expectations are the top topic in Cairo, and Suez Canal traffic numbers are drawing international attention.',
-      'ws.sum2': 'In <strong>politics and society</strong>, the New Administrative Capital is trending with strong positive sentiment, while education reform debates are active across the Delta and Upper Egypt. Misinformation risk is elevated around currency rumors — two clusters flagged for review.',
-      'ws.sum3': '<strong>Recommended watchlist:</strong> inflation data release, Suez Canal announcements, and the El Clasico build-up across Alexandria and Cairo.',
-      'ws.briefchip1': 'Economy', 'ws.briefchip2': 'Politics', 'ws.briefchip3': 'Sports', 'ws.briefchip4': 'Cairo',
-      'ws.kpi1': 'TOTAL SIGNALS', 'ws.kpi2': 'OVERALL SENTIMENT', 'ws.kpi3': 'ACTIVE CRISES', 'ws.kpi4': 'INFLATION TALKS',
-      'ws.gov.t': 'Governorate intelligence', 'ws.gov.s': 'TREND INTENSITY BY REGION',
-      'ws.loc.cairo': 'Cairo', 'ws.loc.capital': 'New Capital', 'ws.loc.ale': 'Alexandria',
-      'ws.loc.giza': 'Giza', 'ws.loc.suez': 'Suez Canal', 'ws.loc.upper': 'Upper Egypt',
-      'ws.loc.ps': 'Port Said', 'ws.loc.mans': 'Mansoura', 'ws.loc.tanta': 'Tanta', 'ws.loc.aswan': 'Aswan',
-      'ws.global.t': 'Global context', 'ws.global.s': 'WORLD SIGNALS · EGYPT WATCH',
-      'ws.global.r1': 'Global recession watch', 'ws.global.r2': 'Gaza ceasefire talks',
-      'ws.global.r3': 'Energy markets', 'ws.global.r4': 'Gulf investment flows',
-      'ws.global.r5': 'Global tourism recovery', 'ws.global.r6': 'BRICS coordination',
-      'ws.topics.t': 'Trending topics', 'ws.topics.s': 'BY SEVERITY · EGYPT',
-      'ws.topics.t1': 'Egyptian Pound', 'ws.topics.t2': 'Suez Canal', 'ws.topics.t3': 'New Capital',
-      'ws.topics.t4': 'Inflation', 'ws.topics.t5': 'El Clasico', 'ws.topics.t6': 'Tourism',
-      'ws.topics.t7': 'Education', 'ws.topics.t8': 'Election law debate',
+      'ws.topics.t': 'Trending topics',
       'ws.timeline.t': 'Historical trend strength', 'ws.timeline.s': 'WEEKLY TREND INDEX · SIGNAL VOLUME',
       'ws.tab.day': '24H', 'ws.tab.week': '7D', 'ws.tab.month': '30D',
-      'ws.donut.t': 'Sentiment split', 'ws.donut.s': 'EGYPT · LAST 24 HOURS',
+      'ws.donut.t': 'Sentiment split',
       'ws.donut.pos': 'Positive', 'ws.donut.neu': 'Neutral', 'ws.donut.neg': 'Negative',
       'ws.nodata': 'No data available',
       'ws.sent.na': 'Sentiment data unavailable',
       'ws.sent.sparse': 'Based on {n} signals — low volume, interpret with caution.',
-      'ws.timeline.na': 'No timestamped historical trend data available for this query.',
+      'ws.timeline.na': 'No timestamped signal data available for this analysis.',
       'ws.timeline.tip': 'index',
-      'ws.keydata.t': 'Key data', 'ws.keydata.s': 'STRUCTURED FACTS FROM ANALYZED SOURCES',
-      'ws.keydata.na': 'No structured data points available for this query.',
-      'ws.keydata.from': 'from', 'ws.keydata.sparse': 'Low signal volume — interpret with caution.',
       'ws.brief.datapoints': 'Structured data recovered: {d}.',
       'ws.brief.dp': '{name} at {value} {currency} per {unit}',
       'ws.brief.dp.plain': '{name} = {value} {currency}',
@@ -130,16 +112,10 @@
       'ws.loc.na': 'No city-level geographic data available for this query.',
       'ws.national.t': 'National coverage',
       'ws.national.s': 'Egypt-wide signal',
-      'ws.inf.na': 'No influencers identified in this analysis',
       'ws.hl.na': 'No AI highlights generated for this query.',
       'ws.src.na': 'No source distribution available for this query.',
-      'ws.mix.na': 'No category mix available for this query.',
-      'ws.global.na': 'No global context available for this query.',
-      'ws.net.na': 'Network relationships unavailable for this analysis.',
       'ws.feed.na': 'No live signals returned for this query.',
       'ws.sum.na': 'No AI brief returned for this query — signals are still displayed below.',
-      'ws.mix.news': 'News', 'ws.mix.social': 'Social', 'ws.mix.gov': 'Government',
-      'ws.mix.sports': 'Sports', 'ws.mix.business': 'Business',
       'ws.src.count': 'sources',
       'ws.updated': 'updated',
       'ws.conf': 'confidence',
@@ -152,38 +128,55 @@
       'ws.brief.locations': 'Geographic focus: {l}.',
       'ws.brief.sources': 'Top sources: {l}.',
       'ws.brief.highlights': '{n} notable signals identified.',
-      'ws.feed.t': 'Live feed', 'ws.feed.s': 'NEWS · SOCIAL · RSS',
-      'ws.feed.i1': 'Finance minister to discuss subsidy reforms in economic council session',
-      'ws.feed.i2': 'Egyptian Pound jumps on record investment inflows',
-      'ws.feed.i3': 'Suez Canal authority reports record quarterly transit numbers',
-      'ws.feed.i4': 'Wide discussion on staple prices in governorate groups',
-      'ws.feed.i5': 'New Capital events draw interest as openings announced',
-      'ws.feed.i6': 'Weather: fog warnings on desert roads for the morning',
-      'ws.feed.i7': 'Analysts split on winter tourism outlook',
-      'ws.feed.i8': 'Community beach-cleanup initiatives grow in Alexandria',
-      'ws.feed.i9': 'EGX closes higher on foreign buying',
+      'ws.feed.t': 'Live feed',
       'ws.hl.t': 'AI highlights', 'ws.hl.s': 'GENERATED THIS CYCLE',
       'ws.hl.t1': 'BREAKING EVENT', 'ws.hl.t2': 'EMERGING PATTERN', 'ws.hl.t3': 'MISINFORMATION RISK',
       'ws.hl.t4': 'OPPORTUNITY', 'ws.hl.t5': 'PUBLIC REACTION',
-      'ws.hl.b1': 'Suez Canal transit figures released — volumes beat expectations.',
-      'ws.hl.b2': 'Pound-related discussions up 43% across Cairo within 3 hours.',
-      'ws.hl.b3': 'Currency devaluation rumors lack primary sources; reach accelerating.',
-      'ws.hl.b4': 'New Capital property interest rising among Gulf investors.',
-      'ws.hl.b5': 'Education reform debate polarized — strong support in Upper Egypt.',
-      'ws.hl.time1': '12m ago', 'ws.hl.time2': '8m ago', 'ws.hl.time3': '6m ago', 'ws.hl.time4': '4m ago', 'ws.hl.time5': '2m ago',
       'ws.inf.t': 'Influencers', 'ws.inf.s': 'TOP VOICES THIS HOUR',
-      'ws.inf.n1': 'Masr Today', 'ws.inf.n2': 'Cairo Pulse', 'ws.inf.n3': 'Dr. Ahmed Hassan',
-      'ws.inf.n4': 'Nour Media', 'ws.inf.n5': 'Omnia Tarek',
-      'ws.src.t': 'Sources', 'ws.src.s': 'SIGNAL SHARE · 24H',
-      'ws.src.r1': 'News desks', 'ws.src.r2': 'X (Twitter)', 'ws.src.r3': 'Facebook',
-      'ws.src.r4': 'RSS feeds', 'ws.src.r5': 'Instagram', 'ws.src.r6': 'Google Trends',
-      'ws.net.t': 'Network graph', 'ws.net.s': 'TOPICS · INSTITUTIONS · VOICES',
-      'ws.mix.t': 'Media mix', 'ws.mix.s': 'SIGNAL SHARE BY CATEGORY',
-      'ws.mix.r1': 'Economy', 'ws.mix.r2': 'Politics', 'ws.mix.r3': 'Sports',
-      'ws.mix.r4': 'Culture', 'ws.mix.r5': 'Tech', 'ws.mix.r6': 'Weather',
-      'ws.foot': 'LIVE INTELLIGENCE · REFRESHED EVERY 60 SECONDS · 14 SOURCE TYPES',
+      'ws.src.t': 'Sources',
+      'ws.foot': 'NABD INTELLIGENCE · REAL-TIME ANALYSIS',
+      'ws.src.s2': 'PUBLISHERS FROM THIS ANALYSIS',
       'ws.toast.new': 'New analysis ready — workspace refreshed',
       'ws.toast.query': 'Tracking updated to: <b>{q}</b>',
+
+      /* data-driven dashboard (real n8n contract) */
+      'ws.rel.s': '{n}s', 'ws.rel.m': '{n}m', 'ws.rel.h': '{n}h', 'ws.rel.d': '{n}d', 'ws.rel.w': '{n}w',
+      'ws.brief.active': 'Active topics: {n}.',
+      'ws.brief.sparse': 'The dataset is sparse — treat these signals with caution.',
+      'ws.brief.influencers': 'Top voices: {n} influencers.',
+      'ws.regional.t': 'Regional intelligence',
+      'ws.regional.s': 'DETECTED LOCATIONS FROM THIS ANALYSIS',
+      'ws.gov.detected': 'detected mentions',
+      'ws.priv.note': 'Private analysis — based on your connected Meta account',
+      'ws.pub.note': 'Public analysis — open web signals',
+      'ws.meta.generated': 'generated {t}',
+      'ws.meta.posts': '{n} resources',
+      'ws.meta.scope': 'Scope: {s}',
+      'ws.kpi.posts': 'RESOURCES ANALYZED',
+      'ws.kpi.active': 'ACTIVE TOPICS',
+      'ws.kpi.sentiment': 'OVERALL SENTIMENT',
+      'ws.kpi.emergency': 'EMERGENCY ALERTS',
+      'ws.sent.sub': '{q} · {s}',
+      'ws.topics.s2': 'RANKED BY SEVERITY',
+      'ws.src.count2': '{n} items',
+      'ws.src.author': 'by {a}',
+      'ws.src.eng': '{n} engagements',
+      'ws.feed.s2': 'REAL SOURCES · CLICK TO OPEN',
+      'ws.influencers.na': 'No influencers identified in this analysis.',
+      'ws.loc.egypt': 'Egypt',
+      'ws.preview.t': 'Start a new analysis',
+      'ws.preview.s': 'Try one of these queries, or ask anything about Egypt.',
+      'ws.preview.go': 'Analyze',
+      'ws.scope.public': 'Public', 'ws.scope.private': 'Private',
+      'db.meta.connected': 'Facebook connected',
+      'db.meta.error': 'Meta connection failed — please try again.',
+      'db.meta.notconfigured': 'Meta OAuth is not configured on the server yet (set META_APP_ID, META_APP_SECRET, META_REDIRECT_URI).',
+      'db.meta.startfail': 'Could not start Meta authorization.',
+      'db.meta.popup': 'The Meta authorization window was blocked — allow popups and try again.',
+      'db.meta.select.title': 'Select the page to analyze',
+      'db.meta.select.sub': 'This page will be used for private analysis.',
+      'db.meta.select.connect': 'Connect this page',
+      'db.meta.select.cancel': 'Cancel',
 
       /* filters */
       'filters.label': 'FILTER', 'filters.all': 'All', 'filters.news': 'News',
@@ -518,6 +511,7 @@
       'uc.c6.t': 'فرق الأمن', 'uc.c6.b': 'إشارات الأزمات والمخاطر الجيوسياسية وكشف الأنشطة المنسقة.',
       'uc.c7.t': 'التسويق', 'uc.c7.b': 'أحاديث ناشئة ومشاعر الجمهور وتوقيت ثقافي للحملات.',
       'uc.c8.t': 'العلاقات العامة', 'uc.c8.b': 'تتبّع ردود الفعل وانجراف السرد وإنذارات مبكرة لمخاطر السمعة.',
+      'brand': 'نبض',
       'cta.eyebrow': 'ابدأ الآن',
       'cta.title': 'ابدأ بفهم<br>نبض <span class="grad">مصر</span>.',
       'cta.sub': 'انضم إلى فرق استخبارات في مصر وأكثر من 30 دولة تراقب العالم لحظة بلحظة.',
@@ -539,35 +533,16 @@
       'ws.brief': 'موجز الذكاء الاصطناعي',
       'ws.meta1': '14 مصدرًا', 'ws.meta2': 'حُدّث قبل دقيقتين', 'ws.meta3': 'ثقة 94%',
       'ws.brieftitle': 'مصر — تقرير حي',
-      'ws.sum1': 'يتحرك الحديث في مصر اليوم على ثلاثة جبهات. <strong>الاقتصاد</strong> يتصدر: أحاديث الجنيه المصري ترتفع بحدة، والتضخم هو الموضوع الأول في القاهرة، وأرقام حركة قناة السويس تجذب انتباه العالم.',
-      'ws.sum2': 'في <strong>السياسة والمجتمع</strong>، العاصمة الإدارية الجديدة تتصدر الترند بمشاعر إيجابية قوية، بينما تتصاعد مناقشات إصلاح التعليم في الدلتا والصعيد. خطر التضليل مرتفع حول شائعات العملة — مجموعتان رُصدتا للمراجعة.',
-      'ws.sum3': '<strong>قائمة المتابعة المقترحة:</strong> إصدار بيانات التضخم، إعلانات قناة السويس، والاستعدادات للكلاسيكو في الإسكندرية والقاهرة.',
-      'ws.briefchip1': 'اقتصاد', 'ws.briefchip2': 'سياسة', 'ws.briefchip3': 'رياضة', 'ws.briefchip4': 'القاهرة',
-      'ws.kpi1': 'إجمالي الإشارات', 'ws.kpi2': 'المشاعر العامة', 'ws.kpi3': 'أزمات نشطة', 'ws.kpi4': 'نقاشات التضخم',
-      'ws.gov.t': 'ذكاء المحافظات', 'ws.gov.s': 'كثافة الترندات حسب الإقليم',
-      'ws.loc.cairo': 'القاهرة', 'ws.loc.capital': 'العاصمة الجديدة', 'ws.loc.ale': 'الإسكندرية',
-      'ws.loc.giza': 'الجيزة', 'ws.loc.suez': 'قناة السويس', 'ws.loc.upper': 'الصعيد',
-      'ws.loc.ps': 'بورسعيد', 'ws.loc.mans': 'المنصورة', 'ws.loc.tanta': 'طنطا', 'ws.loc.aswan': 'أسوان',
-      'ws.global.t': 'السياق العالمي', 'ws.global.s': 'إشارات العالم · متابعة مصر',
-      'ws.global.r1': 'مراقبة الركود العالمي', 'ws.global.r2': 'مفاوضات وقف إطلاق النار في غزة',
-      'ws.global.r3': 'أسواق الطاقة', 'ws.global.r4': 'تدفقات الاستثمار الخليجية',
-      'ws.global.r5': 'تعافي السياحة العالمية', 'ws.global.r6': 'تنسيق بريكس',
-      'ws.topics.t': 'ترندات رائجة', 'ws.topics.s': 'حسب الخطورة · مصر',
-      'ws.topics.t1': 'الجنيه المصري', 'ws.topics.t2': 'قناة السويس', 'ws.topics.t3': 'العاصمة الجديدة',
-      'ws.topics.t4': 'التضخم', 'ws.topics.t5': 'الكلاسيكو', 'ws.topics.t6': 'السياحة',
-      'ws.topics.t7': 'التعليم', 'ws.topics.t8': 'نقاش قانون الانتخابات',
+      'ws.topics.t': 'ترندات رائجة',
       'ws.timeline.t': 'قوة الترند التاريخي', 'ws.timeline.s': 'مؤشر الترند الأسبوعي · حجم الإشارة',
       'ws.tab.day': '24 س', 'ws.tab.week': '7 أيام', 'ws.tab.month': '30 يومًا',
-      'ws.donut.t': 'توزيع المشاعر', 'ws.donut.s': 'مصر · آخر 24 ساعة',
+      'ws.donut.t': 'توزيع المشاعر',
       'ws.donut.pos': 'إيجابي', 'ws.donut.neu': 'محايد', 'ws.donut.neg': 'سلبي',
       'ws.nodata': 'لا توجد بيانات',
       'ws.sent.na': 'بيانات المشاعر غير متاحة',
       'ws.sent.sparse': 'استنادًا إلى {n} إشارة — حجم منخفض، يُفسَّر بحذر.',
-      'ws.timeline.na': 'لا تتوفر بيانات ترند تاريخية بزمن محدد لهذا الاستعلام',
+      'ws.timeline.na': 'لا توجد بيانات إشارة زمنية متاحة لهذا التحليل.',
       'ws.timeline.tip': 'مؤشر',
-      'ws.keydata.t': 'بيانات أساسية', 'ws.keydata.s': 'حقائق منظمة من المصادر المُحلَّلة',
-      'ws.keydata.na': 'لا تتوفر نقاط بيانات منظمة لهذا الاستعلام.',
-      'ws.keydata.from': 'المصدر', 'ws.keydata.sparse': 'حجم إشارات منخفض — ينبغي الحذر عند التفسير.',
       'ws.brief.datapoints': 'بيانات منظمة مُستخلصة: {d}.',
       'ws.brief.dp': '{name} بسعر {value} {currency} لكل {unit}',
       'ws.brief.dp.plain': '{name} = {value} {currency}',
@@ -576,18 +551,11 @@
       'ws.loc.na': 'لا توجد بيانات جغرافية على مستوى المدن لهذا الاستعلام',
       'ws.national.t': 'تغطية وطنية',
       'ws.national.s': 'إشارة على مستوى مصر',
-      'ws.inf.na': 'لم يتم تحديد شخصيات مؤثرة في هذا التحليل',
       'ws.hl.na': 'لم تُنشأ ملخصات ذكاء اصطناعي لهذا الاستعلام.',
       'ws.src.na': 'لا تتوفر توزيعة مصادر لهذا الاستعلام.',
-      'ws.mix.na': 'لا يتوفر مزيج فئات لهذا الاستعلام.',
-      'ws.global.na': 'لا يتوفر سياق عالمي لهذا الاستعلام.',
-      'ws.net.na': 'علاقات الشبكة غير متاحة لهذا التحليل.',
       'ws.feed.na': 'لم تُرجع الإشارات الحية نتائج لهذا الاستعلام.',
       'ws.sum.na': 'لم يُرجع الموجز ملخصًا ذكيًا لهذا الاستعلام — الإشارات معروضة أدناه.',
-      'ws.mix.news': 'أخبار', 'ws.mix.social': 'تواصل اجتماعي', 'ws.mix.gov': 'حكومة',
-      'ws.mix.sports': 'رياضة', 'ws.mix.business': 'أعمال',
-      'ws.src.count': 'مصدر',
-      'ws.updated': 'آخر تحديث',
+      'ws.src.count': 'مصدر',      'ws.updated': 'آخر تحديث',
       'ws.conf': 'ثقة',
       'ws.brief.total': 'إجمالي الإشارات: {n} ذكرًا عبر {s} مصادر.',
       'ws.brief.mentions': 'إجمالي الإشارات: {n} ذكرًا.',
@@ -598,38 +566,55 @@
       'ws.brief.locations': 'التركيز الجغرافي: {l}.',
       'ws.brief.sources': 'أبرز المصادر: {l}.',
       'ws.brief.highlights': 'تم رصد {n} إشارات ملحوظة.',
-      'ws.feed.t': 'التغذية الحية', 'ws.feed.s': 'أخبار · اجتماعي · RSS',
-      'ws.feed.i1': 'وزير المالية يناقش إصلاحات الدعم في اجتماع المجلس الاقتصادي',
-      'ws.feed.i2': 'الجنيه المصري يقفز على خلفية تدفقات استثمارية قياسية',
-      'ws.feed.i3': 'هيئة قناة السويس تعلن أرقام عبور قياسية للربع',
-      'ws.feed.i4': 'نقاش واسع حول أسعار السلع الأساسية في مجموعات المحافظات',
-      'ws.feed.i5': 'فعاليات العاصمة الجديدة تجذب الاهتمام مع الإعلان عن افتتاحات',
-      'ws.feed.i6': 'الطقس: تحذيرات من شبورة على الطرق الصحراوية صباحًا',
-      'ws.feed.i7': 'محللون منقسمون حول آفاق السياحة الشتوية',
-      'ws.feed.i8': 'مبادرات مجتمعية لتنظيف الشواطئ تنمو في الإسكندرية',
-      'ws.feed.i9': 'البورصة المصرية تغلق على ارتفاع مع شراء أجنبي',
+      'ws.feed.t': 'التغذية الحية',
       'ws.hl.t': 'ملخصات الذكاء الاصطناعي', 'ws.hl.s': 'صُنعت في هذه الدورة',
       'ws.hl.t1': 'حدث عاجل', 'ws.hl.t2': 'نمط ناشئ', 'ws.hl.t3': 'خطر تضليل',
       'ws.hl.t4': 'فرصة', 'ws.hl.t5': 'تفاعل جماهيري',
-      'ws.hl.b1': 'أرقام عبور قناة السويس صدرت — الحجم فاق التوقعات.',
-      'ws.hl.b2': 'أحاديث الجنيه ارتفعت 43% في القاهرة خلال 3 ساعات.',
-      'ws.hl.b3': 'شائعات تخفيض قيمة العملة بلا مصادر موثوقة؛ الانتشار يتسارع.',
-      'ws.hl.b4': 'اهتمام خليجي متزايد بمشروعات العاصمة الإدارية الجديدة.',
-      'ws.hl.b5': 'نقاش إصلاح التعليم منقسم — دعم قوي في الصعيد.',
-      'ws.hl.time1': 'منذ 12 دقيقة', 'ws.hl.time2': 'منذ 8 دقائق', 'ws.hl.time3': 'منذ 6 دقائق', 'ws.hl.time4': 'منذ 4 دقائق', 'ws.hl.time5': 'منذ دقيقتين',
       'ws.inf.t': 'المؤثرون', 'ws.inf.s': 'أبرز الأصوات هذه الساعة',
-      'ws.inf.n1': 'مصر اليوم', 'ws.inf.n2': 'كايرو بلس', 'ws.inf.n3': 'د. أحمد حسن',
-      'ws.inf.n4': 'نور ميديا', 'ws.inf.n5': 'أمنية طارق',
-      'ws.src.t': 'المصادر', 'ws.src.s': 'حصة الإشارات · 24 ساعة',
-      'ws.src.r1': 'مكاتب الأخبار', 'ws.src.r2': 'إكس (تويتر)', 'ws.src.r3': 'فيسبوك',
-      'ws.src.r4': 'خلاصات RSS', 'ws.src.r5': 'إنستغرام', 'ws.src.r6': 'جوجل ترندز',
-      'ws.net.t': 'شبكة العلاقات', 'ws.net.s': 'موضوعات · مؤسسات · أصوات',
-      'ws.mix.t': 'مزيج الوسائط', 'ws.mix.s': 'حصة الإشارات حسب الفئة',
-      'ws.mix.r1': 'اقتصاد', 'ws.mix.r2': 'سياسة', 'ws.mix.r3': 'رياضة',
-      'ws.mix.r4': 'ثقافة', 'ws.mix.r5': 'تقنية', 'ws.mix.r6': 'طقس',
-      'ws.foot': 'ذكاء حيّ · يُحدَّث كل 60 ثانية · 14 نوع مصدر',
+      'ws.src.t': 'المصادر',
+      'ws.foot': 'ذكاء نبض · تحليل لحظي',
+      'ws.src.s2': 'الناشرون من هذا التحليل',
       'ws.toast.new': 'تحليل جديد جاهز — أُعيد تحديث مساحة العمل',
       'ws.toast.query': 'تم تحديث المتابعة إلى: <b>{q}</b>',
+
+      /* data-driven dashboard (real n8n contract) */
+      'ws.rel.s': '{n}ث', 'ws.rel.m': '{n}د', 'ws.rel.h': '{n}س', 'ws.rel.d': '{n}ي', 'ws.rel.w': '{n}أ',
+      'ws.brief.active': 'المواضيع النشطة: {n}.',
+      'ws.brief.sparse': 'مجموعة البيانات محدودة — تعامل مع هذه الإشارات بحذر.',
+      'ws.brief.influencers': 'أبرز الأصوات: {n} من المؤثرين.',
+      'ws.regional.t': 'الذكاء الإقليمي',
+      'ws.regional.s': 'المواقع المكتشفة من هذا التحليل',
+      'ws.gov.detected': 'إشارات مكتشفة',
+      'ws.priv.note': 'تحليل خاص — بناءً على حسابك المرتبط على Meta',
+      'ws.pub.note': 'تحليل عام — إشارات الويب المفتوحة',
+      'ws.meta.generated': 'أنشئ {t}',
+      'ws.meta.posts': '{n} مصدر',
+      'ws.meta.scope': 'النطاق: {s}',
+      'ws.kpi.posts': 'الموارد المحللة',
+      'ws.kpi.active': 'المواضيع النشطة',
+      'ws.kpi.sentiment': 'المشاعر العامة',
+      'ws.kpi.emergency': 'تنبيهات الطوارئ',
+      'ws.sent.sub': '{q} · {s}',
+      'ws.topics.s2': 'مرتبة حسب الشدة',
+      'ws.src.count2': '{n} عنصر',
+      'ws.src.author': 'بواسطة {a}',
+      'ws.src.eng': '{n} تفاعل',
+      'ws.feed.s2': 'مصادر حقيقية · انقر للفتح',
+      'ws.influencers.na': 'لم يتم تحديد شخصيات مؤثرة في هذا التحليل.',
+      'ws.loc.egypt': 'مصر',
+      'ws.preview.t': 'ابدأ تحليلاً جديداً',
+      'ws.preview.s': 'جرّب أحد هذه الاستعلامات، أو اسأل عن أي شيء عن مصر.',
+      'ws.preview.go': 'تحليل',
+      'ws.scope.public': 'عام', 'ws.scope.private': 'خاص',
+      'db.meta.connected': 'تم الاتصال بفيسبوك',
+      'db.meta.error': 'فشل الاتصال بـ Meta — حاول مرة أخرى.',
+      'db.meta.notconfigured': 'لم يتم إعداد OAuth لـ Meta على الخادم بعد (META_APP_ID / META_APP_SECRET / META_REDIRECT_URI).',
+      'db.meta.startfail': 'تعذر بدء تفويض Meta.',
+      'db.meta.popup': 'تم حظر نافذة تفويض Meta — اسمح بالنوافذ المنبثقة وحاول مرة أخرى.',
+      'db.meta.select.title': 'اختر الصفحة لتحليلها',
+      'db.meta.select.sub': 'ستُستخدم هذه الصفحة في التحليل الخاص.',
+      'db.meta.select.connect': 'اتصال بهذه الصفحة',
+      'db.meta.select.cancel': 'إلغاء',
 
       /* filters */
       'filters.label': 'تصفية', 'filters.all': 'الكل', 'filters.news': 'أخبار',
@@ -1471,7 +1456,9 @@
   if (feedTrack) feedTrack.innerHTML += feedTrack.innerHTML;
 
   /* ----------------------------------------------------------
-     FACEBOOK PRIVATE ANALYSIS — mock connect (landing)
+     FACEBOOK PRIVATE ANALYSIS — real Meta OAuth (landing)
+     UI reflects the real connection state; connect opens the OAuth
+     popup, disconnect clears the session credentials.
      ---------------------------------------------------------- */
   const fbStatusEl = $('fbStatus');
   const fbConnect = $('fbConnect');
@@ -1495,11 +1482,9 @@
     if (state === 'connected') {
       if (fbConnect) fbConnect.classList.add('hidden');
       if (fbDisconnect) fbDisconnect.classList.remove('hidden');
-      fb.connect();
     } else if (state === 'idle') {
       if (fbConnect) fbConnect.classList.remove('hidden');
       if (fbDisconnect) fbDisconnect.classList.add('hidden');
-      fb.disconnect();
     } else {
       if (fbConnect) fbConnect.classList.add('hidden');
       if (fbDisconnect) fbDisconnect.classList.add('hidden');
@@ -1509,54 +1494,84 @@
 
   if (fbConnect) {
     fbConnect.addEventListener('click', () => {
+      clearTimeout(fbTimer);
       setFbState('connecting');
-      fbTimer = setTimeout(() => setFbState('connected'), 1500);
+      fb.connect();
     });
   }
   if (fbDisconnect) {
     fbDisconnect.addEventListener('click', () => {
       clearTimeout(fbTimer);
-      setFbState('idle');
+      fb.disconnect();
     });
   }
+  document.addEventListener('nabd-fb-change', (e) => {
+    setFbState(e && e.detail && e.detail.connected ? 'connected' : 'idle');
+  });
+
+  /* ----------------------------------------------------------
+     API CONFIG — the n8n webhook URL is environment-configurable.
+     The Vercel serverless route /api/config serves it from
+     NABD_WEBHOOK_URL; when that route is unavailable (local static
+     preview) the production default is used. Resolved once + cached.
+     ---------------------------------------------------------- */
+  const DEFAULT_WEBHOOK = 'https://mimiwi.app.n8n.cloud/webhook/trend-analysis';
+
+  let apiConfigPromise = null;
+  function loadApiConfig() {
+    if (!apiConfigPromise) {
+      apiConfigPromise = fetch('/api/config', { headers: { Accept: 'application/json' }, cache: 'no-store' })
+        .then((res) => (res.ok ? res.json() : Promise.reject(new Error('config http ' + res.status))))
+        .then((cfg) => (cfg && typeof cfg === 'object' ? cfg : {}))
+        .catch(() => ({}));
+    }
+    return apiConfigPromise;
+  }
+  const apiWebhookUrl = (cfg) => (cfg && cfg.webhookUrl) || DEFAULT_WEBHOOK;
 
   /* ----------------------------------------------------------
      ANALYSIS SERVICE — real n8n webhook
      USER INPUT → POST /webhook/trend-analysis → raw response
      ----------------------------------------------------------
      Public payload  : { query, scope: "public" }
-     Private payload : { query, scope: "private", …existing fb identity }
-     Failures (HTTP or network/timeout) reject — never mock.      */
-  const NABD_WEBHOOK = 'https://n8n.addme.solutions/webhook/trend-analysis';
-
+     Private payload : { query, scope: "private", accessToken,
+                         accountId, igUserId }
+     Failures (HTTP or network/timeout) reject — never mock.
+     Errors log status only — access tokens are never logged.     */
   function analyze(query, opts) {
     const scope = opts && opts.scope === 'private' ? 'private' : 'public';
     const payload = { query: String(query || '').trim(), scope: scope };
     if (scope === 'private') {
       const st = fb.read();
       if (!st.connected) return Promise.reject(new Error('fb-not-connected'));
-      ['facebookAccessToken', 'facebookUserId', 'facebookPageId', 'instagramBusinessId'].forEach((k) => {
-        if (st[k]) payload[k] = st[k];
-      });
+      if (st.accessToken) payload.accessToken = st.accessToken;
+      if (st.accountId) payload.accountId = st.accountId;
+      if (st.igUserId) payload.igUserId = st.igUserId;
     }
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 60000);
-    return fetch(NABD_WEBHOOK, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: ctrl.signal
-    }).then((res) => {
-      clearTimeout(timer);
-      if (!res.ok) throw new Error('trend-analysis http ' + res.status);
-      return res.text().then((txt) => {
-        if (!txt || !txt.trim()) throw new Error('trend-analysis empty response');
-        try { return JSON.parse(txt); } catch (e) { throw new Error('trend-analysis invalid json'); }
+    return loadApiConfig()
+      .then((cfg) => fetch(apiWebhookUrl(cfg), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: ctrl.signal
+      }))
+      .then((res) => {
+        clearTimeout(timer);
+        if (!res.ok) {
+          if (typeof console !== 'undefined') console.error('[nabd] trend-analysis http ' + res.status);
+          throw new Error('trend-analysis http ' + res.status);
+        }
+        return res.text().then((txt) => {
+          if (!txt || !txt.trim()) throw new Error('trend-analysis empty response');
+          try { return JSON.parse(txt); } catch (e) { throw new Error('trend-analysis invalid json'); }
+        });
+      })
+      .catch((err) => {
+        clearTimeout(timer);
+        throw err;
       });
-    }).catch((err) => {
-      clearTimeout(timer);
-      throw err;
-    });
   }
 
   /* ----------------------------------------------------------
@@ -1611,14 +1626,15 @@
     };
 
     const out = {
-      query: '', raw: raw, language: null, summary: null, confidence: null, analyzedAt: null,
+      query: '', scope: null, raw: raw, language: null, summary: null, confidence: null, analyzedAt: null,
       articles: [], highlights: [], topics: [], locations: [], influencers: [],
       timeline: null, sentiment: null, network: null, globalContext: null, national: false, sources: [], categories: [],
-      dataPoints: [], mediaMix: [], liveTimeline: null
+      dataPoints: [], mediaMix: [], liveTimeline: null, stats: null
     };
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
 
     out.query = String(pick(raw, ['query', 'q', 'search', 'userQuery'], '') || '');
+    out.scope = String(pick(raw, ['scope'], '') || '').toLowerCase() || null;
     out.language = pick(raw, ['language', 'lang'], null) || null;
     out.summary = pick(raw, ['summary', 'aiSummary', 'brief', 'aiBrief', 'answer', 'result'], null);
     const conf = num(pick(raw, ['confidence'], null));
@@ -1626,6 +1642,21 @@
     out.analyzedAt = pick(raw, ['analyzedAt', 'generatedAt', 'timestamp', 'completedAt', 'created_at'], null) || null;
     out.network = pick(raw, ['network', 'graph', 'entities', 'relations'], null) || null;
     out.globalContext = pick(raw, ['globalContext', 'global', 'global_trends', 'world'], null) || null;
+
+    /* ---- stats (contract: totalPosts, activeTopics, sentimentScore,
+       emergencyAlerts, negativeTopics, positiveTopics). Values that are
+       genuinely missing stay null — the UI shows "—" for those, keeping
+       0 distinct from unavailable. ---- */
+    if (raw.stats && typeof raw.stats === 'object') {
+      out.stats = {
+        totalPosts: num(raw.stats.totalPosts),
+        activeTopics: num(raw.stats.activeTopics),
+        sentimentScore: num(raw.stats.sentimentScore),
+        emergencyAlerts: num(raw.stats.emergencyAlerts),
+        negativeTopics: num(raw.stats.negativeTopics),
+        positiveTopics: num(raw.stats.positiveTopics)
+      };
+    }
 
     /* ---- articles/resources: the foundation ---- */
     const ITEM_KEYS = ['title', 'headline', 'name', 'text', 'content', 'post', 'message'];
@@ -2102,6 +2133,141 @@
     return Object.keys(map).map((k) => ({ label: k, count: map[k], pct: tot ? Math.round((map[k] / tot) * 100) : 0 })).sort((a, b) => b.count - a.count);
   }
 
+  /* ----------------------------------------------------------
+     DATA AVAILABILITY HELPERS — shared by every dashboard widget.
+     null / undefined / '' / NaN ⇒ unavailable; 0 is a real zero.
+     Widgets must never use `value || 0` for metrics because 0 and
+     "missing" mean different things. ------------------------- */
+  const hasData = (v) => v !== null && v !== undefined && v !== '' && !(typeof v === 'number' && isNaN(v));
+  const isAvailable = (v) => v !== null && v !== undefined && v !== '' && !(typeof v === 'number' && isNaN(v));
+
+  function formatNumber(v, compact) {
+    const n = parseFloat(v);
+    if (isNaN(n)) return null;
+    if (compact) {
+      const abs = Math.abs(n);
+      if (abs >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+      if (abs >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+    }
+    return String(Math.round(n * 100) / 100).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  function formatRelativeTime(v) {
+    const d = v instanceof Date ? v : new Date(v);
+    if (isNaN(d.getTime())) return String(v == null ? '' : v);
+    const s = Math.max(0, Math.floor((Date.now() - d.getTime()) / 1000));
+    const A = I18N[lang] || I18N.en || {};
+    if (s < 60) return (A['ws.rel.s'] || '{n}s').split('{n}').join(s);
+    if (s < 3600) return (A['ws.rel.m'] || '{n}m').split('{n}').join(Math.floor(s / 60));
+    if (s < 86400) return (A['ws.rel.h'] || '{n}h').split('{n}').join(Math.floor(s / 3600));
+    if (s < 604800) return (A['ws.rel.d'] || '{n}d').split('{n}').join(Math.floor(s / 86400));
+    return (A['ws.rel.w'] || '{n}w').split('{n}').join(Math.floor(s / 604800));
+  }
+
+  const SRC_TYPE_TOKEN_RE = /^(news|web|website|article|social|x|twitter|facebook|fb|instagram|ig|rss|feed|google|trends|youtube|newspaper|press|media|unknown)$/i;
+  const isSrcTypeToken = (v) => {
+    if (v == null) return true;
+    const s = String(v).toLowerCase().trim();
+    return !!SRC_TYPE_TOKEN_RE.test(s) || /^(news|web|article|social|rss|feed|google|trends|youtube|twitter|facebook|instagram|press|newspaper)/i.test(s);
+  };
+
+  /* Real display label for a source record: the publisher/domain name
+     beats a bare type token like "web" or "news". */
+  function getSourceLabel(item) {
+    if (!item || typeof item !== 'object') return '';
+    const keys = ['source', 'sourceName', 'source_name', 'domain', 'publisher', 'author', 'channel', 'src'];
+    for (let i = 0; i < keys.length; i++) {
+      const v = item[keys[i]];
+      if (v == null) continue;
+      const s = String(v).trim();
+      if (s && !isSrcTypeToken(s)) return s;
+    }
+    for (let i = 0; i < keys.length; i++) {
+      const v = item[keys[i]];
+      if (v == null) continue;
+      const s = String(v).trim();
+      if (s) return s;
+    }
+    return '';
+  }
+
+  /* Egyptian governorates (EN + AR + conservative aliases). Used ONLY to
+     label locations that are explicitly present in returned API data. */
+  const EGYPT_GOVERNORATES = [
+    { en: 'Cairo', ar: 'القاهرة', aliases: ['القاهره', 'caire'] },
+    { en: 'Giza', ar: 'الجيزة', aliases: ['الجيزه'] },
+    { en: 'Alexandria', ar: 'الإسكندرية', aliases: ['الاسكندرية', 'alexandria'] },
+    { en: 'Tanta', ar: 'طنطا', aliases: ['tanta'] },
+    { en: 'Gharbia', ar: 'الغربية', aliases: ['الغربيه', 'gharbeya'] },
+    { en: 'Dakahlia', ar: 'الدقهلية', aliases: ['الدقهليه', 'dakahlia'] },
+    { en: 'Menoufia', ar: 'المنوفية', aliases: ['المنوفيه', 'menoufia'] },
+    { en: 'Qalyubia', ar: 'القليوبية', aliases: ['القليوبيه', 'qalyubia', 'kalubia'] },
+    { en: 'Sharqia', ar: 'الشرقية', aliases: ['الشرقيه', 'sharqia'] },
+    { en: 'Beheira', ar: 'البحيرة', aliases: ['البحيره', 'beheira'] },
+    { en: 'Kafr El Sheikh', ar: 'كفر الشيخ', aliases: ['kafr el sheikh'] },
+    { en: 'Damietta', ar: 'دمياط', aliases: ['damietta'] },
+    { en: 'Port Said', ar: 'بورسعيد', aliases: ['port said'] },
+    { en: 'Suez', ar: 'السويس', aliases: ['suez'] },
+    { en: 'Ismailia', ar: 'الإسماعيلية', aliases: ['الاسماعيلية', 'ismailia'] },
+    { en: 'Fayoum', ar: 'الفيوم', aliases: ['fayoum', 'fayum'] },
+    { en: 'Beni Suef', ar: 'بني سويف', aliases: ['beni suef'] },
+    { en: 'Minya', ar: 'المنيا', aliases: ['minya'] },
+    { en: 'Assiut', ar: 'أسيوط', aliases: ['اسيوط', 'assiut'] },
+    { en: 'Sohag', ar: 'سوهاج', aliases: ['sohag'] },
+    { en: 'Qena', ar: 'قنا', aliases: ['qena'] },
+    { en: 'Luxor', ar: 'الأقصر', aliases: ['الاقصر', 'luxor'] },
+    { en: 'Aswan', ar: 'أسوان', aliases: ['اسوان', 'aswan'] },
+    { en: 'Matrouh', ar: 'مطروح', aliases: ['matrouh'] },
+    { en: 'Red Sea', ar: 'البحر الأحمر', aliases: ['البحر الاحمر', 'red sea'] },
+    { en: 'New Valley', ar: 'الوادي الجديد', aliases: ['الوادي الجديد'] },
+    { en: 'North Sinai', ar: 'شمال سيناء', aliases: ['north sinai'] },
+    { en: 'South Sinai', ar: 'جنوب سيناء', aliases: ['جنوب سيناء'] }
+  ];
+
+  /* normalizeLocation: canonicalize a returned location name to an
+     Egyptian governorate, or flag national "Egypt" coverage. Returns null
+     for anything that cannot be confirmed. Never fabricates a location. */
+  function normalizeLocation(input) {
+    if (!input) return null;
+    const raw = String(input).trim();
+    const key = raw.toLowerCase().replace(/[\s_]+/g, ' ').trim();
+    const NATIONAL = { 'مصر': 1, 'egypt': 1, 'جمهورية مصر العربية': 1, 'arab republic of egypt': 1 };
+    if (NATIONAL[key]) return { name: 'Egypt', ar: 'مصر', national: true, input: raw };
+    for (let i = 0; i < EGYPT_GOVERNORATES.length; i++) {
+      const g = EGYPT_GOVERNORATES[i];
+      const esc = (s) => s.toLowerCase().replace(/[\s_]+/g, ' ').trim();
+      if (key === esc(g.en) || key === g.ar || g.aliases.some((a) => key === esc(a))) {
+        return { name: g.en, ar: g.ar, national: false, input: raw };
+      }
+    }
+    return null;
+  }
+
+  /* detectGovernorates: scan a text blob for explicit Egyptian governorate
+     mentions (word-boundary match, EN + AR). Returns canonical governorates
+     only for explicit matches — used for the "detected mentions" label. */
+  function detectGovernorates(text) {
+    const found = [];
+    if (!text) return found;
+    const t = String(text);
+    const seen = {};
+    EGYPT_GOVERNORATES.forEach((g) => {
+      const names = [g.en, g.ar].concat(g.aliases);
+      let hit = false;
+      for (let i = 0; i < names.length && !hit; i++) {
+        const n = String(names[i] || '').trim();
+        if (!n) continue;
+        const escN = n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const re = /[\u0600-\u06FF]/.test(n)
+          ? new RegExp('(^|[^\\u0600-\\u06FF\\w])' + escN + '([^\\u0600-\\u06FF\\w]|$)', 'i')
+          : new RegExp('(^|[^a-z0-9])' + escN + '([^a-z0-9]|$)', 'i');
+        if (re.test(t)) hit = true;
+      }
+      if (hit && !seen[g.en]) { seen[g.en] = 1; found.push(g); }
+    });
+    return found;
+  }
+
   /* Generate an AI brief from the ACTUAL normalized analysis — used only when
      n8n does not return a summary field. Every sentence is composed from real
      returned data; empty/missing sections are skipped, and mangled strings
@@ -2116,11 +2282,13 @@
 
     const total = num(stats.totalPosts);
     const srcN = Array.isArray(r.articles) ? r.articles.length : 0;
+    const active = num(stats.activeTopics);
     if (total != null) {
       parts.push(srcN > 0
         ? F('ws.brief.total').split('{n}').join(total).split('{s}').join(srcN)
         : F('ws.brief.mentions').split('{n}').join(total));
     }
+    if (active != null && active > 0) parts.push(F('ws.brief.active').split('{n}').join(active));
 
     const topics = cleanNames(r.topics, (t) => t.label).slice(0, 3);
     if (topics.length) parts.push(F('ws.brief.topics').split('{t}').join(topics.join(', ')));
@@ -2173,69 +2341,168 @@
     const crises = num(stats.emergencyAlerts);
     if (crises != null) parts.push(F('ws.brief.crises').split('{n}').join(crises));
 
-    const locs = cleanNames(r.locations, (l) => l.name).slice(0, 3);
+    const locs = cleanNames(r.locations, (l) => {
+      const n = normalizeLocation(l && l.name);
+      return n ? n.name : (l && l.name);
+    }).slice(0, 3);
     if (locs.length) parts.push(F('ws.brief.locations').split('{l}').join(locs.join(', ')));
 
     const srcs = cleanNames(r.sources, (s) => s.label).slice(0, 3);
     if (srcs.length) parts.push(F('ws.brief.sources').split('{l}').join(srcs.join(', ')));
 
+    const infN = Array.isArray(r.influencers) ? r.influencers.length : 0;
+    if (infN > 0) parts.push(F('ws.brief.influencers').split('{n}').join(infN));
+
     const hlN = Array.isArray(r.highlights) ? r.highlights.length : 0;
     if (hlN > 0) parts.push(F('ws.brief.highlights').split('{n}').join(hlN));
+
+    /* sparse dataset — say so explicitly instead of implying full coverage */
+    if (total != null && total < 10) parts.push(F('ws.brief.sparse'));
 
     return parts;
   }
 
   /* ----------------------------------------------------------
-     Frontend-only state: persist, read, migrate. The future n8n
-     task swaps `fb.connect`/`fb.disconnect` with real OAuth calls —
-     the rest of the app only consumes this module + change events.
+     FACEBOOK / META OAUTH — real connection state.
+     - localStorage `nabd-fb` keeps ONLY identity { connected,
+       accountName, connectedAt } — never a token.
+     - sessionStorage `nabd-meta` keeps the session access token +
+       page ids (cleared on disconnect / when the tab closes).
+     - The OAuth exchange happens server-side on Vercel
+       (/api/meta/start, /api/meta/callback, /api/meta/revoke);
+       the Meta App Secret never reaches the browser.
      ---------------------------------------------------------- */
   const fb = {
     key: 'nabd-fb',
+    metaKey: 'nabd-meta',
+    oauthStateKey: 'nabd-oauth-state',
     read() {
+      let meta = null;
+      try { const m = sessionStorage.getItem(this.metaKey); meta = m ? JSON.parse(m) : null; } catch (e) {}
       let raw = null;
       try { raw = localStorage.getItem(this.key); } catch (e) {}
-      if (!raw) return { connected: false, accountName: '', connectedAt: 0 };
-      try {
-        const o = JSON.parse(raw);
-        if (o && typeof o === 'object') {
-          const st = {
-            connected: !!o.connected,
-            accountName: String(o.accountName || ''),
-            connectedAt: Number(o.connectedAt || 0)
-          };
-          ['facebookAccessToken', 'facebookUserId', 'facebookPageId', 'instagramBusinessId'].forEach((k) => {
-            if (o[k]) st[k] = o[k];
-          });
-          return st;
-        }
-      } catch (e) { /* not JSON — legacy string below */ }
-      return { connected: raw === 'connected', accountName: '', connectedAt: 0 };
+      let st = { connected: false, accountName: '', connectedAt: 0 };
+      if (raw) {
+        try {
+          const o = JSON.parse(raw);
+          if (o && typeof o === 'object') {
+            st = {
+              connected: !!o.connected,
+              accountName: String(o.accountName || ''),
+              connectedAt: Number(o.connectedAt || 0)
+            };
+          }
+        } catch (e) { st = { connected: raw === 'connected', accountName: '', connectedAt: 0 }; }
+      }
+      if (meta && meta.accessToken) {
+        st.connected = true;
+        if (meta.accountName) st.accountName = meta.accountName;
+        st.accessToken = meta.accessToken;
+        st.accountId = meta.accountId || meta.pageId || '';
+        st.igUserId = meta.igUserId || '';
+      } else if (st.connected) {
+        /* legacy credentials (pre-OAuth builds) — keep working until the
+           user reconnects through the real flow */
+        try {
+          const o = JSON.parse(raw);
+          if (o.facebookAccessToken) st.accessToken = o.facebookAccessToken;
+          if (o.facebookPageId) st.accountId = o.facebookPageId;
+          if (o.instagramBusinessId) st.igUserId = o.instagramBusinessId;
+        } catch (e) {}
+      }
+      return st;
     },
     write(state) {
-      try { localStorage.setItem(this.key, JSON.stringify(state)); } catch (e) {}
+      /* never persist access tokens in localStorage */
+      const safe = { connected: !!state.connected, accountName: String(state.accountName || ''), connectedAt: Number(state.connectedAt || 0) };
+      try { localStorage.setItem(this.key, JSON.stringify(safe)); } catch (e) {}
     },
-    connect(accountName) {
-      let me = null;
-      try { me = getUser ? getUser() : null; } catch (e) {}
-      const name = (accountName || '').trim()
-        || ((me && (me.first || me.last)) ? ((me.first || '') + ' ' + (me.last || '')).trim() : '')
-        || 'Egypt Pulse — Page';
-      const state = { connected: true, accountName: name, connectedAt: Date.now() };
-      this.write(state);
-      this.emit(state);
-      return state;
+    toastKey(key) {
+      try { document.dispatchEvent(new CustomEvent('nabd-toast', { detail: { key: key } })); } catch (e) {}
+    },
+    connect() {
+      if (this.read().connected) return;
+      const stateId = String(Math.random().toString(36).slice(2)) + String(Date.now().toString(36));
+      try { sessionStorage.setItem(this.oauthStateKey, stateId); } catch (e) {}
+      loadApiConfig()
+        .then((cfg) => fetch('/api/meta/start?state=' + encodeURIComponent(stateId), { headers: { Accept: 'application/json' } }))
+        .then((res) => res.json().catch(() => ({})))
+        .then((data) => {
+          if (!data || !data.url) {
+            if (data && data.error === 'META_NOT_CONFIGURED') throw new Error('META_NOT_CONFIGURED');
+            throw new Error('META_START_FAILED');
+          }
+          const w = 640, h = 780;
+          const left = Math.max(0, Math.round((window.screen.width - w) / 2));
+          const top = Math.max(0, Math.round((window.screen.height - h) / 3));
+          const popup = window.open(data.url, 'nabd-meta-oauth', 'width=' + w + ',height=' + h + ',left=' + left + ',top=' + top + ',popup=1');
+          if (!popup) { this.toastKey('db.meta.popup'); return; }
+          let handled = false;
+          const onMsg = (ev) => {
+            if (!ev || ev.origin !== location.origin) return;
+            const d = ev.data;
+            if (!d || d.type !== 'nabd-meta-result') return;
+            handled = true;
+            window.removeEventListener('message', onMsg);
+            if (d.error) { this.toastKey('db.meta.error'); this.emit({ connected: false, accountName: '', connectedAt: 0 }); return; }
+            const meta = {
+              accessToken: String(d.accessToken || ''),
+              accountId: String(d.accountId || ''),
+              pageId: String(d.accountId || ''),
+              igUserId: d.igUserId ? String(d.igUserId) : '',
+              accountName: String(d.accountName || ''),
+              expiresAt: Number(d.expiresAt || 0)
+            };
+            if (!meta.accessToken || !meta.accountId) { this.toastKey('db.meta.error'); return; }
+            try { sessionStorage.setItem(this.metaKey, JSON.stringify(meta)); } catch (e) {}
+            const st = { connected: true, accountName: meta.accountName, connectedAt: Date.now() };
+            this.write(st);
+            this.emit(st);
+            this.toastKey('db.meta.connected');
+          };
+          window.addEventListener('message', onMsg);
+          const poll = setInterval(() => {
+            try {
+              if (popup.closed) {
+                clearInterval(poll);
+                window.removeEventListener('message', onMsg);
+                if (!handled) {
+                  /* popup closed with no result — keep state honest */
+                  const cur = this.read();
+                  if (!cur.connected) this.emit({ connected: false, accountName: '', connectedAt: 0 });
+                }
+              }
+            } catch (e) {}
+          }, 800);
+          return null;
+        })
+        .catch((err) => {
+          if (err && err.message === 'META_NOT_CONFIGURED') { this.toastKey('db.meta.notconfigured'); return; }
+          this.toastKey('db.meta.startfail');
+        });
     },
     disconnect() {
+      let meta = null;
+      try { const m = sessionStorage.getItem(this.metaKey); meta = m ? JSON.parse(m) : null; } catch (e) {}
+      try { sessionStorage.removeItem(this.metaKey); } catch (e) {}
+      try { sessionStorage.removeItem(this.oauthStateKey); } catch (e) {}
       const state = { connected: false, accountName: '', connectedAt: 0 };
       this.write(state);
       this.emit(state);
+      if (meta && meta.accessToken) {
+        /* best-effort server-side token revocation — never blocks the UI */
+        try {
+          fetch('/api/meta/revoke', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: meta.accessToken })
+          }).catch(() => {});
+        } catch (e) {}
+      }
       return state;
     },
     emit(state) {
-      try {
-        document.dispatchEvent(new CustomEvent('nabd-fb-change', { detail: state }));
-      } catch (e) {}
+      try { document.dispatchEvent(new CustomEvent('nabd-fb-change', { detail: state })); } catch (e) {}
       try { localStorage.setItem('nabd-last-fb', state.connected ? state.accountName : ''); } catch (e) {}
     }
   };
@@ -2309,6 +2576,13 @@
     navigate,
     normalizeAnalysisResponse,
     buildBrief,
+    hasData,
+    isAvailable,
+    formatNumber,
+    formatRelativeTime,
+    getSourceLabel,
+    normalizeLocation,
+    detectGovernorates,
     toast,
     applyTheme,
     getUser,

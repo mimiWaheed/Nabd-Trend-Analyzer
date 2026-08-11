@@ -13,6 +13,7 @@
   const page = document.body.dataset.page || '';
   const toastEl = () => $('appToast');
   const T = (key) => { if (toastEl()) N.toast(toastEl(), L(key)); };
+  document.addEventListener('nabd-toast', (e) => { if (e && e.detail && e.detail.key) T(e.detail.key); });
 
   /* ----------------------------------------------------------
      AUTH GUARD — protected application routes
@@ -522,6 +523,29 @@
       });
     });
 
+    /* ---------- preview suggestion chips (real queries, language-aware) ---------- */
+    const suggestBox = $('dbSuggestions');
+    function paintSuggestions() {
+      if (!suggestBox) return;
+      const items = Array.isArray(N.QUERIES && N.QUERIES[N.lang]) ? N.QUERIES[N.lang].slice(0, 4) : [];
+      suggestBox.innerHTML = items.map((q, i) =>
+        '<button type="button" class="sug-chip" data-q="' + esc(q) + '">'
+        + '<span class="sug-ic mono">' + (i + 1) + '</span><span class="sug-txt">' + esc(q) + '</span>'
+        + '<span class="sug-go mono">' + esc(L('ws.preview.go')) + '</span></button>'
+      ).join('');
+    }
+    if (suggestBox) {
+      suggestBox.addEventListener('click', (e) => {
+        const c = e.target.closest('.sug-chip');
+        if (!c) return;
+        const q = c.dataset.q;
+        if (input) input.value = q;
+        runAnalysis(q);
+      });
+    }
+    document.addEventListener('app-render', paintSuggestions);
+    paintSuggestions();
+
     /* ---------- filter chips · REAL category filtering over returned metadata ---------- */
     let curFilter = 'all';
     /* Categories follow the existing app convention (settings "default scope"
@@ -598,6 +622,11 @@
         : [];
       const emptyS = $('dbEmptySentiment');
       const spar = $('dbSparsityNote');
+      const subEl = $('dbSentSub');
+      if (subEl) {
+        const scopeLbl = privMode === 'private' ? L('ws.scope.private') : L('ws.scope.public');
+        subEl.textContent = L('ws.sent.sub').split('{q}').join(query || '—').split('{s}').join(scopeLbl);
+      }
       const postN = num(stats.totalPosts);
       const setSparsity = () => {
         if (!spar) return;
@@ -658,13 +687,6 @@
       return dflt;
     }
     function num(v) { const n = parseFloat(v); return isNaN(n) ? null : n; }
-    function fmtKpi(v) {
-      const n = num(v);
-      if (n == null) return String(v);
-      if (Math.abs(n) >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M+';
-      if (Math.abs(n) >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
-      return String(Math.round(n * 10) / 10);
-    }
     function fmtDelta(d) {
       const n = num(d);
       if (n == null) return String(d == null ? '' : d);
@@ -672,8 +694,20 @@
     }
     const SEV = ['sev-danger', 'sev-warn', 'sev-blue', 'sev-pos', 'sev-purple'];
     const TAGS = ['tag-danger', 'tag-blue', 'tag-warn', 'tag-pos', 'tag-purple'];
-    const sevCls = (v) => (SEV.indexOf(v) !== -1 ? v : 'sev-blue');
-    const tagCls = (v) => (TAGS.indexOf(v) !== -1 ? v : 'tag-blue');
+    const SEV_MAP = { critical: 'sev-danger', high: 'sev-danger', emergency: 'sev-danger', breaking: 'sev-danger', medium: 'sev-warn', moderate: 'sev-warn', low: 'sev-blue', calm: 'sev-pos', positive: 'sev-pos', rising: 'sev-purple' };
+    const TAG_TYPE = { 'breaking': 'tag-danger', 'breaking event': 'tag-danger', 'misinformation': 'tag-danger', 'misinformation risk': 'tag-danger', 'crisis': 'tag-danger', 'emergency': 'tag-danger', 'opportunity': 'tag-pos', 'emerging pattern': 'tag-blue', 'emerging': 'tag-blue', 'public reaction': 'tag-purple', 'reaction': 'tag-purple', 'watch': 'tag-warn' };
+    const sevCls = (v) => {
+      if (!v) return 'sev-blue';
+      const k = String(v).toLowerCase().trim();
+      if (SEV.indexOf(k) !== -1) return k;
+      return SEV_MAP[k] || 'sev-blue';
+    };
+    const tagCls = (v) => {
+      if (!v) return 'tag-blue';
+      const k = String(v).toLowerCase().trim();
+      if (TAGS.indexOf(k) !== -1) return k;
+      return TAG_TYPE[k] || 'tag-blue';
+    };
 
     function listWidget(listEl, emptyEl, items) {
       const has = items.length > 0;
@@ -684,40 +718,46 @@
       if (emptyEl) { emptyEl.hidden = has; emptyEl.style.display = ''; }
     }
 
-    function topicRow(t, i) {
+    function topicRow(t, i, maxVol) {
       const label = esc(pick(t, ['label', 'name', 'topic', 'title'], '—'));
       const vol = esc(pick(t, ['vol', 'volume', 'count', 'value'], '—'));
-      const dRaw = pick(t, ['delta', 'change'], '');
+      const dRaw = pick(t, ['delta', 'change', 'vsBaseline'], '');
       const flat = /^(stable|flat|same|even|no change)/i.test(String(dRaw)) || String(pick(t, ['dir', 'up', 'trend'], '')).toLowerCase() === 'flat';
       const down = !flat && (/^-/.test(String(dRaw)) || String(pick(t, ['dir', 'up', 'trend'], '')).toLowerCase() === 'down');
-      const w = Math.max(0, Math.min(100, num(pick(t, ['w', 'weight', 'intensity'], 50)) || 50));
+      const countN = num(pick(t, ['count', 'vol', 'volume', 'value'], null));
+      const wRaw = num(pick(t, ['w', 'weight', 'intensity'], null));
+      const hasBar = wRaw != null || countN != null;
+      const w = wRaw != null
+        ? Math.max(0, Math.min(100, wRaw))
+        : (countN != null && maxVol > 0 ? Math.max(2, Math.min(100, Math.round((countN / maxVol) * 100))) : 0);
       const sev = sevCls(pick(t, ['sev', 'severity', 'level'], 'sev-blue'));
       const cat = esc(pick(t, ['cat', 'category'], ''));
       return '<div class="trend-item"' + (cat ? ' data-cat="' + cat + '"' : '') + '>'
         + '<span class="trend-rank">' + String(i + 1).padStart(2, '0') + '</span>'
         + '<span class="trend-name">' + label + '</span>'
-        + '<span class="trend-bar"><i class="' + sev + '" style="--w:' + w + '%"></i></span>'
+        + (hasBar ? '<span class="trend-bar"><i class="' + sev + '" style="--w:' + w + '%"></i></span>' : '')
         + '<span class="trend-vol mono">' + vol + '</span>'
-        + '<span class="trend-delta ' + (flat ? 'flat' : down ? 'down' : 'up') + '">' + esc(fmtDelta(dRaw)) + '</span></div>';
+        + (dRaw ? '<span class="trend-delta ' + (flat ? 'flat' : down ? 'down' : 'up') + '">' + esc(fmtDelta(dRaw)) + '</span>' : '') + '</div>';
     }
     function locationCard(l) {
-      const name = esc(pick(l, ['name', 'label', 'city', 'region'], '—'));
-      const score = num(pick(l, ['score'], null));
-      const count = num(pick(l, ['count'], null));
-      const wv = num(pick(l, ['w', 'weight', 'intensity'], null));
-      const wBase = wv != null ? wv : (score != null ? score : (count != null ? Math.min(100, count) : null));
-      const w = Math.max(0, Math.min(100, wBase || 0));
-      const dRaw = pick(l, ['delta', 'change'], '');
-      const vol = esc(pick(l, ['vol', 'volume', 'mentions', '24h', 'count', 'value'], '—'));
+      const norm = N.normalizeLocation(l && l.name);
+      const canonical = norm && norm.name;
+      const name = esc(canonical ? (N.lang === 'ar' && norm.ar ? norm.ar : canonical) : pick(l, ['name', 'label', 'city', 'region'], '—'));
+      const count = num(l && l.count);
+      const detected = !!(norm && !norm.national);
+      const sub = detected ? L('ws.gov.detected') : (count != null ? N.formatNumber(count) : '');
       return '<div class="region-card">'
-        + '<div class="region-top"><span class="region-name">' + name + '</span><span class="region-score">' + (score == null ? '—' : String(Math.round(score))) + '</span></div>'
-        + '<div class="region-bar"><i style="--w:' + w + '%"></i></div>'
-        + '<div class="region-meta mono"><span class="' + (/^-/.test(String(dRaw)) ? 'down' : 'up') + '">' + esc(fmtDelta(dRaw)) + '</span><span>' + vol + '</span></div></div>';
+        + '<div class="region-top"><span class="region-name">' + name + '</span></div>'
+        + (sub ? '<div class="region-meta mono">' + sub + '</div>' : '')
+        + (count != null ? '<div class="region-bar"><i style="--w:' + Math.min(100, count) + '%"></i></div>' : '') + '</div>';
     }
     function influencerRow(f) {
-      const name = esc(pick(f, ['name', 'label', 'title', 'handle'], '—'));
+      const name = esc(pick(f, ['name', 'label', 'title'], '—'));
+      const handle = esc(pick(f, ['handle'], ''));
       const cat = esc(pick(f, ['cat', 'desc', 'meta', 'category'], ''));
-      const score = esc(pick(f, ['score', 'reach', 'value', 'rank'], '—'));
+      const reach = num(pick(f, ['reach', 'score', 'value', 'rank'], null));
+      const sub = (handle ? '@' + handle : cat);
+      const score = reach != null ? N.formatNumber(reach, true) : '—';
       let hue = num(pick(f, ['hue', 'h'], null));
       if (hue == null || hue < 0 || hue > 360) hue = name.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 360;
       let ini = String(pick(f, ['ini', 'initials'], '') || '').trim();
@@ -726,20 +766,19 @@
         ini = p.length ? (p[0][0] || '') + (p[1] ? p[1][0] || '' : '') : 'NA';
       }
       return '<div class="rank-row"><span class="rank-avatar" style="--h:' + hue + 'deg">' + esc(ini.toUpperCase()) + '</span>'
-        + '<div class="rank-meta"><b>' + name + '</b><span class="mono">' + cat + '</span></div>'
+        + '<div class="rank-meta"><b>' + name + '</b><span class="mono">' + sub + '</span></div>'
         + '<span class="rank-score mono">' + score + '</span></div>';
     }
     function highlightCard(h) {
-      const tag = esc(pick(h, ['tag', 'type', 'label'], L('ws.hl.t2')));
-      const cls = tagCls(pick(h, ['cls', 'class', 'severity'], 'tag-blue'));
-      const conf = pick(h, ['conf', 'confidence', 'score', 'pct'], null);
-      const text = esc(pick(h, ['text', 'summary', 'body', 'title'], '—'));
+      const typeRaw = pick(h, ['type', 'tag', 'label'], L('ws.hl.t2'));
+      const cls = tagCls(pick(h, ['severity', 'cls', 'class'], String(typeRaw).toLowerCase().trim()));
+      const conf = num(pick(h, ['confidence', 'conf', 'score', 'pct'], null));
       const title = esc(pick(h, ['title'], ''));
-      const time = esc(pick(h, ['time', 't', 'age', 'when'], ''));
-      return '<div class="hl-card"><div class="hl-top"><span class="hl-tag ' + cls + '">' + tag + '</span>'
-        + (conf != null ? '<span class="hl-conf mono">' + esc(/[^0-9.]/.test(String(conf)) ? conf : conf + '%') + '</span>' : '')
-        + '</div><p class="hl-text">' + (title && title !== text ? '<strong>' + title + '</strong><br>' : '') + text + '</p>'
-        + (time ? '<span class="hl-time mono">' + time + '</span>' : '') + '</div>';
+      const detail = esc(pick(h, ['detail', 'text', 'summary', 'body'], ''));
+      const body = title && detail ? '<strong>' + title + '</strong>' + (detail ? '<br>' + detail : '') : (title || detail);
+      return '<div class="hl-card"><div class="hl-top"><span class="hl-tag ' + cls + '">' + esc(typeRaw) + '</span>'
+        + (conf != null ? '<span class="hl-conf mono">' + esc(String(Math.round(conf))) + '%</span>' : '')
+        + '</div><p class="hl-text">' + (body || '—') + '</p></div>';
     }
     const FEED_MAP = { news: 'feed-news', web: 'feed-news', x: 'feed-x', twitter: 'feed-x', rss: 'feed-rss', facebook: 'feed-fb', fb: 'feed-fb', instagram: 'feed-ig', ig: 'feed-ig', google: 'feed-news', trends: 'feed-news' };
     function feedItem(f) {
@@ -754,9 +793,16 @@
         : srcRaw === 'google' || srcRaw === 'google trends' || srcRaw === 'trends' ? 'GGL'
         : esc(String(stRaw || pick(f, ['sourceType', 'src', 'source', 'tag', 'type'], 'NEW') || 'NEW').toUpperCase()).slice(0, 4);
       const text = esc(pick(f, ['title', 'text', 'content', 'post', 'message', 'description'], '—'));
-      const t = timeAgo(pick(f, ['publishedAt', 'published', 'date', 'datetime', 't', 'time', 'ts', 'age'], ''));
-      return '<div class="feed-item"><span class="feed-src ' + cls + '">' + tag + '</span>'
-        + '<p class="feed-text">' + text + '</p>' + (t ? '<span class="feed-time mono">' + t + '</span>' : '') + '</div>';
+      const author = esc(pick(f, ['author', 'publisher', 'handle', 'channel'], ''));
+      const eng = num(pick(f, ['engagement', 'engagements', 'likes', 'shares'], null));
+      const t = N.formatRelativeTime(pick(f, ['created', 'createdAt', 'publishedAt', 'published', 'date', 'datetime', 't', 'time', 'ts', 'age'], ''));
+      const url = String(pick(f, ['url', 'link'], '') || '');
+      const safeUrl = url && /^https?:\/\//i.test(url) ? url : '';
+      const inner = '<div class="feed-item">'
+        + '<span class="feed-src ' + cls + '">' + tag + '</span>'
+        + '<p class="feed-text">' + text + (author ? '<span class="feed-author mono">' + author + (eng != null ? ' · ' + N.formatNumber(eng, true) : '') + '</span>' : '') + '</p>'
+        + (t ? '<span class="feed-time mono">' + t + '</span>' : '') + '</div>';
+      return safeUrl ? '<a class="feed-link" href="' + esc(safeUrl) + '" target="_blank" rel="noopener noreferrer">' + inner + '</a>' : inner;
     }
     function timeAgo(v) {
       const d = new Date(v);
@@ -775,66 +821,42 @@
       }
       return String(d.getHours()).padStart(2, '0') + ':00';
     }
-    const NET_COLORS = ['#35D07F', '#5EA2FF', '#7A5CFF', '#F5B84A', '#F45D5D', '#5EC7D0', '#C05EFF', '#FF8A5E'];
-    const SRC_MAP = { 'News desks': 'ws.src.r1', 'X (Twitter)': 'ws.src.r2', Facebook: 'ws.src.r3', 'RSS feeds': 'ws.src.r4', Instagram: 'ws.src.r5', 'Google Trends': 'ws.src.r6' };
-    const MIX_MAP = { News: 'ws.mix.news', Social: 'ws.mix.social', Government: 'ws.mix.gov', Politics: 'ws.mix.gov', Sports: 'ws.mix.sports', Sport: 'ws.mix.sports', Business: 'ws.mix.business', Economy: 'ws.mix.business', Tech: 'ws.mix.r5', Technology: 'ws.mix.r5', Culture: 'ws.mix.r4', Weather: 'ws.mix.r6' };
-    function srcRow(s) {
-      const key = SRC_MAP[s.label];
-      const pct = num(s.pct);
-      const count = num(s.count);
-      const hasRealPct = s.realPct != null;
-      return '<div class="src-row"><span>' + (key ? esc(L(key)) : esc(s.label)) + '</span>'
-        + '<span class="src-bar"><i style="--w:' + Math.max(0, Math.min(100, pct || 0)) + '%"></i></span>'
-        + '<b class="mono">' + (hasRealPct ? pct + '%' : (count != null ? count + '×' : (pct == null ? '—' : pct + '%'))) + '</b></div>';
-    }
-    function mixRow(c) {
-      const key = MIX_MAP[c.label];
-      const pct = num(c.pct);
-      return '<div class="src-row"><span>' + (key ? esc(L(key)) : esc(c.label)) + '</span>'
-        + '<span class="src-bar"><i style="--w:' + Math.max(0, Math.min(100, pct || 0)) + '%"></i></span>'
-        + '<b class="mono">' + (pct == null ? '—' : pct + '%') + '</b></div>';
-    }
-    /* Key data: generic, data-driven rows from the backend's optional
-       dataPoints field. Nothing here is hardcoded per query type — the card
-       renders whatever structured facts n8n actually returned. */
-    function keyDataRow(p) {
-      const val = String(p.value == null ? '' : p.value).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-      const unit = p.unit ? ' / ' + esc(String(p.unit)) : '';
-      const cur = p.currency ? ' ' + esc(String(p.currency)) : '';
-      const cat = p.category ? esc(String(p.category).toUpperCase()) : '';
-      const src = p.source ? esc(String(p.source)) + (p.timestamp ? ' · ' + esc(String(p.timestamp)) : '') : (p.timestamp ? esc(String(p.timestamp)) : '');
-      return '<div class="kd-row"><span class="kd-name">' + esc(p.name) + '</span>'
-        + '<span class="kd-value mono">' + val + cur + unit + '</span>'
-        + (cat || src ? '<span class="kd-meta mono">' + (cat ? cat + (src ? ' · ' : '') : '') + src + '</span>' : '') + '</div>';
-    }
-    function renderKeyData(r) {
-      const dps = Array.isArray(r.dataPoints) ? r.dataPoints : [];
-      listWidget($('dbKeyDataList'), $('dbEmptyKeyData'), dps.map(keyDataRow));
+    /* Sources: real publishers deduplicated from sampleSources */
+    function sourceRow(s) {
+      const n = num(s.count);
+      return '<div class="src-row"><span>' + esc(s.label) + '</span>'
+        + '<span class="src-bar"><i style="--w:' + Math.max(0, Math.min(100, n || 0)) + '%"></i></span>'
+        + '<b class="mono">' + (n != null ? N.formatNumber(n) + '×' : '—') + '</b></div>';
     }
     function renderKpis(r) {
-      const stats = (r.raw && r.raw.stats) || {};
+      const stats = (r.stats) || (r.raw && r.raw.stats) || {};
       const kpiM = $('kpiMentions');
-      if (kpiM) kpiM.textContent = stats.totalPosts != null && stats.totalPosts !== '' ? fmtKpi(stats.totalPosts) : '—';
-      const kpiS = $('kpiCairoSent');
-      if (kpiS) {
-        const n = num(stats.sentimentScore);
-        kpiS.textContent = n != null ? String(Math.round(n * 10) / 10) : (stats.sentimentScore != null && stats.sentimentScore !== '' ? String(stats.sentimentScore) : '—');
-      }
+      if (kpiM) kpiM.textContent = N.isAvailable(stats.totalPosts) ? N.formatNumber(stats.totalPosts, true) : '—';
+      const kpiA = $('kpiActive');
+      if (kpiA) kpiA.textContent = N.isAvailable(stats.activeTopics) ? N.formatNumber(stats.activeTopics) : '—';
+      const kpiS = $('kpiSentiment');
+      if (kpiS) kpiS.textContent = N.isAvailable(stats.sentimentScore) ? N.formatNumber(stats.sentimentScore) : '—';
       const kpiC = $('kpiCrises');
-      if (kpiC) {
-        const n = num(stats.emergencyAlerts);
-        kpiC.textContent = n != null ? String(Math.round(n)) : (stats.emergencyAlerts != null && stats.emergencyAlerts !== '' ? String(stats.emergencyAlerts) : '—');
+      if (kpiC) kpiC.textContent = N.isAvailable(stats.emergencyAlerts) ? N.formatNumber(stats.emergencyAlerts) : '—';
+      /* delta labels reflect the optional topic deltas from the response */
+      const dPosts = $('kpiPostsDelta');
+      const dActive = $('kpiActiveDelta');
+      const dSent = $('kpiSentDelta');
+      const dCrises = $('kpiCrisesDelta');
+      const topics = Array.isArray(r.topics) ? r.topics : [];
+      if (dPosts) {
+        const d = topics.length ? topics[0].delta : null;
+        dPosts.textContent = d != null && String(d).trim() ? String(d) : '—';
       }
-      const kpiI = $('kpiInflation');
-      const infl = (r.raw && r.raw.metrics) ? pick(r.raw.metrics, ['inflation', 'inflationRate', 'inflation_rate'], null) : null;
-      if (kpiI) {
-        const n = num(infl);
-        kpiI.textContent = n != null ? String(n) + '%' : '—';
+      if (dActive) {
+        const d = topics.length > 1 ? topics[1].delta : null;
+        dActive.textContent = d != null && String(d).trim() ? String(d) : '—';
       }
-      document.querySelectorAll('.kpi-card .delta').forEach((d) => {
-        d.classList.remove('up', 'down');
-        d.textContent = '—';
-      });
+      if (dSent && r.sentiment && r.sentiment.label) {
+        const lbl = String(r.sentiment.label);
+        dSent.textContent = lbl.charAt(0).toUpperCase() + lbl.slice(1);
+      } else if (dSent) dSent.textContent = '—';
+      if (dCrises) dCrises.textContent = '—';
     }
     function renderSummary(r) {
       const title = $('dbBriefTitle');
@@ -864,21 +886,46 @@
       if (meta2) meta2.textContent = r.analyzedAt ? L('ws.updated') + ' ' + timeAgo(r.analyzedAt) : '';
       const meta3 = $('dbMeta3');
       if (meta3) meta3.textContent = r.confidence != null ? L('ws.conf') + ' ' + Math.round(r.confidence) + '%' : '';
+
+      const scope = r.scope || (r.raw && r.raw.scope);
+      const scopeLbl = scope === 'private' ? L('ws.scope.private') : scope === 'public' ? L('ws.scope.public') : '';
+      const scopeChip = $('dbScopeChip');
+      const scopeChipTxt = $('dbScopeChipTxt');
+      if (scopeChip && scopeChipTxt) {
+        const hasScope = scopeLbl.length > 0;
+        scopeChip.hidden = !hasScope;
+        if (hasScope) scopeChipTxt.textContent = L('ws.meta.scope').split('{s}').join(scopeLbl);
+      }
+      const metaGen = $('dbMetaGen');
+      if (metaGen) {
+        const gt = (r.generatedAt || (r.raw && r.raw.generatedAt));
+        const rel = N.formatRelativeTime(gt);
+        metaGen.hidden = !rel;
+        if (rel) metaGen.textContent = L('ws.meta.generated').split('{t}').join(rel);
+      }
+      const metaPosts = $('dbMetaPosts');
+      if (metaPosts) {
+        const n = r.stats && r.stats.totalPosts;
+        const avail = N.isAvailable(n);
+        metaPosts.hidden = !avail;
+        if (avail) metaPosts.textContent = L('ws.meta.posts').split('{n}').join(N.formatNumber(n));
+      }
+      const scopeNote = $('dbScopeNote');
+      if (scopeNote) {
+        const noteKey = scope === 'private' ? 'ws.priv.note' : 'ws.pub.note';
+        scopeNote.hidden = !scopeLbl;
+        if (scopeLbl) scopeNote.textContent = L(noteKey);
+      }
       const chips = $('dbChips');
       if (chips) {
-        const cats = r.categories && r.categories.length ? r.categories.slice(0, 4) : [];
-        chips.hidden = !cats.length;
-        chips.innerHTML = cats.map((c) => '<span class="chip"><span class="chip-pulse" aria-hidden="true"></span> <span>' + esc(MIX_MAP[c.label] ? L(MIX_MAP[c.label]) : c.label) + (num(c.pct) != null ? ' ' + num(c.pct) + '%' : '') + '</span></span>').join('');
+        const topics = Array.isArray(r.topics) ? r.topics.slice(0, 4) : [];
+        chips.hidden = !topics.length;
+        chips.innerHTML = topics.map((c) => {
+          const label = esc(c.topic || c.name || '');
+          const n = num(c.count);
+          return '<span class="chip"><span class="chip-pulse" aria-hidden="true"></span> <span>' + label + (n != null ? ' · ' + N.formatNumber(n, true) : '') + '</span></span>';
+        }).join('');
       }
-    }
-    function renderGlobal(r) {
-      let g = null;
-      if (r.globalContext) {
-        const gc = r.globalContext;
-        if (Array.isArray(gc)) g = gc;
-        else if (typeof gc === 'object') g = Array.isArray(gc.items) ? gc.items : Array.isArray(gc.topics) ? gc.topics : gc.rows || null;
-      }
-      listWidget($('dbGlobalList'), $('dbEmptyGlobal'), (g || []).map(topicRow));
     }
     function renderWidgets() {
       const r = lastResult && typeof lastResult === 'object' && !Array.isArray(lastResult) ? lastResult : {};
@@ -886,33 +933,49 @@
 
       renderKpis(r);
       renderSummary(r);
-      renderGlobal(r);
-      renderKeyData(r);
 
       const topics = has(r.topics) ? r.topics : (Array.isArray(r.trendingTopics) ? r.trendingTopics : []);
       const locs = has(r.locations) ? r.locations : (Array.isArray(r.topLocations) ? r.topLocations : []);
       const infs = has(r.influencers) ? r.influencers : (Array.isArray(r.topInfluencers) ? r.topInfluencers : []);
       const hls = has(r.highlights) ? r.highlights : (Array.isArray(r.aiHighlights) ? r.aiHighlights : []);
       const feed = has(r.articles) ? r.articles : (Array.isArray(r.sampleSources) ? r.sampleSources : []);
-      const srcs = has(r.sources) ? r.sources : [];
-      const cats = has(r.categories) ? r.categories : [];
 
-      listWidget($('dbTrendList'), $('dbEmptyTopics'), topics.filter(inCat).map(topicRow));
+      const maxCount = topics.reduce((m, t) => {
+        const n = num(pick(t, ['count', 'vol', 'volume', 'value'], null));
+        return n != null && n > m ? n : m;
+      }, 0);
+      listWidget($('dbTrendList'), $('dbEmptyTopics'), topics.filter(inCat).map((t, i) => topicRow(t, i, maxCount)));
       listWidget($('dbHlList'), $('dbEmptyHighlights'), hls.filter(inCat).map(highlightCard));
       listWidget($('dbFeedTrack'), $('dbEmptyFeed'), feed.filter(inCat).map(feedItem));
 
       const nl = $('dbNational');
       const el = $('dbEmptyLocations');
-      if (locs.length) {
-        listWidget($('regionGrid'), el, locs.map(locationCard));
-        if (nl) nl.hidden = true;
-      } else {
+      const regional = locs.filter((l) => {
+        const n = N.normalizeLocation(l && l.name);
+        return n ? !n.national : true;
+      });
+      const showNational = (!locs.length && r.national) || (locs.length && !regional.length);
+      if (showNational) {
         listWidget($('regionGrid'), el, []);
-        if (nl) nl.hidden = !r.national;
+        if (el) el.hidden = true;
+        if (nl) nl.hidden = false;
+      } else {
+        listWidget($('regionGrid'), el, regional.map(locationCard));
+        if (nl) nl.hidden = true;
       }
       listWidget($('dbRankList'), $('dbEmptyInfluencers'), infs.map(influencerRow));
-      listWidget($('dbSrcList'), $('dbEmptySources'), srcs.map(srcRow));
-      listWidget($('dbMixList'), $('dbEmptyMix'), cats.map(mixRow));
+
+      /* sources = real publishers deduplicated from the actual returned articles */
+      const countBy = {};
+      feed.forEach((f) => {
+        const label = N.getSourceLabel(f);
+        if (label) countBy[label] = (countBy[label] || 0) + 1;
+      });
+      const srcs = Object.keys(countBy)
+        .map((label) => ({ label: label, count: countBy[label] }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 8);
+      listWidget($('dbSrcList'), $('dbEmptySources'), srcs.map(sourceRow));
     }
     function renderLive() {
       renderDonut();
