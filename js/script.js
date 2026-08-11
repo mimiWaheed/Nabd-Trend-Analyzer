@@ -1661,9 +1661,22 @@
     out.query = String(pick(raw, ['query', 'q', 'search', 'userQuery'], '') || '');
     out.scope = String(pick(raw, ['scope'], '') || '').toLowerCase() || null;
     out.language = pick(raw, ['language', 'lang'], null) || null;
-    out.summary = pick(raw, ['summary', 'aiSummary', 'brief', 'aiBrief', 'answer', 'result', 'text'], null);
-    const conf = num(pick(raw, ['confidence'], null));
+    let aiBriefObj = null;
+    if (raw.aiBrief && typeof raw.aiBrief === 'object' && !Array.isArray(raw.aiBrief)) aiBriefObj = raw.aiBrief;
+    else if (raw.brief && typeof raw.brief === 'object' && !Array.isArray(raw.brief)) aiBriefObj = raw.brief;
+    let sumVal = pick(raw, ['summary', 'aiSummary', 'brief', 'aiBrief', 'answer', 'result', 'text'], null);
+    if (sumVal && typeof sumVal === 'object' && !Array.isArray(sumVal)) {
+      sumVal = pick(sumVal, ['summary', 'text', 'content', 'brief'], null) || JSON.stringify(sumVal);
+    }
+    out.summary = sumVal;
+    let conf = num(pick(raw, ['confidence'], null));
+    if (conf == null && aiBriefObj) conf = num(aiBriefObj.confidence);
     out.confidence = conf != null ? conf : null;
+    out.briefMeta = aiBriefObj ? {
+      title: aiBriefObj.title != null ? String(aiBriefObj.title) : null,
+      keyFindings: Array.isArray(aiBriefObj.keyFindings) ? aiBriefObj.keyFindings.map((x) => String(x)).filter(Boolean) : [],
+      confidence: conf
+    } : null;
     out.analyzedAt = pick(raw, ['analyzedAt', 'generatedAt', 'timestamp', 'completedAt', 'created_at'], null) || null;
     out.network = pick(raw, ['network', 'graph', 'entities', 'relations'], null) || null;
     out.globalContext = pick(raw, ['globalContext', 'global', 'global_trends', 'world'], null) || null;
