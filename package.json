@@ -5,9 +5,11 @@
   "description": "NABD (نبض) — static frontend with Vercel serverless routes (config + Meta OAuth).",
   "engines": { "node": ">=18" },
   "scripts": {
-    "start": "vercel dev"
+    "start": "vercel dev",
+    "test": "node tests/parser.test.js && node tests/e2e-dashboard.test.js && node tests/workflow-validation.test.js"
   },
   "devDependencies": {
-    "vercel": "^34.0.0"
+    "vercel": "^34.0.0",
+    "jsdom": "^24.1.0"
   }
 }

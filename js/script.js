@@ -1637,6 +1637,7 @@
           const inner = parseEmbeddedJson(s);
           if (inner && typeof inner === 'object') { data = inner; continue; }
         }
+        if (data.output && typeof data.output === 'object') { data = data.output; continue; }
         break;
       }
       break;
