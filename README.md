@@ -69,7 +69,7 @@ The analysis flow is wired to a production **n8n** workflow that performs the re
 - Every metric respects the `null`/`undefined` = unavailable vs `0` = real-zero distinction; unavailable values render as "—" and missing sections collapse into compact intentional empty states — the dashboard never shows fake data or huge empty placeholder cards.
 - The response is persisted in `localStorage` so history and saved searches keep working offline against the last result.
 
-The webhook is hosted at `https://mimiwi.app.n8n.cloud/webhook/trend-analysis`. Do not replace or rename it — the integration depends on that exact endpoint. The n8n workflow itself is read-only reference; the frontend only consumes its contract.
+The webhook is hosted at `https://n8n.addme.solutions/webhook/trend-analysis`. Do not replace or rename it — the integration depends on that exact endpoint. The workflow expects the request body to carry both `query` and `prompt` (the analysis prompt), and returns the result wrapped as `{ "text": "<json string>" }`; the normalization layer unwraps that before mapping. The n8n workflow itself is read-only reference; the frontend only consumes its contract.
 
 ## Authentication
 

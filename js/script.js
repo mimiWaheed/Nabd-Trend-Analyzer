@@ -1515,7 +1515,7 @@
      NABD_WEBHOOK_URL; when that route is unavailable (local static
      preview) the production default is used. Resolved once + cached.
      ---------------------------------------------------------- */
-  const DEFAULT_WEBHOOK = 'https://mimiwi.app.n8n.cloud/webhook/trend-analysis';
+  const DEFAULT_WEBHOOK = 'https://n8n.addme.solutions/webhook/trend-analysis';
 
   let apiConfigPromise = null;
   function loadApiConfig() {
@@ -1533,14 +1533,19 @@
      ANALYSIS SERVICE — real n8n webhook
      USER INPUT → POST /webhook/trend-analysis → raw response
      ----------------------------------------------------------
-     Public payload  : { query, scope: "public" }
-     Private payload : { query, scope: "private", accessToken,
+     Public payload  : { query, prompt, scope: "public" }
+     Private payload : { query, prompt, scope: "private", accessToken,
                          accountId, igUserId }
      Failures (HTTP or network/timeout) reject — never mock.
      Errors log status only — access tokens are never logged.     */
   function analyze(query, opts) {
     const scope = opts && opts.scope === 'private' ? 'private' : 'public';
-    const payload = { query: String(query || '').trim(), scope: scope };
+    const q = String(query || '').trim();
+    /* The deployed workflow requires BOTH `query` (drives data gathering) and
+       `prompt` (its AI analysis input) — with only `query` present it responds
+       with an empty body. */
+    const payload = { query: q, scope: scope };
+    if (q) payload.prompt = q;
     if (scope === 'private') {
       const st = fb.read();
       if (!st.connected) return Promise.reject(new Error('fb-not-connected'));
@@ -1583,6 +1588,26 @@
      dashboard renders a meaningful unavailable state instead.
      ---------------------------------------------------------- */
   function normalizeAnalysisResponse(raw) {
+    /* ---- transport unwrap: the deployed n8n workflow wraps the analysis as
+       { text: "<json string>" } and may also array-wrap it ([ {...} ]).
+       Peel those layers so every consumer reads the same object. The original
+       HTTP body is preserved on the returned result as `.raw`. ---- */
+    let data = raw;
+    for (let guard = 0; guard < 3; guard++) {
+      if (typeof data === 'string') { try { data = JSON.parse(data); } catch (e) { break; } }
+      if (Array.isArray(data)) { data = data[0] || null; continue; }
+      if (data && typeof data === 'object' && typeof data.text === 'string' && data.text.trim()) {
+        const t = data.text.trim();
+        if (t.charAt(0) === '{' || t.charAt(0) === '[') {
+          try {
+            const inner = JSON.parse(t);
+            if (inner && typeof inner === 'object') { data = inner; continue; }
+          } catch (e) { /* not JSON text — treat the object as-is */ }
+        }
+      }
+      break;
+    }
+    raw = data;
     const pick = (o, keys, dflt) => {
       for (let i = 0; i < keys.length; i++) if (o && o[keys[i]] != null && o[keys[i]] !== '') return o[keys[i]];
       return dflt;
@@ -1636,7 +1661,7 @@
     out.query = String(pick(raw, ['query', 'q', 'search', 'userQuery'], '') || '');
     out.scope = String(pick(raw, ['scope'], '') || '').toLowerCase() || null;
     out.language = pick(raw, ['language', 'lang'], null) || null;
-    out.summary = pick(raw, ['summary', 'aiSummary', 'brief', 'aiBrief', 'answer', 'result'], null);
+    out.summary = pick(raw, ['summary', 'aiSummary', 'brief', 'aiBrief', 'answer', 'result', 'text'], null);
     const conf = num(pick(raw, ['confidence'], null));
     out.confidence = conf != null ? conf : null;
     out.analyzedAt = pick(raw, ['analyzedAt', 'generatedAt', 'timestamp', 'completedAt', 'created_at'], null) || null;
