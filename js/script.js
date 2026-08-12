@@ -214,6 +214,7 @@
       'auth.art2.b': 'Trends, sentiment, crises and live feeds across every Egyptian governorate — in one live workspace.',
       'auth.err.email': 'Please enter a valid email address.',
       'auth.err.email.bad': 'Temporary mailboxes are not allowed.',
+      'auth.err.email.notfound': 'This email does not exist.',
       'auth.err.name': 'Name required.',
       'auth.err.name.invalid': 'Invalid name.',
       'auth.err.phone': 'Invalid Egyptian phone number.',
@@ -678,6 +679,7 @@
       'auth.art2.b': 'الترندات والمشاعر والأزمات والتغذية الحية في كل محافظات مصر — في مساحة عمل واحدة حية.',
       'auth.err.email': 'يرجى إدخال بريد إلكتروني صحيح.',
       'auth.err.email.bad': 'البريد المؤقت غير مسموح به.',
+      'auth.err.email.notfound': 'هذا البريد الإلكتروني غير موجود.',
       'auth.err.name': 'الاسم مطلوب.',
       'auth.err.name.invalid': 'اسم غير صالح.',
       'auth.err.phone': 'رقم هاتف مصري غير صالح.',
@@ -1020,12 +1022,19 @@
       const ct = res.headers.get('content-type') || '';
       const parse = ct.indexOf('application/json') !== -1
         ? res.json()
-        : res.text().then((t) => (t && t.trim() ? { message: t } : {}));
+        : res.text().then((t) => {
+            const s = (t || '').trim();
+            if (!s) return {};
+            if (res.status >= 500 || /^\s*<!doctype html|^\s*<html/i.test(s)) {
+              return { _serverError: true, status: res.status, message: 'Server error (' + res.status + ')' };
+            }
+            return { message: s };
+          });
       return parse.then((data) => {
         if (!res.ok) {
           const err = new Error((data && data.message) || 'Request failed');
           err.status = res.status;
-          err.code = data && data.error;
+          err.code = data && data._serverError ? 'SERVER_ERROR' : (data && data.error);
           err.data = data;
           throw err;
         }

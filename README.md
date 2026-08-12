@@ -45,19 +45,54 @@ A dependency-free static web app. No build step, no framework — plain HTML, CS
 
 ## How to run locally
 
-The project is fully static — serve the folder with any static file server and open `index.html`.
+The frontend is fully static, but auth and the dashboard APIs are real Vercel
+serverless functions under `api/` — they only exist when the site is served by
+the Vercel runtime. A plain static server (e.g. `python -m http.server`) serves
+the pages but CANNOT handle the `/api/*` POSTs, so sign-in/sign-up fail with a
+**501 "Unsupported method ('POST')"** error.
+
+### Full local runtime (recommended) — static files + real `/api/*`
 
 ```bash
-# Python
-python -m http.server 8000
-
-# Node (npx)
-npx serve .
+npm install
+npm start        # = npx vercel dev   → http://localhost:3000
 ```
 
-Then open `http://localhost:8000`. No environment variables or build tools are required.
+`vercel dev` starts the actual serverless runtime locally: it serves the static
+files AND mounts every `api/` route at `/api/*`, so login, signup and the
+dashboard APIs behave exactly as deployed. It needs a Vercel account once:
 
-> Note: open `index.html` through a local server (not `file://`) so page navigation between `pages/` works normally.
+```bash
+npx vercel login
+```
+
+### No-login alternative — real handlers, in-memory data
+
+```bash
+npm run dev      # = node dev-server.js   → http://localhost:3000
+```
+
+`dev-server.js` mounts the real `api/*` handlers and serves the static files
+without Vercel credentials. It uses the in-memory store by default
+(`NABD_DATA=memory`), so it never touches a real database; verification OTPs are
+printed to the terminal. Use `npm start` for the real Postgres backend.
+
+### Static preview only (no auth backend)
+
+```bash
+python -m http.server 8000
+```
+
+Fine for browsing the UI, but every `/api/*` call returns a 501 because a static
+server has no POST endpoint. Open `http://localhost:3000` (Vercel dev) or
+`http://localhost:8000` (static preview).
+
+### Environment variables
+
+Copy `.env.example` to `.env` for `vercel dev` / deployments. Required for auth:
+`DATABASE_URL` (Postgres). Optional: `AUTH_SECRET` (encrypts Facebook tokens),
+SMTP vars (real verification emails — without them the OTP is printed to the
+server console), `NABD_WEBHOOK_URL` (analysis), Meta OAuth vars.
 
 ## How the frontend talks to the n8n backend
 
@@ -73,7 +108,13 @@ The webhook is hosted at `https://n8n.addme.solutions/webhook/trend-analysis`. D
 
 ## Authentication
 
-Authentication is a frontend demo (localStorage-backed) for the time being. `N.setUser()`/`N.getUser()` in `script.js` power the sign-in/sign-up flow and the protected-route guard. No credentials are stored or transmitted beyond the current page session.
+Auth is a real serverless backend (`api/auth/*`): bcrypt password hashing,
+DB-backed sessions (httpOnly cookie), email-verification OTP, and per-account
+login rate limiting. `N.api()` in `script.js` posts to same-origin `/api/*`
+routes. Because the handlers only run under the Vercel runtime, auth does NOT
+work from a plain static server (you'll get the 501 shown above) — use `npm start`
+or `npm run dev`. The protected-route guard in `js/app.js` re-validates the
+session against `GET /api/auth/me` and bounces unauthenticated visitors.
 
 ## Meta (Facebook) private analysis
 

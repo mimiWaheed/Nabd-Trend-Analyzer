@@ -220,6 +220,11 @@
           location.replace('signup.html?verify=' + encodeURIComponent(siEmail.value.trim()));
           return;
         }
+        if (err.code === 'SERVER_ERROR') {
+          if (typeof console !== 'undefined') console.error('[nabd-auth] login backend unavailable (HTTP ' + err.status + ') — the /api serverless route is not reachable from this host');
+          setError(N.t('auth.err.email.notfound'));
+          return;
+        }
         setError(err.message || N.t('auth.err.req'));
       });
     });
