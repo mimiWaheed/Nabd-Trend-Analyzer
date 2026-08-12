@@ -360,11 +360,13 @@ function makePostgresStore(pool) {
 
     async createSearch(s) {
       return one(
-        `INSERT INTO searches (id, user_id, query, scope, status, error)
-         VALUES ($1,$2,$3,$4,$5,$6)
+        `INSERT INTO searches (id, user_id, query, scope, status, error, category, source_count)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
          RETURNING id, user_id AS "userId", query, scope, status, error,
+                   category, source_count AS "sourceCount",
                    created_at AS "createdAt", updated_at AS "updatedAt"`,
-        [s.id, s.userId, s.query, s.scope || 'public', s.status || 'pending', s.error || null]);
+        [s.id, s.userId, s.query, s.scope || 'public', s.status || 'pending', s.error || null,
+         s.category || null, s.sourceCount != null ? s.sourceCount : null]);
     },
     async updateSearch(id, patch) {
       const fields = [];
@@ -379,17 +381,20 @@ function makePostgresStore(pool) {
       return one(
         `UPDATE searches SET ${fields.join(', ')}, updated_at = NOW() WHERE id = $${params.length}
          RETURNING id, user_id AS "userId", query, scope, status, error,
+                   category, source_count AS "sourceCount",
                    created_at AS "createdAt", updated_at AS "updatedAt"`,
         params
       );
     },
     async getSearch(id) {
       return one(`SELECT id, user_id AS "userId", query, scope, status, error,
+                         category, source_count AS "sourceCount",
                          created_at AS "createdAt", updated_at AS "updatedAt"
                   FROM searches WHERE id = $1`, [id]);
     },
     async listSearches(userId, { limit, offset }) {
       return q(`SELECT id, user_id AS "userId", query, scope, status, error,
+                       category, source_count AS "sourceCount",
                        created_at AS "createdAt", updated_at AS "updatedAt"
                 FROM searches WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3`,
         [userId, limit, offset]);

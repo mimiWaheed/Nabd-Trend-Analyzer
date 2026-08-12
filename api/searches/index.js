@@ -8,6 +8,8 @@ const { pagination } = require('../_lib/validate');
 const { randomToken, nowIso } = require('../_lib/crypto');
 const events = require('../_lib/events');
 
+const CATEGORIES = ['news', 'social', 'gov', 'sport', 'business'];
+
 function toClient(s) {
   return {
     id: s.id,
@@ -15,6 +17,8 @@ function toClient(s) {
     scope: s.scope,
     status: s.status,
     error: s.error || null,
+    category: CATEGORIES.indexOf(s.category) !== -1 ? s.category : null,
+    sourceCount: s.sourceCount != null ? Number(s.sourceCount) : null,
     createdAt: s.createdAt,
     updatedAt: s.updatedAt
   };
@@ -42,6 +46,15 @@ module.exports = async function handler(req, res) {
     if (!query) return fail(res, 422, 'VALIDATION_ERROR', 'Query is required');
     if (query.length > 500) return fail(res, 422, 'VALIDATION_ERROR', 'Query is too long');
 
+    const rawCat = body && body.category != null ? String(body.category).toLowerCase() : '';
+    const category = CATEGORIES.indexOf(rawCat) !== -1 ? rawCat : null;
+    let sourceCount = null;
+    if (body && body.sourceCount != null && body.sourceCount !== '') {
+      const n = parseInt(body.sourceCount, 10);
+      if (Number.isNaN(n) || n < 0) return fail(res, 422, 'VALIDATION_ERROR', 'sourceCount must be a non-negative integer');
+      sourceCount = Math.min(n, 1000000);
+    }
+
     const search = await store.createSearch({
       id: randomToken(16),
       userId: auth.user.id,
@@ -49,10 +62,12 @@ module.exports = async function handler(req, res) {
       scope,
       status: 'pending',
       error: null,
+      category,
+      sourceCount,
       createdAt: nowIso(),
       updatedAt: nowIso()
     });
-    await events.logActivity(auth.user.id, 'SEARCH_CREATED', { query });
+    await events.logActivity(auth.user.id, 'SEARCH_CREATED', { query, category, sourceCount });
     return created(res, { search: toClient(search) });
   }
 
