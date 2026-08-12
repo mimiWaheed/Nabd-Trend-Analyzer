@@ -91,6 +91,7 @@
       'footer.copyright': 'NABD (نبض) Intelligence Systems', 'footer.status': 'All systems operational',
       'nav.legal.eyebrow': 'NABD · LEGAL',
       'nav.legal.privacy': 'Privacy Policy', 'nav.legal.terms': 'Terms of Service',
+      'nav.legal.effective': 'Effective Date:',
 
       /* workspace */
       'ws.back': 'Home', 'ws.new': 'New analysis', 'ws.querylabel': 'TRACKING', 'ws.private.badge': 'Private Analysis',
@@ -545,6 +546,7 @@
       'footer.copyright': 'نبض لأنظمة الاستخبارات', 'footer.status': 'جميع الأنظمة تعمل',
       'nav.legal.eyebrow': 'نبض · قانوني',
       'nav.legal.privacy': 'سياسة الخصوصية', 'nav.legal.terms': 'شروط الخدمة',
+      'nav.legal.effective': 'تاريخ السريان:',
 
       /* workspace */
       'ws.back': 'الرئيسية', 'ws.new': 'تحليل جديد', 'ws.querylabel': 'المتابعة', 'ws.private.badge': 'تحليل خاص',

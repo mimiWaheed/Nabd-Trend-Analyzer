@@ -53,16 +53,34 @@ function check(file) {
     if (!doc.getElementById(a.getAttribute('href').slice(1))) errors.push('TOC anchor missing: ' + a.getAttribute('href'));
   });
 
-  // 4. must NOT use the auth-guarded app shell
+  // 4. bilingual blocks: one .legal-en, one .legal-ar, both present
+  const enBlock = doc.querySelector('.legal-en');
+  const arBlock = doc.querySelector('.legal-ar');
+  if (!enBlock) errors.push('no .legal-en block');
+  if (!arBlock) errors.push('no .legal-ar block');
+  if (enBlock && arBlock) {
+    if (enBlock.getAttribute('lang') !== 'en') errors.push('.legal-en missing lang="en"');
+    if (arBlock.getAttribute('lang') !== 'ar') errors.push('.legal-ar missing lang="ar"');
+  }
+
+  // 5. no duplicate element ids anywhere (AR block uses ar- prefixed ids)
+  const seen = new Set();
+  doc.querySelectorAll('[id]').forEach((el) => {
+    const id = el.getAttribute('id');
+    if (seen.has(id)) errors.push('duplicate id: ' + id);
+    seen.add(id);
+  });
+
+  // 6. must NOT use the auth-guarded app shell
   if ((doc.body.className || '').indexOf('app-page') !== -1) errors.push('uses auth-guarded app-page shell');
 
-  // 5. every data-i18n key on the page resolves in the EN dictionary
+  // 7. every data-i18n key on the page resolves in the EN dictionary
   doc.querySelectorAll('[data-i18n]').forEach((el) => {
     const k = el.getAttribute('data-i18n');
     if (en[k] === undefined) errors.push('unresolved data-i18n key: ' + k);
   });
 
-  // 6. internal links resolve to existing files
+  // 8. internal links resolve to existing files
   doc.querySelectorAll('a[href]').forEach((a) => {
     const href = a.getAttribute('href');
     if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto:')) return;
@@ -70,6 +88,11 @@ function check(file) {
     if (!target) return;
     if (!fs.existsSync(path.join(APP, target))) errors.push('broken link: ' + href);
   });
+
+  // 9. the hero date key resolves in both dictionaries
+  const eff = 'nav.legal.effective';
+  if (en[eff] === undefined) errors.push('missing EN key: ' + eff);
+  if (ar[eff] === undefined) errors.push('missing AR key: ' + eff);
 
   return errors;
 }

@@ -3218,6 +3218,16 @@ html[dir="rtl"] .legal-toc ol { padding-left: 0; padding-right: 20px; }
 html[dir="rtl"] .legal-card ul,
 html[dir="rtl"] .legal-card ol { padding-left: 0; padding-right: 22px; }
 
+/* bilingual legal content: show only the block matching the active language */
+html[lang="ar"] .legal-en,
+html[lang="en"] .legal-ar { display: none; }
+
+html[lang="ar"] .legal-card h2,
+html[lang="ar"] .legal-card h3 { letter-spacing: 0; line-height: 1.35; }
+html[lang="ar"] .legal-card p,
+html[lang="ar"] .legal-card ul,
+html[lang="ar"] .legal-card ol { line-height: 1.9; }
+
 @media (max-width: 760px) {
   .legal-hero { padding: 88px 0 24px; }
   .legal-title { font-size: 1.9rem; }
