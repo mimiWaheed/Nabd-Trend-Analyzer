@@ -223,6 +223,15 @@
       'auth.err.req': 'Please fill in all required fields.',
       'auth.err.match': 'Passwords do not match.',
       'auth.err.terms': 'Terms must be accepted.',
+      'auth.verify.title': 'Verify your email',
+      'auth.verify.sub': 'Enter the 6-digit code we sent to',
+      'auth.verify.label': 'Verification code',
+      'auth.verify.btn': 'Verify',
+      'auth.verify.no': 'Didn\'t get a code?',
+      'auth.verify.resend': 'Resend code',
+      'auth.verify.sent': 'Code resent — check your inbox.',
+      'auth.verify.err': 'Invalid or expired code. Please try again.',
+      'auth.verify.err.digits': 'Enter the 6-digit code.',
       'auth.pending': 'Please wait…',
       'auth.ok.signin': 'Welcome back — launching app…',
       'auth.ok.signup': 'Account created — launching workspace…',
@@ -678,6 +687,15 @@
       'auth.err.req': 'يرجى ملء جميع الحقول المطلوبة.',
       'auth.err.match': 'كلمتا المرور غير متطابقتين.',
       'auth.err.terms': 'يجب الموافقة على الشروط.',
+      'auth.verify.title': 'تحقق من بريدك الإلكتروني',
+      'auth.verify.sub': 'أدخل رمز التحقق المكوّن من 6 أرقام الذي أرسلناه إلى',
+      'auth.verify.label': 'رمز التحقق',
+      'auth.verify.btn': 'تحقق',
+      'auth.verify.no': 'لم يصلك رمز؟',
+      'auth.verify.resend': 'إعادة إرسال الرمز',
+      'auth.verify.sent': 'تم إعادة إرسال الرمز — تحقق من بريدك.',
+      'auth.verify.err': 'رمز غير صالح أو منتهي الصلاحية. حاول مرة أخرى.',
+      'auth.verify.err.digits': 'أدخل الرمز المكوّن من 6 أرقام.',
       'auth.pending': 'يرجى الانتظار…',
       'auth.ok.signin': 'مرحبًا بعودتك — جارٍ تشغيل التطبيق…',
       'auth.ok.signup': 'تم إنشاء الحساب — جارٍ تشغيل مساحة العمل…',
@@ -979,6 +997,58 @@
       localStorage.removeItem('nabd-user');
       sessionStorage.removeItem('nabd-user');
     } catch (e) {}
+  }
+
+  /* ----------------------------------------------------------
+     API — same-origin Vercel serverless routes (/api/*).
+     Sends the auth session cookie (credentials: 'include') on every
+     request. Errors reject with { message, code, status, data }.
+     ---------------------------------------------------------- */
+  function api(path, opts) {
+    const o = opts || {};
+    const init = {
+      method: o.method || 'GET',
+      headers: Object.assign({ Accept: 'application/json' }, o.headers || {}),
+      credentials: 'include',
+      cache: 'no-store'
+    };
+    if (o.body !== undefined) {
+      init.headers['Content-Type'] = 'application/json';
+      init.body = JSON.stringify(o.body);
+    }
+    return fetch(path, init).then((res) => {
+      const ct = res.headers.get('content-type') || '';
+      const parse = ct.indexOf('application/json') !== -1
+        ? res.json()
+        : res.text().then((t) => (t && t.trim() ? { message: t } : {}));
+      return parse.then((data) => {
+        if (!res.ok) {
+          const err = new Error((data && data.message) || 'Request failed');
+          err.status = res.status;
+          err.code = data && data.error;
+          err.data = data;
+          throw err;
+        }
+        return data;
+      });
+    });
+  }
+
+  /* Resolve the current server-side session (GET /api/auth/me).
+     Resolves to the user object, or null when unauthenticated. */
+  function authMe() {
+    return Promise.resolve()
+      .then(() => api('/api/auth/me'))
+      .then((d) => (d && d.user) || null)
+      .catch((err) => {
+        if (err.status === 401) return null;
+        throw err;
+      });
+  }
+
+  /* End the server session and clear the local cache. */
+  function logout() {
+    return api('/api/auth/logout', { method: 'POST' }).then(() => { clearUser(); });
   }
 
   /* ----------------------------------------------------------
@@ -2794,6 +2864,9 @@
     getUser,
     persistUser,
     clearUser,
+    api,
+    authMe,
+    logout,
     historyGet,
     historyAdd,
     historyRemove,

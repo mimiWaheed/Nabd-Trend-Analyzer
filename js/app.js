@@ -16,12 +16,26 @@
   document.addEventListener('nabd-toast', (e) => { if (e && e.detail && e.detail.key) T(e.detail.key); });
 
   /* ----------------------------------------------------------
-     AUTH GUARD — protected application routes
+     AUTH GUARD — protected application routes.
+     The server session (/api/auth/me, httpOnly cookie) is the source
+     of truth. A cached user boots the shell immediately; the session is
+     re-validated in the background and stale sessions bounce to sign-in.
+     Invoked at the bottom of this IIFE (after shared consts are defined).
      ---------------------------------------------------------- */
-  if (!N.getUser()) {
+  function bootGuard() {
     const here = location.pathname.split('/').pop() + location.search;
-    location.replace('signin.html?next=' + encodeURIComponent(here));
-    return;
+    const cached = N.getUser();
+    const bounce = () => location.replace('signin.html?next=' + encodeURIComponent(here));
+    const bootWith = (u) => { if (u) { N.persistUser(u); boot(); } else bounce(); };
+    if (cached && cached.email) {
+      boot();
+      N.authMe().then((u) => {
+        if (u) N.persistUser(u);
+        else { N.clearUser(); bounce(); }
+      }).catch(() => {});
+    } else {
+      N.authMe().then(bootWith, () => bounce());
+    }
   }
 
   const IC = {
@@ -70,7 +84,7 @@
   function initials() {
     const u = N.getUser();
     if (u) {
-      const n = u.name || ((u.first ? u.first : '') + ' ' + (u.last || '')).trim();
+      const n = u.name || ((u.firstName || u.first || '') + ' ' + (u.lastName || u.last || '')).trim();
       if (n) {
         const p = n.trim().split(/\s+/);
         return ((p[0] || '')[0] || '') + ((p[1] || '')[0] || '');
@@ -153,7 +167,7 @@
     const name = $('sideUserName');
     const mail = $('sideUserMail');
     const u = N.getUser();
-    const display = u ? (u.name || ((u.first || '') + ' ' + (u.last || '')).trim() || null) : null;
+    const display = u ? (u.name || ((u.firstName || u.first || '') + ' ' + (u.lastName || u.last || '')).trim() || null) : null;
     if (name) name.textContent = display || 'Guest Analyst';
     if (mail) mail.textContent = (u && u.email) || 'guest@nabd.ai';
   }
@@ -221,9 +235,12 @@
         } else if (it.dataset.menu === 'lang') {
           setLang(N.lang === 'ar' ? 'en' : 'ar');
         } else if (it.dataset.menu === 'signout') {
-          N.clearUser();
-          T('app.toast.signedout');
-          setTimeout(() => N.navigate('../index.html'), 700);
+          const done = () => {
+            N.clearUser();
+            T('app.toast.signedout');
+            setTimeout(() => N.navigate('../index.html'), 700);
+          };
+          if (N.logout) N.logout().then(done, done); else done();
         }
         setOpen(false);
       });
@@ -1784,17 +1801,21 @@
   }
 
   /* ---------------- boot ---------------- */
-  if (!injectShell()) return;
-  bindShell();
-  if (page === 'dashboard') initDashboard();
-  else if (page === 'history') initHistory();
-  else if (page === 'reports') initReports();
-  else if (page === 'profile') initProfile();
-  else if (page === 'settings') initSettings();
-  else if (page === 'connections') initConnections();
-  else if (page === 'api') initApi();
-  else if (page === 'notifications') initNotifications();
-  else if (page === 'favorites') initFavorites();
-  else if (page === 'searches') initSearches();
-  window.addEventListener('app-unread', updateBadge);
+  function boot() {
+    if (!injectShell()) return;
+    bindShell();
+    if (page === 'dashboard') initDashboard();
+    else if (page === 'history') initHistory();
+    else if (page === 'reports') initReports();
+    else if (page === 'profile') initProfile();
+    else if (page === 'settings') initSettings();
+    else if (page === 'connections') initConnections();
+    else if (page === 'api') initApi();
+    else if (page === 'notifications') initNotifications();
+    else if (page === 'favorites') initFavorites();
+    else if (page === 'searches') initSearches();
+    window.addEventListener('app-unread', updateBadge);
+  }
+
+  bootGuard();
 })();

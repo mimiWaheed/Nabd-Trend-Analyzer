@@ -1028,6 +1028,11 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
 .auth-switch { text-align: center; margin-top: 24px; font-size: .88rem; color: var(--text-muted); }
 .auth-terms { margin-bottom: 22px; }
 .auth-error { color: var(--danger); font-size: .82rem; min-height: 1.2em; margin-bottom: 12px; }
+.auth-otp .auth-sub { margin-bottom: 22px; }
+.auth-otp .mono { color: var(--text); }
+.auth-otp-resend { text-align: center; font-size: .85rem; color: var(--text-muted); margin-top: 18px; display: flex; gap: 6px; justify-content: center; align-items: baseline; }
+.auth-otp-resend button { background: none; border: 0; padding: 0; cursor: pointer; font-size: .85rem; }
+.auth-otp-resend button:disabled { opacity: .5; cursor: default; }
 
 /* auth field validation */
 .field { position: relative; }

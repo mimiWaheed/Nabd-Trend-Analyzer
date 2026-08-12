@@ -138,6 +138,24 @@
         <button type="submit" class="btn btn-primary auth-submit" id="signupSubmit" data-i18n="auth.signup.submit">Create account</button>
       </form>
 
+      <div class="auth-otp" id="otpStep" hidden>
+        <h2 class="auth-title" data-i18n="auth.verify.title">Verify your email</h2>
+        <p class="auth-sub"><span data-i18n="auth.verify.sub">Enter the 6-digit code we sent to</span> <span class="mono" id="otpEmail"></span></p>
+        <form id="otpForm" novalidate>
+          <div class="field">
+            <label for="suOtp" data-i18n="auth.verify.label">Verification code</label>
+            <input type="text" id="suOtp" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" spellcheck="false" aria-describedby="suOtpMsg">
+            <p class="field-msg" id="suOtpMsg" role="alert"></p>
+          </div>
+          <p class="auth-error" id="otpError"></p>
+          <button type="submit" class="btn btn-primary auth-submit" data-i18n="auth.verify.btn">Verify</button>
+        </form>
+        <p class="auth-otp-resend">
+          <span data-i18n="auth.verify.no">Didn't get a code?</span>
+          <button type="button" class="link-soft" id="otpResend" data-i18n="auth.verify.resend">Resend code</button>
+        </p>
+      </div>
+
       <p class="auth-alt" data-i18n="auth.alt">or continue with</p>
       <div class="social-row">
         <button type="button" class="btn btn-google" data-social="google" aria-label="Continue with Google — coming soon">

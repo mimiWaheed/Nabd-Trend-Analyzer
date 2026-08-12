@@ -137,8 +137,9 @@
   }
   function setPending(btn, on) {
     if (!btn) return;
+    if (!btn.dataset.origText) btn.dataset.origText = btn.textContent;
     btn.disabled = on;
-    btn.textContent = on ? N.t('auth.pending') : '';
+    btn.textContent = on ? N.t('auth.pending') : btn.dataset.origText;
   }
 
   /* ----------------------------------------------------------
@@ -204,9 +205,23 @@
       }
       busy = true;
       setPending(siSubmit, true);
-      N.persistUser({ email: siEmail.value.trim() }, siRemember && siRemember.checked);
-      N.notifAdd({ title: 'notif.auth.in.t', sub: 'notif.auth.in.s', cat: 'system', ts: Date.now() });
-      finishAuth(N.t('auth.ok.signin'));
+      const remember = !!(siRemember && siRemember.checked);
+      N.api('/api/auth/login', {
+        method: 'POST',
+        body: { email: siEmail.value.trim(), password: siPwd.value, remember }
+      }).then((d) => {
+        N.persistUser(d.user, remember);
+        N.notifAdd({ title: 'notif.auth.in.t', sub: 'notif.auth.in.s', cat: 'system', ts: Date.now() });
+        finishAuth(N.t('auth.ok.signin'));
+      }).catch((err) => {
+        busy = false;
+        setPending(siSubmit, false);
+        if (err.code === 'EMAIL_NOT_VERIFIED') {
+          location.replace('signup.html?verify=' + encodeURIComponent(siEmail.value.trim()));
+          return;
+        }
+        setError(err.message || N.t('auth.err.req'));
+      });
     });
   }
 
@@ -291,6 +306,80 @@
     });
 
     let busy = false;
+    let otpBusy = false;
+    let pendingEmail = null;
+
+    /* ---- email OTP verification step ---- */
+    const otpWrap = $('otpStep');
+    const otpErrEl = $('otpError');
+    const setOtpError = (m) => { if (otpErrEl) otpErrEl.textContent = m || ''; };
+
+    function showOtp(email) {
+      pendingEmail = email;
+      if (signupForm) signupForm.style.display = 'none';
+      if (otpWrap) {
+        const em = $('otpEmail');
+        if (em) em.textContent = email;
+        otpWrap.hidden = false;
+        const inp = $('suOtp');
+        if (inp) inp.focus();
+      }
+    }
+
+    const otpForm = $('otpForm');
+    const otpResend = $('otpResend');
+
+    function verifyOtpDone() {
+      otpBusy = false;
+      busy = false;
+      N.notifAdd({ title: 'notif.auth.up.t', sub: 'notif.auth.up.s', cat: 'system', ts: Date.now() });
+      if (N.getUser()) finishAuth(N.t('auth.ok.signup'));
+      else N.navigate('signin.html');
+    }
+
+    if (otpForm) otpForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (otpBusy) return;
+      const inp = $('suOtp');
+      const val = (inp && inp.value || '').trim();
+      if (!/^\d{6}$/.test(val)) {
+        setOtpError(N.t('auth.verify.err.digits'));
+        if (inp) inp.focus();
+        return;
+      }
+      otpBusy = true;
+      setOtpError('');
+      N.api('/api/auth/verify-email', { method: 'POST', body: { email: pendingEmail, otp: val } })
+        .then(verifyOtpDone)
+        .catch((err) => {
+          otpBusy = false;
+          setOtpError(err.message || N.t('auth.verify.err'));
+          if (inp) inp.select();
+        });
+    });
+
+    if (otpResend) otpResend.addEventListener('click', () => {
+      if (otpResend.disabled) return;
+      otpResend.disabled = true;
+      N.api('/api/auth/resend-verification', { method: 'POST', body: { email: pendingEmail } })
+        .then(() => {
+          otpResend.disabled = false;
+          N.toast(toastEl, N.t('auth.verify.sent'));
+        })
+        .catch((err) => {
+          otpResend.disabled = false;
+          setOtpError(err.message || N.t('auth.verify.err'));
+        });
+    });
+
+    /* open the OTP step directly when arriving with ?verify=<email> */
+    (function () {
+      try {
+        const v = new URLSearchParams(location.search).get('verify');
+        if (v && v.indexOf('@') !== -1) showOtp(decodeURIComponent(v));
+      } catch (e) {}
+    })();
+
     signupForm.addEventListener('submit', (e) => {
       e.preventDefault();
       if (busy) return;
@@ -319,17 +408,26 @@
 
       busy = true;
       setPending(suSubmit, true);
-      N.persistUser({
-        first: cleanName(suFirst.value),
-        last: cleanName(suLast.value),
-        org: (suOrg ? suOrg.value : '').trim(),
-        email: suEmail.value.trim(),
-        phone: cleanPhone(suPhone.value),
-        country: countrySel ? countrySel.value : '',
-        lang: langSel ? langSel.value : ''
-      }, true);
-      N.notifAdd({ title: 'notif.auth.up.t', sub: 'notif.auth.up.s', cat: 'system', ts: Date.now() });
-      finishAuth(N.t('auth.ok.signup'));
+      N.api('/api/auth/signup', {
+        method: 'POST',
+        body: {
+          firstName: cleanName(suFirst.value),
+          lastName: cleanName(suLast.value),
+          email: suEmail.value.trim(),
+          password: suPwd.value,
+          phone: suPhone.value,
+          organization: (suOrg ? suOrg.value : '').trim(),
+          country: countrySel ? countrySel.value : '',
+          lang: langSel ? langSel.value : ''
+        }
+      }).then((d) => {
+        N.persistUser(d.user, true);
+        showOtp(suEmail.value.trim());
+      }).catch((err) => {
+        busy = false;
+        setPending(suSubmit, false);
+        setError(err.message || N.t('auth.err.req'));
+      });
     });
   }
 
