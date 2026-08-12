@@ -6,7 +6,6 @@ const { nowIso } = storeApi;
 const { asyncBody, fail, created, failCode } = require('../_lib/respond');
 const { isEmail, isName, isPassword, isPhone, cleanPhone } = require('../_lib/validate');
 const { hashPassword, hashOtp, generateOtp } = require('../_lib/crypto');
-const sessionLib = require('../_lib/session');
 const mailer = require('../_lib/mailer');
 const events = require('../_lib/events');
 
@@ -79,19 +78,15 @@ module.exports = async function handler(req, res) {
     emailStatus = 'failed';
   }
 
-  const session = await sessionLib.createSession(req, user.id, true);
-
   await events.logActivity(user.id, 'USER_REGISTERED', { email });
   await events.logActivity(user.id, 'EMAIL_VERIFICATION_SENT', {});
 
-  res.setHeader('Set-Cookie', session.cookie);
   return created(res, {
     user: {
       id: user.id, firstName, lastName, email,
       emailVerified: false, phone: user.phone, organization: user.organization,
       country: user.country, lang, createdAt: user.createdAt
     },
-    token: session.token,
     emailStatus,
     verified: false
   });

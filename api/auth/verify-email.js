@@ -8,9 +8,10 @@
 
 const { randomToken } = require('../_lib/crypto');
 const storeApi = require('../_lib/store');
-const { asyncBody, fail, ok, failCode } = require('../_lib/respond');
+const { asyncBody, fail, ok, failCode, publicUser } = require('../_lib/respond');
 const { isEmail } = require('../_lib/validate');
 const { verifyOtp } = require('../_lib/crypto');
+const sessionLib = require('../_lib/session');
 const events = require('../_lib/events');
 
 module.exports = async function handler(req, res) {
@@ -31,7 +32,11 @@ module.exports = async function handler(req, res) {
   const user = await store.findUserByEmail(email);
   if (!user) return fail(res, 404, 'NOT_FOUND', 'No account found for this email');
 
-  if (user.emailVerified) return ok(res, { verified: true, user: { id: user.id, email, emailVerified: true } });
+  if (user.emailVerified) {
+    const session = await sessionLib.createSession(req, user.id, true);
+    res.setHeader('Set-Cookie', session.cookie);
+    return ok(res, { verified: true, user: publicUser(user), token: session.token });
+  }
 
   const verification = await store.findLatestVerificationByUser(user.id);
   if (!verification) return fail(res, 404, 'NOT_FOUND', 'No verification code was issued');
@@ -61,5 +66,7 @@ module.exports = async function handler(req, res) {
   await events.logActivity(user.id, 'EMAIL_VERIFIED', {});
   await events.createNotification(user.id, 'system', 'Email verified', 'Your email address has been verified.');
 
-  return ok(res, { verified: true, user: { id: user.id, email, emailVerified: true } });
+  const session = await sessionLib.createSession(req, user.id, true);
+  res.setHeader('Set-Cookie', session.cookie);
+  return ok(res, { verified: true, user: publicUser(Object.assign({}, user, { emailVerified: true })), token: session.token });
 };

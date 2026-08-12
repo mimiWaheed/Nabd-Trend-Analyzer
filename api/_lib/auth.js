@@ -17,6 +17,11 @@ async function requireAuth(req, res) {
     failCode(res, 'UNAUTHENTICATED', 'Session is no longer valid');
     return null;
   }
+  if (!user.emailVerified) {
+    await store.deleteSessionByTokenHash(session.tokenHash);
+    failCode(res, 'EMAIL_NOT_VERIFIED', 'Please verify your email before continuing.');
+    return null;
+  }
   return { session, user, public: publicUser(user) };
 }
 

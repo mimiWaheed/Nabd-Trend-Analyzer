@@ -32,7 +32,7 @@
       N.authMe().then((u) => {
         if (u) N.persistUser(u);
         else { N.clearUser(); bounce(); }
-      }).catch(() => {});
+      }).catch(() => { N.clearUser(); bounce(); });
     } else {
       N.authMe().then(bootWith, () => bounce());
     }

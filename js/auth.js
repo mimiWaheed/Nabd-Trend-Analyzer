@@ -329,9 +329,10 @@
     const otpForm = $('otpForm');
     const otpResend = $('otpResend');
 
-    function verifyOtpDone() {
+    function verifyOtpDone(d) {
       otpBusy = false;
       busy = false;
+      if (d && d.user) N.persistUser(d.user, true);
       N.notifAdd({ title: 'notif.auth.up.t', sub: 'notif.auth.up.s', cat: 'system', ts: Date.now() });
       if (N.getUser()) finishAuth(N.t('auth.ok.signup'));
       else N.navigate('signin.html');
@@ -420,8 +421,7 @@
           country: countrySel ? countrySel.value : '',
           lang: langSel ? langSel.value : ''
         }
-      }).then((d) => {
-        N.persistUser(d.user, true);
+      }).then(() => {
         showOtp(suEmail.value.trim());
       }).catch((err) => {
         busy = false;

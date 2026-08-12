@@ -60,10 +60,9 @@ const run = async (handler, method, body, headers) => {
   assert(r.body && r.body.ok === true, 'signup returns ok:true');
   assert(r.body.user.email === EMAIL, 'signup returns the created user email');
   assert(r.body.user.emailVerified === false, 'signup creates an UNVERIFIED account');
-  assert(r.body.token, 'signup establishes a session (token returned)');
+  assert(!r.body.token, 'signup does NOT auto-login an unverified account (no token)');
   assert(!JSON.stringify(r.body).includes('passwordHash'), 'signup response never leaks passwordHash');
   assert(!JSON.stringify(r.body).includes('otp'), 'signup response never leaks the OTP');
-  const token = r.body.token;
 
   /* password is stored hashed, not plaintext */
   const mem = store._mem.users.find((u) => u.email === EMAIL);
@@ -107,6 +106,8 @@ const run = async (handler, method, body, headers) => {
 
   r = await run(verifyHandler, 'POST', { email: VERIFIED_EMAIL, otp: knownOtp });
   assert(r.status === 200 && r.body.verified === true, 'correct OTP verifies the account');
+  assert(r.body.token, 'successful OTP verify establishes a session (token returned)');
+  const verifyToken = r.body.token;
   const verifiedUser = store._mem.users.find((u) => u.email === VERIFIED_EMAIL);
   assert(verifiedUser.emailVerified === true, 'emailVerified flag is persisted after OTP verify');
   assert(verif.usedAt, 'OTP is single-use (marked used)');
@@ -184,9 +185,9 @@ const run = async (handler, method, body, headers) => {
   r = await run(meHandler, 'GET', undefined, { authorization: 'Bearer ' + loginToken });
   assert(r.status === 401, 'session is destroyed after logout (/auth/me returns 401)');
 
-  /* signup session also persists (auto-login) then /auth/me works */
-  r = await run(meHandler, 'GET', undefined, { authorization: 'Bearer ' + token });
-  assert(r.status === 200 && r.body.user.email === EMAIL, 'signup session is valid for /auth/me');
+  /* the session established by OTP verification persists (auto-login after verify) */
+  r = await run(meHandler, 'GET', undefined, { authorization: 'Bearer ' + verifyToken });
+  assert(r.status === 200 && r.body.user.email === VERIFIED_EMAIL, 'session created on OTP verify is valid for /auth/me');
 
   if (!process.exitCode) console.log('ALL TESTS PASSED');
 })().catch((e) => { console.error(e); process.exitCode = 1; });
