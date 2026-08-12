@@ -89,6 +89,8 @@
       'footer.c4': 'Legal', 'footer.l41': 'Privacy', 'footer.l42': 'Terms',
       'footer.l43': 'Security', 'footer.l44': 'DPA',
       'footer.copyright': 'NABD (نبض) Intelligence Systems', 'footer.status': 'All systems operational',
+      'nav.legal.eyebrow': 'NABD · LEGAL',
+      'nav.legal.privacy': 'Privacy Policy', 'nav.legal.terms': 'Terms of Service',
 
       /* workspace */
       'ws.back': 'Home', 'ws.new': 'New analysis', 'ws.querylabel': 'TRACKING', 'ws.private.badge': 'Private Analysis',
@@ -203,7 +205,8 @@
       'auth.signup.switch': 'Don\'t have an account? <a class="link-soft" href="signup.html" data-page="signup.html">Sign up</a>',
       'auth.signin.switch': 'Already have an account? <a class="link-soft" href="signin.html" data-page="signin.html">Sign in</a>',
       'auth.back': 'Back to home', 'auth.country': 'Country', 'auth.lang': 'Language',
-      'auth.terms': 'I agree to the <a class="link-soft" href="../index.html#cta">Terms of Service</a> and the <a class="link-soft" href="../index.html#cta">Privacy Policy</a>',
+      'auth.terms': 'I agree to the <a class="link-soft" href="../terms.html" data-page="../terms.html">Terms of Service</a> and the <a class="link-soft" href="../privacy-policy.html" data-page="../privacy-policy.html">Privacy Policy</a>',
+      'auth.legal': 'By continuing you agree to the <a class="link-soft" href="../terms.html" data-page="../terms.html">Terms of Service</a> and the <a class="link-soft" href="../privacy-policy.html" data-page="../privacy-policy.html">Privacy Policy</a>',
       'auth.art1.t': 'Your intelligence command center',
       'auth.art1.b': 'Trends, sentiment, crises and live feeds across every Egyptian governorate — in one live workspace.',
       'auth.art2.t': 'Your intelligence command center',
@@ -369,6 +372,7 @@
       /* settings */
       'set.general': 'General', 'set.appearance': 'Appearance', 'set.lang': 'Language',
       'set.notif': 'Notifications', 'set.privacy': 'Privacy', 'set.security': 'Security',
+      'set.privacy.doc': 'Read the full policy', 'set.privacy.doc.s': 'See how Nabd handles your information.', 'set.privacy.doc.b': 'Privacy Policy',
       'set.shortcuts': 'Shortcuts', 'set.experimental': 'Experimental features',
       'set.danger': 'Danger zone',
       'set.g.name': 'Full name', 'set.g.org': 'Organization', 'set.g.email': 'Email',
@@ -539,6 +543,8 @@
       'footer.c4': 'القانونية', 'footer.l41': 'الخصوصية', 'footer.l42': 'الشروط',
       'footer.l43': 'الأمان', 'footer.l44': 'اتفاقية حماية البيانات',
       'footer.copyright': 'نبض لأنظمة الاستخبارات', 'footer.status': 'جميع الأنظمة تعمل',
+      'nav.legal.eyebrow': 'نبض · قانوني',
+      'nav.legal.privacy': 'سياسة الخصوصية', 'nav.legal.terms': 'شروط الخدمة',
 
       /* workspace */
       'ws.back': 'الرئيسية', 'ws.new': 'تحليل جديد', 'ws.querylabel': 'المتابعة', 'ws.private.badge': 'تحليل خاص',
@@ -653,7 +659,8 @@
       'auth.signup.switch': 'ليس لديك حساب؟ <a class="link-soft" href="signup.html" data-page="signup.html">أنشئ حسابًا</a>',
       'auth.signin.switch': 'لديك حساب بالفعل؟ <a class="link-soft" href="signin.html" data-page="signin.html">سجّل الدخول</a>',
       'auth.back': 'العودة للرئيسية', 'auth.country': 'الدولة', 'auth.lang': 'اللغة',
-      'auth.terms': 'أوافق على <a class="link-soft" href="../index.html#cta">شروط الخدمة</a> و <a class="link-soft" href="../index.html#cta">سياسة الخصوصية</a>',
+      'auth.terms': 'أوافق على <a class="link-soft" href="../terms.html" data-page="../terms.html">شروط الخدمة</a> و <a class="link-soft" href="../privacy-policy.html" data-page="../privacy-policy.html">سياسة الخصوصية</a>',
+      'auth.legal': 'بالمتابعة فأنت توافق على <a class="link-soft" href="../terms.html" data-page="../terms.html">شروط الخدمة</a> و <a class="link-soft" href="../privacy-policy.html" data-page="../privacy-policy.html">سياسة الخصوصية</a>',
       'auth.art1.t': 'مركز قيادة الذكاء الخاص بك',
       'auth.art1.b': 'الترندات والمشاعر والأزمات والتغذية الحية في كل محافظات مصر — في مساحة عمل واحدة حية.',
       'auth.art2.t': 'مركز قيادة الذكاء الخاص بك',
@@ -819,6 +826,7 @@
       /* settings */
       'set.general': 'عام', 'set.appearance': 'المظهر', 'set.lang': 'اللغة',
       'set.notif': 'الإشعارات', 'set.privacy': 'الخصوصية', 'set.security': 'الأمان',
+      'set.privacy.doc': 'اقرأ السياسة كاملة', 'set.privacy.doc.s': 'اطّلع على كيفية تعامل نبض مع معلوماتك.', 'set.privacy.doc.b': 'سياسة الخصوصية',
       'set.shortcuts': 'الاختصارات', 'set.experimental': 'الميزات التجريبية',
       'set.danger': 'منطقة الخطر',
       'set.g.name': 'الاسم الكامل', 'set.g.org': 'المؤسسة', 'set.g.email': 'البريد الإلكتروني',
