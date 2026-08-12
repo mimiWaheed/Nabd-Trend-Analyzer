@@ -66,7 +66,7 @@
       <p class="auth-sub" data-i18n="auth.signup.sub">Start watching Egypt's pulse in minutes.</p>
 
       <form id="signupForm" novalidate>
-        <div class="field-row" style="margin:0 0 18px;">
+        <div class="field-row" style="margin:0 0 18px;align-items:flex-start;">
           <div class="field" style="flex:1;margin:0;">
             <label for="suFirst" data-i18n="auth.first">First name</label>
             <input type="text" id="suFirst" name="first" autocomplete="given-name" spellcheck="false" aria-describedby="suFirstMsg">
@@ -117,7 +117,7 @@
           </div>
           <p class="field-msg" id="suPwd2Msg" role="alert"></p>
         </div>
-        <div class="field-row" style="margin:0 0 18px;">
+        <div class="field-row" style="margin:0 0 18px;align-items:flex-start;">
           <div class="field" style="flex:1;margin:0;">
             <label for="suCountry" data-i18n="auth.country">Country</label>
             <select id="suCountry" name="country"></select>
@@ -128,8 +128,8 @@
           </div>
         </div>
         <div class="field auth-terms">
-          <label class="check">
-            <input type="checkbox" id="suTerms" aria-describedby="suTermsMsg">
+          <label class="check" for="suTerms">
+            <input type="checkbox" id="suTerms" name="terms" required aria-describedby="suTermsMsg">
             <span data-i18n-html="auth.terms">I agree to the <a class="link-soft" href="../terms.html" data-page="../terms.html">Terms of Service</a> and the <a class="link-soft" href="../privacy-policy.html" data-page="../privacy-policy.html">Privacy Policy</a></span>
           </label>
           <p class="field-msg" id="suTermsMsg" role="alert"></p>

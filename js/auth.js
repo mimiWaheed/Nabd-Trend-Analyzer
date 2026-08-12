@@ -91,10 +91,16 @@
     return true;
   }
 
+  /* Egyptian mobile numbers: 010/011/012/015 followed by 8 digits.
+     Accepts local (0), local-without-0, +20 and 0020 prefixes. */
   function isValidPhone(v) {
-    const s = cleanPhone(v);
-    if (!s) return false;
-    return /^\+?\d{7,15}$/.test(s);
+    let n = cleanPhone(v);
+    if (!n) return false;
+    if (n.charAt(0) === '+') n = n.slice(1);
+    if (n.indexOf('0020') === 0) n = n.slice(3);
+    else if (n.indexOf('20') === 0) n = n.slice(2);
+    if (n.length === 11 && n.charAt(0) === '0') n = n.slice(1);
+    return /^1[0125]\d{8}$/.test(n);
   }
 
   function passwordScore(v) {

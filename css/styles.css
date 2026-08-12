@@ -1000,7 +1000,14 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
 .pwd-toggle svg { width: 18px; height: 18px; }
 .field-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 2px 0 22px; font-size: .85rem; flex-wrap: wrap; }
 .check { display: inline-flex; align-items: center; gap: 9px; color: var(--text-soft); cursor: pointer; user-select: none; }
-.check input { accent-color: var(--accent); width: 16px; height: 16px; }
+.check input {
+  appearance: auto;
+  -webkit-appearance: auto;
+  accent-color: var(--accent);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
 .link-soft { color: var(--accent); font-weight: 500; }
 .link-soft:hover { text-decoration: underline; }
 .auth-submit { width: 100%; margin-top: 4px; }
