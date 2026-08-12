@@ -1025,7 +1025,7 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
 /* auth field validation */
 .field { position: relative; }
 .field-msg {
-  min-height: 0;
+  min-height: 1.5em;
   margin-top: 6px;
   font-size: .76rem;
   line-height: 1.4;
@@ -1790,6 +1790,7 @@ html[dir="rtl"] .field select {
   backdrop-filter: blur(18px);
   border-inline-end: 1px solid var(--border);
   overflow: hidden;
+  transition: width .35s var(--ease);
 }
 .app-side.collapsed { width: var(--side-w-collapsed); }
 
@@ -1831,14 +1832,7 @@ html[dir="rtl"] .field select {
 .app-side.collapsed .app-nav-item span,
 .app-side.collapsed .app-side-foot .side-status span,
 .app-side.collapsed .app-nav-sep {
-  opacity: 0;
-  pointer-events: none;
-}
-.app-side.collapsed .app-brand-name {
-  width: 0;
-  margin: 0;
-  overflow: hidden;
-  white-space: nowrap;
+  display: none;
 }
 /* Logo / collapse-icon swap — instant, only while hovering the brand */
 .app-side-head:hover .app-brand-side,
@@ -1907,6 +1901,9 @@ html[dir="rtl"] .field select {
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+.app-nav-item {
+  transition: background .25s var(--ease), color .25s var(--ease);
 }
 .app-nav-item:hover { background: var(--surface-1); color: var(--text); }
 .app-nav-item.active {
@@ -2006,6 +2003,7 @@ html[dir="rtl"] .field select {
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
+  transition: inset-inline-start .35s var(--ease);
 }
 .app-side.collapsed ~ .app-top { inset-inline-start: var(--side-w-collapsed); }
 .app-top-left {
@@ -2124,6 +2122,7 @@ html[dir="rtl"] .field select {
   margin-inline-end: auto;
   padding: calc(var(--top-h) + 26px) 30px 60px;
   max-width: 1400px;
+  transition: margin-inline-start .35s var(--ease);
 }
 .app-side.collapsed ~ .app-main { margin-inline-start: var(--side-w-collapsed); }
 
