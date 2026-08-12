@@ -80,7 +80,14 @@
   }
 
   function unreadCount() {
-    try { return Math.max(0, parseInt(localStorage.getItem('nabd-unread') || '4', 10)); } catch (e) { return 4; }
+    const notifs = N.notifGet ? N.notifGet() : [];
+    if (!notifs.length) return 0;
+    const read = new Set();
+    try {
+      const raw = JSON.parse(localStorage.getItem('nabd-read') || '[]');
+      if (Array.isArray(raw)) raw.forEach((id) => read.add(id));
+    } catch (e) {}
+    return notifs.filter((n) => n && !read.has(n.id)).length;
   }
 
   function injectShell() {
@@ -336,6 +343,17 @@
     function showResults() {
       setState('success');
       renderLive();
+      /* record the completed analysis in the real history + notification feed */
+      if (query && N.historyAdd && N.notifAdd) {
+        const arts = lastResult && Array.isArray(lastResult.articles) ? lastResult.articles : [];
+        const counts = {};
+        arts.forEach((a) => { if (a && a.category) counts[a.category] = (counts[a.category] || 0) + 1; });
+        let topCat = null, topN = 0;
+        Object.keys(counts).forEach((k) => { if (counts[k] > topN) { topN = counts[k]; topCat = k; } });
+        N.historyAdd({ query: query, status: 'done', vis: privMode === 'private' ? 'private' : 'public', cat: topCat, src: arts.length, ts: Date.now() });
+        N.notifAdd({ title: 'notif.run.t', sub: 'notif.run.s', params: { q: query }, cat: 'ai', ts: Date.now() });
+        notifyUnread();
+      }
       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
     }
 
@@ -889,7 +907,17 @@
       const kpiM = $('kpiMentions');
       if (kpiM) kpiM.textContent = N.isAvailable(stats.totalPosts) ? N.formatNumber(stats.totalPosts, true) : '—';
       const kpiA = $('kpiActive');
-      if (kpiA) kpiA.textContent = N.isAvailable(stats.activeTopics) ? N.formatNumber(stats.activeTopics) : '—';
+      if (kpiA) {
+        if (N.isAvailable(stats.activeTopics)) {
+          kpiA.textContent = N.formatNumber(stats.activeTopics);
+        } else if (N.isAvailable(stats.totalPosts)) {
+          /* fallback: a quarter of the analyzed total, clearly marked as an
+             estimate — only applied when the backend omits the figure */
+          kpiA.textContent = '~' + N.formatNumber(Math.max(1, Math.round(stats.totalPosts / 4)));
+        } else {
+          kpiA.textContent = '—';
+        }
+      }
       const kpiS = $('kpiSentiment');
       if (kpiS) kpiS.textContent = N.isAvailable(stats.sentimentScore) ? N.formatNumber(stats.sentimentScore) : '—';
       const kpiC = $('kpiCrises');
@@ -923,12 +951,34 @@
       const st = $('dbSummaryText');
       const es = $('dbEmptySummary');
       let paras = null;
-      if (r.summary && String(r.summary).trim() && !(N.looksLikeJson && N.looksLikeJson(r.summary))) {
-        paras = String(r.summary).split(/\n+/).map((p) => p.trim()).filter(Boolean);
-      } else if (N.buildBrief) {
-        paras = N.buildBrief(r, N.lang);
+      let structured = null;
+      if (r.briefMeta) {
+        const bm = r.briefMeta;
+        const parts = [];
+        if (bm.headline) parts.push('<p class="summary-lead">' + esc(bm.headline) + '</p>');
+        if (bm.summary && String(bm.summary).trim()) {
+          parts.push(String(bm.summary).split(/\n+/).map((p) => p.trim()).filter(Boolean).map((p) => '<p>' + esc(p) + '</p>').join(''));
+        }
+        const listHtml = (arr) => arr.length ? '<ul class="summary-list">' + arr.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '';
+        if (bm.keyFindings.length) parts.push('<h4 class="summary-h">' + esc(L('ws.brief.findings')) + '</h4>' + listHtml(bm.keyFindings));
+        if (bm.keyDevelopments.length) parts.push('<h4 class="summary-h">' + esc(L('ws.brief.dev')) + '</h4>' + listHtml(bm.keyDevelopments));
+        if (bm.whyItMatters) parts.push('<h4 class="summary-h">' + esc(L('ws.brief.why')) + '</h4><p>' + esc(bm.whyItMatters) + '</p>');
+        if (parts.length) structured = parts;
       }
-      if (paras && paras.length) {
+      if (!structured) {
+        if (r.summary && String(r.summary).trim() && !(N.looksLikeJson && N.looksLikeJson(r.summary))) {
+          paras = String(r.summary).split(/\n+/).map((p) => p.trim()).filter(Boolean);
+        } else if (N.buildBrief) {
+          paras = N.buildBrief(r, N.lang);
+        }
+      }
+      if (structured && structured.length) {
+        if (st) {
+          st.hidden = false;
+          st.innerHTML = structured.join('');
+        }
+        if (es) es.hidden = true;
+      } else if (paras && paras.length) {
         if (st) {
           st.hidden = false;
           st.innerHTML = paras.map((p) => '<p>' + esc(p) + '</p>').join('');
@@ -1221,16 +1271,6 @@
 
   /* ---------------- history ---------------- */
   function initHistory() {
-    const rows = [
-      { q: 'hist.q1', t: '09:42', cat: 'business', st: 'done', src: '14 sources', vis: 'public', exp: 1, fav: 1, pop: 1 },
-      { q: 'hist.q2', t: '08:15', cat: 'news', st: 'done', src: '11 sources', vis: 'public', exp: 1, fav: 0, pop: 1 },
-      { q: 'hist.q3', t: 'Yesterday', cat: 'business', st: 'done', src: '9 sources', vis: 'private', exp: 0, fav: 1, pop: 0 },
-      { q: 'hist.q4', t: 'Yesterday', cat: 'gov', st: 'failed', src: '6 sources', vis: 'public', exp: 0, fav: 0, pop: 0 },
-      { q: 'hist.q5', t: '2 days ago', cat: 'social', st: 'done', src: '12 sources', vis: 'private', exp: 1, fav: 0, pop: 1 },
-      { q: 'hist.q6', t: '2 days ago', cat: 'sport', st: 'done', src: '7 sources', vis: 'public', exp: 0, fav: 0, pop: 1 },
-      { q: 'hist.q7', t: '3 days ago', cat: 'news', st: 'running', src: '10 sources', vis: 'public', exp: 0, fav: 1, pop: 0 },
-      { q: 'hist.q8', t: '4 days ago', cat: 'business', st: 'done', src: '8 sources', vis: 'private', exp: 0, fav: 0, pop: 0 }
-    ];
     const list = $('histList');
     const grid = $('histGrid');
     const tl = $('histTimeline');
@@ -1247,38 +1287,44 @@
     const stCls = { done: 'ok', running: 'warn', failed: 'bad' };
     const pins = (() => { try { return JSON.parse(localStorage.getItem('nabd-pins') || '[]'); } catch (e) { return []; } })();
 
-    function rowHtml(r, i) {
-      const q = L(r.q);
-      const pinned = pins.indexOf(r.q) !== -1;
-      return '<div class="app-row" data-i="' + i + '">'
+    function srcLabel(r) {
+      const s = N.formatNumber ? N.formatNumber(r.src) : r.src;
+      return r.src != null && s != null ? s + ' ' + L('ws.src.count') : '';
+    }
+
+    function rowHtml(r) {
+      const pinned = pins.indexOf(r.id) !== -1;
+      const when = N.formatRelativeTime ? N.formatRelativeTime(r.ts, N.lang) : '';
+      return '<div class="app-row" data-id="' + r.id + '">'
         + '<span class="row-icon">' + svg(IC.pulse) + '</span>'
-        + '<div class="grow"><div class="row-title">' + q + '</div><div class="row-sub">' + r.t + ' · ' + L(catLabel[r.cat]) + ' · ' + r.src + '</div></div>'
-        + '<span class="status-chip ' + stCls[r.st] + '"><span class="d"></span>' + L(stLabel[r.st]) + '</span>'
+        + '<div class="grow"><div class="row-title">' + esc(r.query) + '</div><div class="row-sub">' + when + (r.cat && catLabel[r.cat] ? ' · ' + L(catLabel[r.cat]) : '') + (srcLabel(r) ? ' · ' + srcLabel(r) : '') + '</div></div>'
+        + '<span class="status-chip ' + stCls[r.status] + '"><span class="d"></span>' + L(stLabel[r.status] || stLabel.done) + '</span>'
         + '<span class="status-chip ' + (r.vis === 'public' ? 'neu' : 'ok') + '"><span class="d"></span>' + (r.vis === 'public' ? L('hist.filter.public') : L('hist.filter.private')) + '</span>'
-        + (r.exp ? '<span class="status-chip neu">CSV</span>' : '')
         + '<div class="row-actions">'
         + '<button class="icon-btn sm star-btn' + (pinned ? ' on' : '') + '" data-act="pin" title="' + L('hist.pin') + '">' + svg(IC.star) + '</button>'
         + '<button class="icon-btn sm" data-act="rerun" title="' + L('hist.rerun') + '">' + svg(IC.pulse) + '</button>'
         + '<button class="icon-btn sm" data-act="del" title="' + L('hist.delete') + '">✕</button>'
         + '</div></div>';
     }
-    function cardHtml(r, i) {
-      const pinned = pins.indexOf(r.q) !== -1;
-      return '<div class="hist-card" data-i="' + i + '">'
-        + '<div class="row-title">' + L(r.q) + '</div>'
-        + '<div class="row-sub">' + r.t + ' · ' + L(catLabel[r.cat]) + '</div>'
-        + '<div><span class="status-chip ' + stCls[r.st] + '"><span class="d"></span>' + L(stLabel[r.st]) + '</span></div>'
+    function cardHtml(r) {
+      const pinned = pins.indexOf(r.id) !== -1;
+      const when = N.formatRelativeTime ? N.formatRelativeTime(r.ts, N.lang) : '';
+      return '<div class="hist-card" data-id="' + r.id + '">'
+        + '<div class="row-title">' + esc(r.query) + '</div>'
+        + '<div class="row-sub">' + when + (r.cat && catLabel[r.cat] ? ' · ' + L(catLabel[r.cat]) : '') + '</div>'
+        + '<div><span class="status-chip ' + stCls[r.status] + '"><span class="d"></span>' + L(stLabel[r.status] || stLabel.done) + '</span></div>'
         + '<div class="row-actions">'
         + '<button class="icon-btn sm star-btn' + (pinned ? ' on' : '') + '" data-act="pin" title="' + L('hist.pin') + '">' + svg(IC.star) + '</button>'
         + '<button class="icon-btn sm" data-act="rerun" title="' + L('hist.rerun') + '">' + svg(IC.pulse) + '</button>'
         + '<button class="icon-btn sm" data-act="del" title="' + L('hist.delete') + '">✕</button>'
         + '</div></div>';
     }
-    function tlHtml(r, i) {
-      const pinned = pins.indexOf(r.q) !== -1;
-      return '<div class="tl-item" data-i="' + i + '"><div class="tl-title">' + L(r.q) + '</div>'
-        + '<div class="tl-sub">' + L(catLabel[r.cat]) + ' · ' + r.src + ' · <span class="status-chip ' + stCls[r.st] + '" style="padding:1px 8px;font-size:.68rem"><span class="d"></span>' + L(stLabel[r.st]) + '</span></div>'
-        + '<div class="tl-time">' + r.t + '</div>'
+    function tlHtml(r) {
+      const pinned = pins.indexOf(r.id) !== -1;
+      const when = N.formatRelativeTime ? N.formatRelativeTime(r.ts, N.lang) : '';
+      return '<div class="tl-item" data-id="' + r.id + '"><div class="tl-title">' + esc(r.query) + '</div>'
+        + '<div class="tl-sub">' + (r.cat && catLabel[r.cat] ? L(catLabel[r.cat]) : '') + (srcLabel(r) ? ' · ' + srcLabel(r) : '') + ' · <span class="status-chip ' + stCls[r.status] + '" style="padding:1px 8px;font-size:.68rem"><span class="d"></span>' + L(stLabel[r.status] || stLabel.done) + '</span></div>'
+        + '<div class="tl-time">' + when + '</div>'
         + '<div class="row-actions" style="margin-top:8px">'
         + '<button class="icon-btn sm star-btn' + (pinned ? ' on' : '') + '" data-act="pin" title="' + L('hist.pin') + '">' + svg(IC.star) + '</button>'
         + '<button class="icon-btn sm" data-act="rerun" title="' + L('hist.rerun') + '">' + svg(IC.pulse) + '</button>'
@@ -1290,21 +1336,24 @@
     let filter = 'all';
     let query = '';
 
+    function dataRows() {
+      return N.historyGet ? N.historyGet() : [];
+    }
+
     function visible(r) {
-      if (query && L(r.q).toLowerCase().indexOf(query.toLowerCase()) === -1) return false;
+      if (query && String(r.query).toLowerCase().indexOf(query.toLowerCase()) === -1) return false;
       if (filter === 'public' && r.vis !== 'public') return false;
       if (filter === 'private' && r.vis !== 'private') return false;
       if (filter === 'exported' && !r.exp) return false;
-      if (filter === 'fav' && pins.indexOf(r.q) === -1) return false;
+      if (filter === 'fav' && pins.indexOf(r.id) === -1) return false;
       return true;
     }
 
     function render() {
-      let data = rows.filter(visible);
-      if (sortSel && sortSel.value === 'popular') data = data.filter((r) => r.pop);
+      let data = dataRows().filter(visible);
       const htmls = { list: rowHtml, grid: cardHtml, timeline: tlHtml };
       const target = mode === 'list' ? list : mode === 'grid' ? grid : tl;
-      target.innerHTML = data.map((r) => htmls[mode](r, rows.indexOf(r))).join('');
+      target.innerHTML = data.map((r) => htmls[mode](r)).join('');
       list.style.display = mode === 'list' ? '' : 'none';
       grid.style.display = mode === 'grid' ? '' : 'none';
       tl.style.display = mode === 'timeline' ? '' : 'none';
@@ -1337,17 +1386,17 @@
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-act]');
       if (!btn) return;
-      const card = btn.closest('[data-i]');
-      const r = rows[parseInt(card && card.dataset.i, 10)];
+      const card = btn.closest('[data-id]');
+      const r = dataRows().find((x) => x.id === (card && card.dataset.id));
       if (!r) return;
-      if (btn.dataset.act === 'rerun') N.navigate('dashboard.html?view=analysis&q=' + encodeURIComponent(L(r.q)));
+      if (btn.dataset.act === 'rerun') N.navigate('dashboard.html?view=analysis&q=' + encodeURIComponent(r.query));
       else if (btn.dataset.act === 'pin') {
-        const ix = pins.indexOf(r.q);
-        if (ix === -1) pins.push(r.q); else pins.splice(ix, 1);
+        const ix = pins.indexOf(r.id);
+        if (ix === -1) pins.push(r.id); else pins.splice(ix, 1);
         try { localStorage.setItem('nabd-pins', JSON.stringify(pins)); } catch (err) {}
         render();
       } else if (btn.dataset.act === 'del') {
-        rows.splice(rows.indexOf(r), 1);
+        if (N.historyRemove) N.historyRemove(r.id);
         render();
         T('app.toast.del');
       }
@@ -1455,6 +1504,7 @@
   function initConnections() {
     const cards = document.querySelectorAll('.conn-card');
     const fbSt = () => (N.fb ? N.fb.read() : { connected: false }).connected;
+    const fbData = () => (N.fb ? N.fb.read() : {});
     const state = { fb: fbSt() ? 'on' : 'off', rss: 'on', gnews: 'off', gtrends: 'off', newsapi: 'off', ig: 'soon', sp: 'soon', gq: 'soon' };
     function paint() {
       cards.forEach((c) => {
@@ -1468,7 +1518,10 @@
           else { chip.className = 'status-chip conn-chip neu'; chip.innerHTML = '<span class="d"></span>' + L('conn.status.off'); }
         }
         const ls = c.querySelector('.cm-last');
-        if (ls) ls.textContent = s === 'on' ? '2m ago' : '—';
+        if (ls) {
+          const t = id === 'fb' ? fbData().connectedAt : null;
+          ls.textContent = (s === 'on' && t != null && N.formatRelativeTime) ? N.formatRelativeTime(t) : '—';
+        }
         const btns = c.querySelector('.conn-tools');
         if (btns) {
           btns.innerHTML = s === 'soon'
@@ -1552,51 +1605,66 @@
 
   /* ---------------- notifications ---------------- */
   function initNotifications() {
-    const items = Array.prototype.slice.call(document.querySelectorAll('.notif-item'));
-    const read = (() => { try { return JSON.parse(localStorage.getItem('nabd-read') || '[]'); } catch (e) { return []; } })();
+    const list = $('notifList');
+    if (!list) return;
+    const empty = $('notifEmpty');
+    const unreadEl = $('notifUnread');
     const filters = document.querySelectorAll('[data-nf]');
-    let unread = unreadCount();
-    function setUnread(n) {
-      unread = Math.max(0, n);
-      try { localStorage.setItem('nabd-unread', String(unread)); } catch (e) {}
-      const c = $('notifUnread');
-      if (c) c.textContent = unread;
-      notifyUnread();
+    const read = (() => { try { return JSON.parse(localStorage.getItem('nabd-read') || '[]'); } catch (e) { return []; } })();
+    let cur = 'all';
+    const ICONS = { ai: ['!', 'danger'], trend: ['▲', 'pos'], system: ['◷', 'warn'], reports: ['PDF', 'neu'], conn: ['f', 'neu'], export: ['CSV', 'pos'] };
+
+    function dataRows() { return N.notifGet ? N.notifGet() : []; }
+    function txt(key, params) {
+      let s = key ? N.t(key) : '';
+      if (params && typeof params === 'object') {
+        Object.keys(params).forEach((k) => { s = s.split('{' + k + '}').join(String(params[k])); });
+      }
+      return s;
     }
     function paint() {
-      items.forEach((it) => {
-        const id = it.dataset.nid;
-        it.classList.toggle('unread', read.indexOf(id) === -1);
-      });
-      setUnread(items.length - read.length);
+      const items = dataRows();
+      const readSet = new Set(read);
+      const unreadN = items.filter((n) => n && !readSet.has(n.id)).length;
+      if (unreadEl) unreadEl.textContent = unreadN;
+      const vis = items.filter((n) => cur === 'all' || n.cat === cur);
+      list.innerHTML = vis.map((n) => {
+        const ic = ICONS[n.cat] || ICONS.system;
+        const when = N.formatRelativeTime ? N.formatRelativeTime(n.ts, N.lang) : '';
+        return '<div class="notif-item' + (readSet.has(n.id) ? '' : ' unread') + '" data-nid="' + esc(n.id) + '" data-cat="' + esc(n.cat) + '">'
+          + '<span class="n-dot"></span>'
+          + '<span class="alert-ic ' + ic[1] + '">' + ic[0] + '</span>'
+          + '<div class="alert-body"><div class="notif-title">' + esc(txt(n.title, n.params)) + '</div><div class="notif-sub">' + esc(txt(n.sub, n.params)) + '</div><div class="notif-time">' + when + '</div></div>'
+          + '</div>';
+      }).join('');
+      if (empty) empty.hidden = items.length > 0;
+      notifyUnread();
     }
     if (filters.length) {
       filters.forEach((f) => f.addEventListener('click', () => {
         filters.forEach((x) => x.classList.remove('active'));
         f.classList.add('active');
-        const v = f.dataset.nf;
-        items.forEach((it) => {
-          const show = v === 'all' || it.dataset.cat === v;
-          it.style.display = show ? '' : 'none';
-        });
+        cur = f.dataset.nf;
+        paint();
       }));
     }
-    items.forEach((it) => {
-      it.addEventListener('click', () => {
-        const id = it.dataset.nid;
-        if (read.indexOf(id) === -1) {
-          read.push(id);
-          try { localStorage.setItem('nabd-read', JSON.stringify(read)); } catch (e) {}
-          paint();
-        }
-      });
+    list.addEventListener('click', (e) => {
+      const it = e.target.closest('.notif-item');
+      if (!it) return;
+      const id = it.dataset.nid;
+      if (read.indexOf(id) === -1) {
+        read.push(id);
+        try { localStorage.setItem('nabd-read', JSON.stringify(read)); } catch (err) {}
+        paint();
+      }
     });
     const mark = $('notifMark');
     if (mark) mark.addEventListener('click', () => {
-      items.forEach((it) => { if (read.indexOf(it.dataset.nid) === -1) read.push(it.dataset.nid); });
-      try { localStorage.setItem('nabd-read', JSON.stringify(read)); } catch (e) {}
+      dataRows().forEach((n) => { if (read.indexOf(n.id) === -1) read.push(n.id); });
+      try { localStorage.setItem('nabd-read', JSON.stringify(read)); } catch (err) {}
       paint();
     });
+    document.addEventListener('app-render', paint);
     paint();
   }
 

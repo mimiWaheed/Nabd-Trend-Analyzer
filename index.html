@@ -49,7 +49,7 @@
           </button>
           <button class="lang-toggle mono" data-action="lang">العربية</button>
           <a class="nav-signin" href="pages/signin.html" data-page="pages/signin.html" data-i18n="nav.signin">Sign In</a>
-          <a class="btn btn-primary btn-sm" href="pages/signin.html" data-page="pages/signin.html" data-i18n="nav.getstarted">Get Started</a>
+          <a class="btn btn-primary btn-sm" href="pages/signup.html" data-page="pages/signup.html" data-i18n="nav.getstarted">Get Started</a>
           <button class="nav-burger" id="navBurger" aria-label="Toggle menu">
             <span></span><span></span><span></span>
           </button>
@@ -78,8 +78,8 @@
           <h1 class="reveal" style="--d:.05s" data-i18n-html="hero.h1">Understand <span class="grad">Egypt</span> before it reacts.</h1>
           <p class="hero-sub reveal" style="--d:.1s" data-i18n="hero.sub">NABD (نبض) is Egypt's AI intelligence platform — monitoring news, public opinion, social media and crises across every governorate in real time, with global coverage when you need it.</p>
           <div class="hero-cta reveal" style="--d:.15s">
-            <a class="btn btn-primary" href="#search">
-              <span data-i18n="hero.cta1">Explore the intelligence</span>
+            <a class="btn btn-primary" href="pages/signup.html" data-page="pages/signup.html">
+              <span data-i18n="hero.cta1">Get Started</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
             <a class="btn btn-ghost" href="#why" data-i18n="hero.cta2">How it works</a>
@@ -211,44 +211,6 @@
               <p class="chip-sub mono">Cairo · +18.4%</p>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ SEARCH ============ -->
-    <section class="search-section" id="search">
-      <div class="container">
-        <div class="search-wrap reveal">
-          <div class="search-box" id="searchBox">
-            <span class="search-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-            </span>
-            <div class="search-input-wrap">
-              <span class="search-placeholder" id="searchPlaceholder" aria-hidden="true">
-                <span id="typedText"></span><span class="caret"></span>
-              </span>
-              <input type="text" id="searchInput" autocomplete="off" spellcheck="false" aria-label="Ask NABD about Egypt">
-            </div>
-            <button class="btn-search" id="searchBtn" type="button">
-              <span class="btn-search-label" data-i18n="search.btn">Analyze</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </button>
-          </div>
-          <div class="suggestions" id="suggestions" aria-label="Suggested questions">
-            <div class="suggestions-track" id="suggestionsTrack">
-              <button class="chip" data-q="What's happening in Cairo today?" data-i18n="q.cairo"><span class="chip-pulse" aria-hidden="true"></span> Cairo today</button>
-              <button class="chip" data-q="Analyze Egypt's inflation discussions." data-i18n="q.inflation">Inflation talks</button>
-              <button class="chip" data-q="Why is the Egyptian Pound trending?" data-i18n="q.pound">Egyptian Pound</button>
-              <button class="chip" data-q="Track Suez Canal conversations." data-i18n="q.suez">Suez Canal</button>
-              <button class="chip" data-q="Show public sentiment about education." data-i18n="q.education">Education sentiment</button>
-              <button class="chip" data-q="What's new in Egyptian football?" data-i18n="q.football">Football pulse</button>
-              <button class="chip" data-q="Track New Administrative Capital news." data-i18n="q.capital">New Capital</button>
-            </div>
-          </div>
-          <p class="search-note mono">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.24 7.76 2.83-2.83"/><path d="M18 12h4"/><path d="m16.24 16.24 2.83 2.83"/><path d="M12 18v4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M4 12H2"/><path d="m4.93 4.93 2.83 2.83"/></svg>
-            <span data-i18n="search.note">Live intelligence engine — searching opens the dedicated analysis workspace</span>
-          </p>
         </div>
       </div>
     </section>
@@ -461,7 +423,7 @@
           </div>
           <div class="footer-col">
             <h4 data-i18n="footer.c1">Product</h4>
-            <a href="#search" data-i18n="footer.l11">Live analysis</a>
+            <a href="pages/dashboard.html?view=analysis" data-page="pages/dashboard.html?view=analysis" data-i18n="footer.l11">Live analysis</a>
             <a href="#why" data-i18n="footer.l12">Features</a>
             <a href="#cta" data-i18n="footer.l13">Pricing</a>
             <a href="pages/dashboard.html?view=analysis" data-page="pages/dashboard.html?view=analysis" data-i18n="footer.l14">Live dashboard</a>

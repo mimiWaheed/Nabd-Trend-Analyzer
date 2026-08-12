@@ -34,7 +34,7 @@
         <p data-i18n="app.sub.notifications">Alerts and updates across the platform.</p>
       </div>
       <div class="app-head-actions">
-        <span class="status-chip neu"><span class="d"></span><span id="notifUnread">4</span>&nbsp;<span data-i18n="notif.unread">unread</span></span>
+        <span class="status-chip neu"><span class="d"></span><span id="notifUnread">0</span>&nbsp;<span data-i18n="notif.unread">unread</span></span>
         <button class="btn btn-ghost btn-sm" id="notifMark" data-i18n="notif.mark">Mark all read</button>
       </div>
     </div>
@@ -51,46 +51,10 @@
       </div>
     </div>
 
-    <div id="notifList">
-      <div class="notif-item" data-nid="n1" data-cat="ai">
-        <span class="n-dot"></span>
-        <span class="alert-ic danger">!</span>
-        <div class="alert-body"><div class="notif-title" data-i18n="notif.t1">Crisis detected — currency rumor cluster</div><div class="notif-sub" data-i18n="notif.s1">Escalation risk: elevated misinformation around currency rumors in Delta groups.</div><div class="notif-time">12 min ago</div></div>
-      </div>
-      <div class="notif-item" data-nid="n2" data-cat="trend">
-        <span class="n-dot"></span>
-        <span class="alert-ic pos">▲</span>
-        <div class="alert-body"><div class="notif-title" data-i18n="notif.t2">Trend spike: Suez Canal</div><div class="notif-sub" data-i18n="notif.s2">Conversation volume tripled in the last 3 hours.</div><div class="notif-time">41 min ago</div></div>
-      </div>
-      <div class="notif-item" data-nid="n3" data-cat="reports">
-        <span class="n-dot"></span>
-        <span class="alert-ic neu">PDF</span>
-        <div class="alert-body"><div class="notif-title" data-i18n="notif.t3">Weekly Egypt Brief is ready</div><div class="notif-sub" data-i18n="notif.s3">Generated from 14 sources — available as PDF and CSV.</div><div class="notif-time">2h ago</div></div>
-      </div>
-      <div class="notif-item" data-nid="n4" data-cat="conn">
-        <span class="n-dot"></span>
-        <span class="alert-ic neu">f</span>
-        <div class="alert-body"><div class="notif-title" data-i18n="notif.t4">Facebook page connected</div><div class="notif-sub" data-i18n="notif.s4">Page: NABD Analytics — audience sync started.</div><div class="notif-time">4h ago</div></div>
-      </div>
-      <div class="notif-item" data-nid="n5" data-cat="export">
-        <span class="n-dot"></span>
-        <span class="alert-ic pos">CSV</span>
-        <div class="alert-body"><div class="notif-title" data-i18n="notif.t5">Export finished — Suez dataset</div><div class="notif-sub" data-i18n="notif.s5">CSV ready to download in Reports.</div><div class="notif-time">6h ago</div></div>
-      </div>
-      <div class="notif-item" data-nid="n6" data-cat="trend">
-        <span class="n-dot"></span>
-        <span class="alert-ic warn">◈</span>
-        <div class="alert-body"><div class="notif-title" data-i18n="notif.t6">Inflation topic crossed threshold</div><div class="notif-sub" data-i18n="notif.s6">Inflation discussion crossed its 24-hour threshold.</div><div class="notif-time">Yesterday</div></div>
-      </div>
-      <div class="notif-item" data-nid="n7" data-cat="system">
-        <span class="n-dot"></span>
-        <span class="alert-ic warn">◷</span>
-        <div class="alert-body"><div class="notif-title" data-i18n="notif.t7">Scheduled report failed — source timeout</div><div class="notif-sub" data-i18n="notif.s7">One source timed out — the report will retry automatically.</div><div class="notif-time">Yesterday</div></div>
-      </div>
-      <div class="notif-item" data-nid="n8" data-cat="system">
-        <span class="alert-ic neu">✦</span>
-        <div class="alert-body"><div class="notif-title" data-i18n="notif.t8">New feature: narrative maps</div><div class="notif-sub" data-i18n="notif.s8">Try it under Settings → Experimental.</div><div class="notif-time">3 days ago</div></div>
-      </div>
+    <div id="notifList"></div>
+    <div class="empty-state notif-empty" id="notifEmpty" hidden>
+      <div class="e-ic">✉</div>
+      <p data-i18n="notif.empty.new">No notifications yet — completed analyses and account events will appear here.</p>
     </div>
   </main>
 

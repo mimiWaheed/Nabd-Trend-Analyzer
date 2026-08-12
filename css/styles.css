@@ -935,7 +935,6 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
 .auth-panel {
   position: relative;
   flex: 1;
-  max-width: 560px;
   min-width: 0;
   min-height: 100vh;
   min-height: 100dvh;
@@ -1869,6 +1868,16 @@ html[dir="rtl"] .field select {
 .app-side .collapse-btn:hover { color: var(--accent); border-color: var(--border-strong); }
 .app-side.collapsed .collapse-btn { transform: translateY(-50%) rotate(180deg); }
 
+/* Collapsed sidebar — center the brand, nav icons and side foot */
+.app-side.collapsed .app-side-head { padding-inline: 0; }
+.app-side.collapsed .app-brand-side { justify-content: center; }
+.app-side.collapsed .collapse-btn { inset-inline-start: 25px; }
+.app-side.collapsed .app-nav { padding-inline: 0; }
+.app-side.collapsed .app-nav-item { justify-content: center; padding-inline: 0; }
+.app-side.collapsed .app-side-foot { padding-inline: 0; display: flex; flex-direction: column; align-items: center; }
+.app-side.collapsed .side-user { justify-content: center; margin-bottom: 12px; }
+.app-side.collapsed .side-status { justify-content: center; }
+
 .app-nav {
   flex: 1;
   display: flex;
@@ -2112,10 +2121,26 @@ html[dir="rtl"] .field select {
 /* ---------- main ---------- */
 .app-main {
   margin-inline-start: var(--side-w);
+  margin-inline-end: auto;
   padding: calc(var(--top-h) + 26px) 30px 60px;
   max-width: 1400px;
 }
 .app-side.collapsed ~ .app-main { margin-inline-start: var(--side-w-collapsed); }
+
+/* Subtle page transitions on data-page navigation */
+.page-enter { animation: pageIn .35s var(--ease) both; }
+.page-leaving { animation: pageOut .16s var(--ease) both; }
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pageOut {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(-4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-enter, .page-leaving { animation: none; }
+}
 .app-head {
   display: flex;
   align-items: flex-end;
@@ -2474,6 +2499,7 @@ html[dir="rtl"] .field select {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  flex-wrap: wrap;
   padding: 13px 0;
   border-bottom: 1px solid var(--line-soft);
 }
@@ -2654,6 +2680,7 @@ html[dir="rtl"] .db-results .summary-body .empty-state { text-align: right; }
   }
   .side-backdrop.show { opacity: 1; pointer-events: auto; }
   .app-side.collapsed { width: var(--side-w); }
+  .kv { grid-template-columns: 1fr; }
 }
 
 /* ============================================================

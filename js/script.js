@@ -22,7 +22,7 @@
       'hero.eyebrow': 'AI TREND INTELLIGENCE',
       'hero.h1': 'Understand <span class="grad">Egypt</span> before it reacts.',
       'hero.sub': 'NABD (نبض) is Egypt\'s AI intelligence platform — monitoring news, public opinion, social media and crises across every governorate in real time, with global coverage when you need it.',
-      'hero.cta1': 'Explore the intelligence', 'hero.cta2': 'How it works',
+      'hero.cta1': 'Get Started', 'hero.cta2': 'How it works',
       'hero.trust': '5 crises detected today · 27 governorates · 40+ languages',
       'pv.trends': 'CURRENT EGYPTIAN TRENDS', 'pv.sentiment': 'Egypt sentiment',
       'pv.positive': 'positive', 'pv.timeline': 'EGYPT · 24H VOLUME',
@@ -93,6 +93,7 @@
       /* workspace */
       'ws.back': 'Home', 'ws.new': 'New analysis', 'ws.querylabel': 'TRACKING', 'ws.private.badge': 'Private Analysis',
       'ws.brief': 'AI BRIEF', 'ws.meta1': '14 sources', 'ws.meta2': 'updated 2m ago', 'ws.meta3': 'confidence 94%',
+      'ws.brief.findings': 'Key findings', 'ws.brief.dev': 'Key developments', 'ws.brief.why': 'Why it matters',
       'ws.brieftitle': 'Egypt — live brief',
       'ws.topics.t': 'Trending topics',
       'ws.timeline.t': 'Historical trend strength', 'ws.timeline.s': 'WEEKLY TREND INDEX · SIGNAL VOLUME',
@@ -202,12 +203,13 @@
       'auth.signup.switch': 'Don\'t have an account? <a class="link-soft" href="signup.html" data-page="signup.html">Sign up</a>',
       'auth.signin.switch': 'Already have an account? <a class="link-soft" href="signin.html" data-page="signin.html">Sign in</a>',
       'auth.back': 'Back to home', 'auth.country': 'Country', 'auth.lang': 'Language',
-      'auth.terms': 'I agree to the Terms & Privacy Policy',
+      'auth.terms': 'I agree to the <a class="link-soft" href="../index.html#cta">Terms of Service</a> and the <a class="link-soft" href="../index.html#cta">Privacy Policy</a>',
       'auth.art1.t': 'Your intelligence command center',
       'auth.art1.b': 'Trends, sentiment, crises and live feeds across every Egyptian governorate — in one live workspace.',
       'auth.art2.t': 'Your intelligence command center',
       'auth.art2.b': 'Trends, sentiment, crises and live feeds across every Egyptian governorate — in one live workspace.',
       'auth.err.email': 'Please enter a valid email address.',
+      'auth.err.email.bad': 'Enter a valid email address — temporary mailboxes are not allowed.',
       'auth.err.name': 'Please enter your name.',
       'auth.err.name.invalid': 'Please enter a valid name — letters, spaces, hyphens and apostrophes only.',
       'auth.err.phone': 'Please enter a valid phone number (e.g. +20 100 000 0000).',
@@ -334,6 +336,7 @@
       'hist.q7': 'New Capital openings', 'hist.q8': 'Tourism recovery',
       'hist.rerun': 'Re-run', 'hist.pin': 'Pin', 'hist.unpin': 'Unpin', 'hist.delete': 'Delete',
       'hist.count': 'analyses',
+      'hist.empty': 'No analyses yet — run one from the dashboard and it will appear here.',
 
       /* reports */
       'rep.generated': 'Generated reports',
@@ -437,6 +440,11 @@
       'notif.s7': 'One source timed out — the report will retry automatically.',
       'notif.s8': 'Try it under Settings → Experimental.',
       'notif.empty': 'Nothing here yet.',
+      'notif.empty.new': 'No notifications yet — completed analyses and account events will appear here.',
+      'notif.fb.t': 'Facebook connected', 'notif.fb.s': 'Page: {p}',
+      'notif.run.t': 'Analysis completed', 'notif.run.s': 'Query: {q}',
+      'notif.auth.in.t': 'Signed in', 'notif.auth.in.s': 'Welcome back to NABD.',
+      'notif.auth.up.t': 'Account created', 'notif.auth.up.s': 'Welcome to NABD — your workspace is ready.',
 
       /* favorites */
       'fav.t.reports': 'Reports', 'fav.t.searches': 'Searches',
@@ -464,7 +472,7 @@
       'hero.eyebrow': 'ذكاء الترندات الاصطناعي',
       'hero.h1': 'افهم <span class="grad">مصر</span> قبل أن تتفاعل.',
       'hero.sub': 'نبض هو منصة الذكاء الاصطناعي المصرية — ترصد الأخبار والرأي العام ومواقع التواصل الاجتماعي والأزمات في كل المحافظات لحظة بلحظة، مع تغطية عالمية عند الحاجة.',
-      'hero.cta1': 'استكشف الذكاء', 'hero.cta2': 'كيف يعمل',
+      'hero.cta1': 'ابدأ الآن', 'hero.cta2': 'كيف يعمل',
       'hero.trust': '5 أزمات رُصدت اليوم · 27 محافظة · 40+ لغة',
       'pv.trends': 'ترندات مصر الحالية', 'pv.sentiment': 'مشاعر مصر',
       'pv.positive': 'إيجابي', 'pv.timeline': 'مصر · 24 ساعة',
@@ -535,6 +543,7 @@
       /* workspace */
       'ws.back': 'الرئيسية', 'ws.new': 'تحليل جديد', 'ws.querylabel': 'المتابعة', 'ws.private.badge': 'تحليل خاص',
       'ws.brief': 'موجز الذكاء الاصطناعي',
+      'ws.brief.findings': 'النتائج الرئيسية', 'ws.brief.dev': 'التطورات الرئيسية', 'ws.brief.why': 'لماذا يهم',
       'ws.meta1': '14 مصدرًا', 'ws.meta2': 'حُدّث قبل دقيقتين', 'ws.meta3': 'ثقة 94%',
       'ws.brieftitle': 'مصر — تقرير حي',
       'ws.topics.t': 'ترندات رائجة',
@@ -644,12 +653,13 @@
       'auth.signup.switch': 'ليس لديك حساب؟ <a class="link-soft" href="signup.html" data-page="signup.html">أنشئ حسابًا</a>',
       'auth.signin.switch': 'لديك حساب بالفعل؟ <a class="link-soft" href="signin.html" data-page="signin.html">سجّل الدخول</a>',
       'auth.back': 'العودة للرئيسية', 'auth.country': 'الدولة', 'auth.lang': 'اللغة',
-      'auth.terms': 'أوافق على الشروط وسياسة الخصوصية',
+      'auth.terms': 'أوافق على <a class="link-soft" href="../index.html#cta">شروط الخدمة</a> و <a class="link-soft" href="../index.html#cta">سياسة الخصوصية</a>',
       'auth.art1.t': 'مركز قيادة الذكاء الخاص بك',
       'auth.art1.b': 'الترندات والمشاعر والأزمات والتغذية الحية في كل محافظات مصر — في مساحة عمل واحدة حية.',
       'auth.art2.t': 'مركز قيادة الذكاء الخاص بك',
       'auth.art2.b': 'الترندات والمشاعر والأزمات والتغذية الحية في كل محافظات مصر — في مساحة عمل واحدة حية.',
       'auth.err.email': 'يرجى إدخال بريد إلكتروني صحيح.',
+      'auth.err.email.bad': 'أدخل بريدًا إلكترونيًا صحيحًا — البريد المؤقت غير مسموح به.',
       'auth.err.name': 'يرجى إدخال اسمك.',
       'auth.err.name.invalid': 'يرجى إدخال اسم صحيح — حروف ومسافات وشرطات فقط.',
       'auth.err.phone': 'يرجى إدخال رقم هاتف صحيح (مثال: 20+ 100 000 0000).',
@@ -776,6 +786,7 @@
       'hist.q7': 'افتتاحيات العاصمة الجديدة', 'hist.q8': 'تعافي السياحة',
       'hist.rerun': 'إعادة تشغيل', 'hist.pin': 'تثبيت', 'hist.unpin': 'إلغاء التثبيت', 'hist.delete': 'حذف',
       'hist.count': 'تحليلات',
+      'hist.empty': 'لا توجد تحليلات بعد — شغّل تحليلًا من لوحة التحكم وسيظهر هنا.',
 
       /* reports */
       'rep.generated': 'التقارير المنشأة',
@@ -879,6 +890,11 @@
       'notif.s7': 'انتهت مهلة مصدر — سيُعاد المحاولة تلقائياً.',
       'notif.s8': 'جرّبها من الإعدادات → تجريبي.',
       'notif.empty': 'لا شيء هنا بعد.',
+      'notif.empty.new': 'لا توجد إشعارات بعد — ستظهر هنا التحليلات المكتملة وأحداث الحساب.',
+      'notif.fb.t': 'تم ربط فيسبوك', 'notif.fb.s': 'الصفحة: {p}',
+      'notif.run.t': 'اكتمل التحليل', 'notif.run.s': 'الاستعلام: {q}',
+      'notif.auth.in.t': 'تم تسجيل الدخول', 'notif.auth.in.s': 'مرحبًا بعودتك إلى نبض.',
+      'notif.auth.up.t': 'تم إنشاء الحساب', 'notif.auth.up.s': 'أهلًا بك في نبض — مساحة العمل جاهزة.',
 
       /* favorites */
       'fav.t.reports': 'التقارير', 'fav.t.searches': 'البحوث',
@@ -956,6 +972,69 @@
   }
 
   /* ----------------------------------------------------------
+     ACTIVITY STORE — real history + notifications
+     Persists actions the user actually takes (completed analyses,
+     account events, Facebook connects). Nothing here is seeded or
+     fabricated. History caps at 60 entries, notifications at 30.
+     ---------------------------------------------------------- */
+  const HISTORY_KEY = 'nabd-history';
+  const NOTIF_KEY = 'nabd-notif';
+  const NOTIF_MAX = 30;
+  const NOTIF_CATS = ['ai', 'trend', 'system', 'reports', 'conn', 'export'];
+  const HISTORY_CATS = ['news', 'social', 'gov', 'sport', 'business'];
+
+  function readStore(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      const arr = raw ? JSON.parse(raw) : null;
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function writeStore(key, arr) {
+    try { localStorage.setItem(key, JSON.stringify(arr)); } catch (e) {}
+  }
+  function historyGet() {
+    return readStore(HISTORY_KEY).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  }
+  function historyAdd(entry) {
+    const item = {
+      id: 'h' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      query: String((entry && entry.query) || '').trim(),
+      ts: Number((entry && entry.ts) || Date.now()),
+      status: entry && entry.status === 'failed' ? 'failed' : entry && entry.status === 'running' ? 'running' : 'done',
+      vis: entry && entry.vis === 'private' ? 'private' : 'public',
+      src: entry && entry.src != null ? entry.src : null,
+      cat: entry && HISTORY_CATS.indexOf(entry.cat) !== -1 ? entry.cat : null,
+      exp: entry && entry.exp ? 1 : 0
+    };
+    if (!item.query) return item;
+    const list = readStore(HISTORY_KEY);
+    list.unshift(item);
+    writeStore(HISTORY_KEY, list.slice(0, 60));
+    return item;
+  }
+  function historyRemove(id) {
+    writeStore(HISTORY_KEY, readStore(HISTORY_KEY).filter((h) => h.id !== id));
+  }
+  function notifGet() {
+    return readStore(NOTIF_KEY).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  }
+  function notifAdd(entry) {
+    const item = {
+      id: 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      title: String((entry && entry.title) || ''),
+      sub: entry && entry.sub != null ? String(entry.sub) : '',
+      cat: entry && NOTIF_CATS.indexOf(entry.cat) !== -1 ? entry.cat : 'system',
+      ts: Number((entry && entry.ts) || Date.now()),
+      params: entry && entry.params && typeof entry.params === 'object' ? entry.params : null
+    };
+    const list = readStore(NOTIF_KEY);
+    list.unshift(item);
+    writeStore(NOTIF_KEY, list.slice(0, NOTIF_MAX));
+    return item;
+  }
+
+  /* ----------------------------------------------------------
      I18N APPLY
      ---------------------------------------------------------- */
   const langBtns = document.querySelectorAll('.lang-toggle');
@@ -996,10 +1075,7 @@
   }
 
   langBtns.forEach((b) => b.addEventListener('click', () => {
-    const next = lang === 'ar' ? 'en' : 'ar';
-    phrases = QUERIES[next];
-    if (typedEl) typedEl.textContent = '';
-    applyLang(next);
+    applyLang(lang === 'ar' ? 'en' : 'ar');
   }));
 
   /* ----------------------------------------------------------
@@ -1021,6 +1097,14 @@
   /* app pages live in pages/ — resolve relative to the current page's directory */
   const PAGE_DIR = location.pathname.split('/').pop() === 'index.html' ? 'pages/' : '';
 
+  /* Subtle fade transition on the content container for data-page navigations.
+     The fixed shell (sidebar/topbar) stays static; prefers-reduced-motion is
+     respected. */
+  function pageFadeTarget() {
+    const el = document.querySelector('.app-main') || document.querySelector('main') || document.querySelector('.auth-panel');
+    return (el && el.nodeType === 1) ? el : null;
+  }
+
   function navigate(url) {
     const cur = location.pathname.split('/').pop();
     const target = url.split(/[?#]/)[0].split('/').pop();
@@ -1028,7 +1112,14 @@
       window.scrollTo(0, 0);
       return;
     }
-    location.href = url;
+    const el = pageFadeTarget();
+    if (reduceMotion || !el || !el.classList) {
+      location.href = url;
+      return;
+    }
+    if (el._nabdNavToken) clearTimeout(el._nabdNavToken);
+    el.classList.add('page-leaving');
+    el._nabdNavToken = setTimeout(() => { location.href = url; }, 170);
   }
 
   document.addEventListener('click', (e) => {
@@ -1302,81 +1393,6 @@
       hv.style.transform = `perspective(1100px) rotateX(${(-py * 5).toFixed(2)}deg) rotateY(${(px * 6).toFixed(2)}deg)`;
     });
     hv.addEventListener('mouseleave', () => (hv.style.transform = ''));
-  }
-
-  /* ----------------------------------------------------------
-     TYPEWRITER (landing)
-     ---------------------------------------------------------- */
-  const typedEl = $('typedText');
-  const searchInput = $('searchInput');
-  const placeholder = $('searchPlaceholder');
-  let phrases = QUERIES[lang];
-
-  if (typedEl && searchInput) {
-    let pi = 0, ci = 0, deleting = false;
-    const hidePlaceholder = () => {
-      placeholder.style.opacity = '0';
-      placeholder.style.transition = 'opacity .2s';
-    };
-    const showPlaceholder = () => {
-      if (!searchInput.value) {
-        placeholder.style.opacity = '1';
-        placeholder.style.transition = 'opacity .3s';
-      }
-    };
-    searchInput.addEventListener('input', () => searchInput.value ? hidePlaceholder() : showPlaceholder());
-    searchInput.addEventListener('focus', () => searchInput.value && hidePlaceholder());
-    searchInput.addEventListener('blur', showPlaceholder);
-
-    const tick = () => {
-      if (deleting) {
-        ci--;
-        typedEl.textContent = phrases[pi].slice(0, ci);
-        if (ci <= 0) { deleting = false; pi = (pi + 1) % phrases.length; setTimeout(tick, 600); return; }
-        setTimeout(tick, 20);
-      } else {
-        ci++;
-        typedEl.textContent = phrases[pi].slice(0, ci);
-        if (ci >= phrases[pi].length) { deleting = true; setTimeout(tick, 5000); return; }
-        setTimeout(tick, 42);
-      }
-    };
-    tick();
-  }
-
-  /* ----------------------------------------------------------
-     SUGGESTIONS — rotation + navigate
-     ---------------------------------------------------------- */
-  const sTrack = $('suggestionsTrack');
-  if (sTrack) {
-    setInterval(() => {
-      sTrack.classList.add('swap');
-      setTimeout(() => {
-        sTrack.appendChild(sTrack.children[0]);
-        sTrack.classList.remove('swap');
-      }, 500);
-    }, 4200);
-  }
-
-  document.querySelectorAll('.suggestions .chip').forEach((chip) => {
-    chip.addEventListener('click', () => {
-      const q = chip.dataset.q;
-      if (searchInput) {
-        searchInput.value = q;
-        placeholder.style.opacity = '0';
-      }
-      navigate(PAGE_DIR + 'dashboard.html?view=analysis&q=' + encodeURIComponent(q));
-    });
-  });
-
-  /* search submit → analysis inside the authenticated app */
-  const searchBtn = $('searchBtn');
-  if (searchBtn) searchBtn.addEventListener('click', () => submitSearch());
-  if (searchInput) searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitSearch(); });
-
-  function submitSearch() {
-    const q = (searchInput.value || '').trim() || QUERIES[lang][0];
-    navigate(PAGE_DIR + 'dashboard.html?view=analysis&q=' + encodeURIComponent(q));
   }
 
   /* ----------------------------------------------------------
@@ -1773,9 +1789,14 @@
     let conf = num(pick(raw, ['confidence'], null));
     if (conf == null && aiBriefObj) conf = num(aiBriefObj.confidence);
     out.confidence = conf != null ? conf : null;
+    out.aiBrief = aiBriefObj;
     out.briefMeta = aiBriefObj ? {
       title: aiBriefObj.title != null ? String(aiBriefObj.title) : null,
+      headline: aiBriefObj.headline != null ? String(aiBriefObj.headline) : null,
+      summary: aiBriefObj.summary != null ? String(aiBriefObj.summary) : null,
       keyFindings: Array.isArray(aiBriefObj.keyFindings) ? aiBriefObj.keyFindings.map((x) => String(x)).filter(Boolean) : [],
+      keyDevelopments: Array.isArray(aiBriefObj.keyDevelopments) ? aiBriefObj.keyDevelopments.map((x) => String(x)).filter(Boolean) : [],
+      whyItMatters: aiBriefObj.whyItMatters != null ? String(aiBriefObj.whyItMatters) : null,
       confidence: conf
     } : null;
     out.analyzedAt = pick(raw, ['analyzedAt', 'generatedAt', 'timestamp', 'completedAt', 'created_at'], null) || null;
@@ -2621,6 +2642,7 @@
             try { sessionStorage.setItem(this.metaKey, JSON.stringify(meta)); } catch (e) {}
             const st = { connected: true, accountName: meta.accountName, connectedAt: Date.now() };
             this.write(st);
+            notifAdd({ title: 'notif.fb.t', sub: 'notif.fb.s', params: { p: meta.accountName || '' }, cat: 'conn', ts: Date.now() });
             this.emit(st);
             this.toastKey('db.meta.connected');
           };
@@ -2723,6 +2745,12 @@
   const year = $('year');
   if (year) year.textContent = String(new Date().getFullYear());
 
+  /* gentle content fade-in for the current page (reduced motion is skipped) */
+  if (!reduceMotion) {
+    const fadeTarget = pageFadeTarget();
+    if (fadeTarget) fadeTarget.classList.add('page-enter');
+  }
+
   applyLang(lang);
   setFbState(fb.read().connected ? 'connected' : 'idle');
 
@@ -2756,6 +2784,11 @@
     getUser,
     persistUser,
     clearUser,
+    historyGet,
+    historyAdd,
+    historyRemove,
+    notifGet,
+    notifAdd,
     buildDonut,
     analyze,
     fb,

@@ -57,6 +57,15 @@
   const NAME_RE = /^[\p{L}\p{M}'’\s.-]+$/u;
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
+  /* common disposable / throwaway domains rejected at sign-up */
+  const DISPOSABLE_DOMAINS = [
+    'mailinator.com', 'yopmail.com', 'guerrillamail.com', 'tempmail.com',
+    '10minutemail.com', 'throwaway.com', 'trashmail.com', 'sharklasers.com',
+    'getnada.com', 'temp-mail.org', 'maildrop.cc', 'mohmal.com',
+    'emailnator.com', 'fakeinbox.com', 'dropmail.me', 'inboxkitten.com',
+    'tmpmail.org', 'spam4.me', 'mailnesia.com', 'dispostable.com', 'burnermail.io'
+  ];
+
   const cleanName = (v) => (v || '').trim().replace(/\s+/g, ' ');
   const cleanPhone = (v) => (v || '').replace(/[\s().-]/g, '');
 
@@ -69,7 +78,18 @@
     return true;
   }
 
-  function isValidEmail(v) { return EMAIL_RE.test((v || '').trim()); }
+  function isValidEmail(v) {
+    const s = (v || '').trim();
+    if (!EMAIL_RE.test(s)) return false;
+    const at = s.lastIndexOf('@');
+    const domain = s.slice(at + 1).toLowerCase();
+    const parts = domain.split('.');
+    const host = parts[parts.length - 2] || '';
+    const tld = parts[parts.length - 1] || '';
+    if (!host || !/^[a-z]{2,}$/.test(tld)) return false;
+    if (DISPOSABLE_DOMAINS.indexOf(domain) !== -1) return false;
+    return true;
+  }
 
   function isValidPhone(v) {
     const s = cleanPhone(v);
@@ -155,7 +175,7 @@
     const checkSiEmail = wireField(siEmail, msgEmail, (v) => {
       const empty = !(v || '').trim();
       const ok = !empty && isValidEmail(v);
-      if (!ok) setFieldState(siEmail, msgEmail, empty ? N.t('auth.err.email') : N.t('auth.err.email'), ok);
+      if (!ok) setFieldState(siEmail, msgEmail, empty ? N.t('auth.err.email') : N.t('auth.err.email.bad'), ok);
       return ok;
     });
     const checkSiPwd = wireField(siPwd, msgPwd, (v) => {
@@ -179,6 +199,7 @@
       busy = true;
       setPending(siSubmit, true);
       N.persistUser({ email: siEmail.value.trim() }, siRemember && siRemember.checked);
+      N.notifAdd({ title: 'notif.auth.in.t', sub: 'notif.auth.in.s', cat: 'system', ts: Date.now() });
       finishAuth(N.t('auth.ok.signin'));
     });
   }
@@ -221,7 +242,7 @@
     const checkEmail = wireField(suEmail, mEmail, (v) => {
       const empty = !(v || '').trim();
       const ok = !empty && isValidEmail(v);
-      setFieldState(suEmail, mEmail, ok ? '' : N.t('auth.err.email'), ok);
+      setFieldState(suEmail, mEmail, ok ? '' : (empty ? N.t('auth.err.email') : N.t('auth.err.email.bad')), ok);
       return ok;
     });
 
@@ -301,6 +322,7 @@
         country: countrySel ? countrySel.value : '',
         lang: langSel ? langSel.value : ''
       }, true);
+      N.notifAdd({ title: 'notif.auth.up.t', sub: 'notif.auth.up.s', cat: 'system', ts: Date.now() });
       finishAuth(N.t('auth.ok.signup'));
     });
   }
