@@ -17,7 +17,7 @@
 
   /* ----------------------------------------------------------
      AUTH GUARD — protected application routes.
-     The server session (/api/auth/me, httpOnly cookie) is the source
+     The server session (/api/auth?action=me, httpOnly cookie) is the source
      of truth. A cached user boots the shell immediately; the session is
      re-validated in the background and stale sessions bounce to sign-in.
      Invoked at the bottom of this IIFE (after shared consts are defined).

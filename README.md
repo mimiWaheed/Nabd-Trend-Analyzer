@@ -108,21 +108,21 @@ The webhook is hosted at `https://n8n.addme.solutions/webhook/trend-analysis`. D
 
 ## Authentication
 
-Auth is a real serverless backend (`api/auth/*`): bcrypt password hashing,
+Auth is a real serverless backend (`api/auth.js`): bcrypt password hashing,
 DB-backed sessions (httpOnly cookie), email-verification OTP, and per-account
 login rate limiting. `N.api()` in `script.js` posts to same-origin `/api/*`
 routes. Because the handlers only run under the Vercel runtime, auth does NOT
 work from a plain static server (you'll get the 501 shown above) — use `npm start`
 or `npm run dev`. The protected-route guard in `js/app.js` re-validates the
-session against `GET /api/auth/me` and bounces unauthenticated visitors.
+session against `GET /api/auth?action=me` and bounces unauthenticated visitors.
 
 ## Meta (Facebook) private analysis
 
 Private analysis (`scope: "private"`) connects a user's Meta Page and Instagram Business account through a real OAuth flow handled by the Vercel routes under `api/meta/`:
 
-1. `api/meta/start.js` builds the Meta authorization dialog URL.
+1. `api/meta/index.js` (`?action=start`) builds the Meta authorization dialog URL.
 2. `api/meta/callback.js` exchanges the authorization code for a token server-side (the App Secret never leaves the server), resolves the connected Page + Instagram business account, converts the user token into a **page access token** (the new Pages experience requires a page token for `/{pageId}/posts`), and hands the result back to the opener via `postMessage`.
-3. `api/meta/revoke.js` clears the token on disconnect.
+3. `api/meta/index.js` (`?action=revoke`) clears the token on disconnect.
 
 Required environment variables (see `.env.example`): `NABD_WEBHOOK_URL`, `META_APP_ID`, `META_APP_SECRET`, `META_REDIRECT_URI`. Optional: `META_DEFAULT_PAGE_ID` (page to analyze when the account manages several pages; defaults to the first page Meta returns). The access token is kept only in `sessionStorage` and never in `localStorage`. If Meta variables are missing, the UI shows a clear setup error instead of pretending the account is connected. Public analysis never sends Facebook credentials.
 

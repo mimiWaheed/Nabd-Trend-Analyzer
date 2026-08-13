@@ -8,6 +8,7 @@
    point at this route). */
 
 const GRAPH = 'https://graph.facebook.com/v19.0';
+const { queryOf } = require('../../lib/respond');
 
 const PAGE_HTML = (message) =>
   '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
@@ -34,14 +35,16 @@ function pickPageId(pages, defaultId) {
 module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
 
-  const code = String((req.query && req.query.code) || '');
-  const authError = req.query && req.query.error;
+  const q = queryOf(req);
+  const code = String((q && q.code) || '');
+  const authError = q && q.error;
   const appId = process.env.META_APP_ID;
   const appSecret = process.env.META_APP_SECRET;
   const redirectUri = process.env.META_REDIRECT_URI;
 
   const fail = (message) => {
-    res.status(200).send(PAGE_HTML(message));
+    res.statusCode = 200;
+    res.end(PAGE_HTML(message));
   };
 
   if (authError) return fail('Meta authorization was not completed. You can close this window.');
@@ -106,7 +109,8 @@ module.exports = async function handler(req, res) {
   };
 
   const payloadJson = JSON.stringify(payload).replace(/</g, '\\u003c');
-  res.status(200).send(
+  res.statusCode = 200;
+  res.end(
     '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>NABD — connected</title></head>'
     + '<body style="background:#070B14;color:#E8EEF9;font:14px/1.5 system-ui,sans-serif;'
     + 'display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0">'

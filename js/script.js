@@ -1043,11 +1043,11 @@
     });
   }
 
-  /* Resolve the current server-side session (GET /api/auth/me).
+  /* Resolve the current server-side session (GET /api/auth?action=me).
      Resolves to the user object, or null when unauthenticated. */
   function authMe() {
     return Promise.resolve()
-      .then(() => api('/api/auth/me'))
+      .then(() => api('/api/auth?action=me'))
       .then((d) => (d && d.user) || null)
       .catch((err) => {
         if (err.status === 401) return null;
@@ -1057,7 +1057,7 @@
 
   /* End the server session and clear the local cache. */
   function logout() {
-    return api('/api/auth/logout', { method: 'POST' }).then(() => { clearUser(); });
+    return api('/api/auth?action=logout', { method: 'POST' }).then(() => { clearUser(); });
   }
 
   /* ----------------------------------------------------------
@@ -2642,7 +2642,7 @@
      - sessionStorage `nabd-meta` keeps the session access token +
        page ids (cleared on disconnect / when the tab closes).
      - The OAuth exchange happens server-side on Vercel
-       (/api/meta/start, /api/meta/callback, /api/meta/revoke);
+       (/api/meta?action=start, /api/meta/callback, /api/meta?action=revoke);
        the Meta App Secret never reaches the browser.
      ---------------------------------------------------------- */
   const fb = {
@@ -2698,7 +2698,7 @@
       const stateId = String(Math.random().toString(36).slice(2)) + String(Date.now().toString(36));
       try { sessionStorage.setItem(this.oauthStateKey, stateId); } catch (e) {}
       loadApiConfig()
-        .then((cfg) => fetch('/api/meta/start?state=' + encodeURIComponent(stateId), { headers: { Accept: 'application/json' } }))
+        .then((cfg) => fetch('/api/meta?action=start&state=' + encodeURIComponent(stateId), { headers: { Accept: 'application/json' } }))
         .then((res) => res.json().catch(() => ({})))
         .then((data) => {
           if (!data || !data.url) {
@@ -2769,7 +2769,7 @@
            Revoke the user token when we have it (page tokens cannot be
            revoked through /me/permissions). */
         try {
-          fetch('/api/meta/revoke', {
+          fetch('/api/meta?action=revoke', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ token: meta.userToken || meta.accessToken })

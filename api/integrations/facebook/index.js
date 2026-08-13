@@ -1,11 +1,11 @@
 /* GET /api/integrations/facebook — connection status (never exposes tokens).
    DELETE /api/integrations/facebook — disconnect + revoke (best-effort). */
 
-const { requireAuth } = require('../_lib/auth');
-const storeApi = require('../_lib/store');
-const { fail, ok } = require('../_lib/respond');
-const fbLib = require('../../_lib/facebook');
-const events = require('../_lib/events');
+const { requireAuth } = require('../../../lib/auth');
+const storeApi = require('../../../lib/store');
+const { fail, ok } = require('../../../lib/respond');
+const fbLib = require('../../../lib/facebook');
+const events = require('../../../lib/events');
 
 module.exports = async function handler(req, res) {
   const auth = await requireAuth(req, res);

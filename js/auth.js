@@ -206,7 +206,7 @@
       busy = true;
       setPending(siSubmit, true);
       const remember = !!(siRemember && siRemember.checked);
-      N.api('/api/auth/login', {
+      N.api('/api/auth?action=login', {
         method: 'POST',
         body: { email: siEmail.value.trim(), password: siPwd.value, remember }
       }).then((d) => {
@@ -355,7 +355,7 @@
       }
       otpBusy = true;
       setOtpError('');
-      N.api('/api/auth/verify-email', { method: 'POST', body: { email: pendingEmail, otp: val } })
+      N.api('/api/auth?action=verify-email', { method: 'POST', body: { email: pendingEmail, otp: val } })
         .then(verifyOtpDone)
         .catch((err) => {
           otpBusy = false;
@@ -367,7 +367,7 @@
     if (otpResend) otpResend.addEventListener('click', () => {
       if (otpResend.disabled) return;
       otpResend.disabled = true;
-      N.api('/api/auth/resend-verification', { method: 'POST', body: { email: pendingEmail } })
+      N.api('/api/auth?action=resend-verification', { method: 'POST', body: { email: pendingEmail } })
         .then(() => {
           otpResend.disabled = false;
           N.toast(toastEl, N.t('auth.verify.sent'));
@@ -414,7 +414,7 @@
 
       busy = true;
       setPending(suSubmit, true);
-      N.api('/api/auth/signup', {
+      N.api('/api/auth?action=signup', {
         method: 'POST',
         body: {
           firstName: cleanName(suFirst.value),

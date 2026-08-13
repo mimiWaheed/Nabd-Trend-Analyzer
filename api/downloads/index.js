@@ -1,11 +1,11 @@
 /* POST /api/downloads — record a real download.
    GET  /api/downloads — list the user's download history. */
 
-const { requireAuth } = require('../_lib/auth');
-const storeApi = require('../_lib/store');
-const { asyncBody, fail, ok, created } = require('../_lib/respond');
-const { randomToken, nowIso } = require('../_lib/crypto');
-const events = require('../_lib/events');
+const { requireAuth } = require('../../lib/auth');
+const storeApi = require('../../lib/store');
+const { asyncBody, fail, ok, created } = require('../../lib/respond');
+const { randomToken, nowIso } = require('../../lib/crypto');
+const events = require('../../lib/events');
 
 const FILE_TYPES = ['pdf', 'csv', 'xlsx', 'json', 'png', 'zip', 'report'];
 

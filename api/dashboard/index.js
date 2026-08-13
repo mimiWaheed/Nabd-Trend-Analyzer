@@ -1,9 +1,9 @@
 /* GET /api/dashboard — aggregate the user's real data.
    Everything here is computed from the database — no random numbers. */
 
-const { requireAuth } = require('../_lib/auth');
-const storeApi = require('../_lib/store');
-const { fail, ok } = require('../_lib/respond');
+const { requireAuth } = require('../../lib/auth');
+const storeApi = require('../../lib/store');
+const { fail, ok } = require('../../lib/respond');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return fail(res, 405, 'METHOD_NOT_ALLOWED');

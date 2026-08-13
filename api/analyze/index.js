@@ -2,9 +2,9 @@
    The n8n webhook is called server-side; stored Facebook tokens (decrypted
    at rest) are injected for private scope and never exposed to the browser. */
 
-const { requireAuth } = require('../_lib/auth');
-const { asyncBody, fail, ok, failCode } = require('../_lib/respond');
-const { runAnalysis } = require('../_lib/analysis');
+const { requireAuth } = require('../../lib/auth');
+const { asyncBody, fail, ok, failCode } = require('../../lib/respond');
+const { runAnalysis } = require('../../lib/analysis');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return fail(res, 405, 'METHOD_NOT_ALLOWED');
