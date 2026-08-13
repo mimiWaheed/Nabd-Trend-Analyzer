@@ -116,7 +116,8 @@
 
   function passwordLevel(score) {
     if (score <= 1) return 'weak';
-    if (score <= 3) return 'fair';
+    if (score === 2) return 'fair';
+    if (score === 3) return 'good';
     return 'strong';
   }
 
@@ -150,7 +151,16 @@
       input.classList.toggle('field-invalid', !ok);
       input.setAttribute('aria-invalid', ok ? 'false' : 'true');
     }
-    if (msgEl) msgEl.textContent = ok ? '' : msg || '';
+    if (msgEl) {
+      msgEl.textContent = ok ? '' : msg || '';
+      if (msgEl.textContent) {
+        msgEl.classList.remove('field-msg-in');
+        void msgEl.offsetWidth; /* restart the fade */
+        msgEl.classList.add('field-msg-in');
+      } else {
+        msgEl.classList.remove('field-msg-in');
+      }
+    }
     return ok;
   }
 
@@ -290,7 +300,7 @@
         return;
       }
       const lvl = passwordLevel(score);
-      const pct = { weak: 33, fair: 66, strong: 100 }[lvl];
+      const pct = { weak: 25, fair: 50, good: 75, strong: 100 }[lvl];
       if (meter) { meter.style.width = pct + '%'; meter.className = 'lvl-' + lvl; }
       if (levelEl) levelEl.textContent = N.t('auth.pwd.' + lvl);
     }
@@ -567,21 +577,30 @@
   let forgotStage = 'email'; /* email → otp → pwd */
   const fpErr = (m) => { const el = $('forgotError'); if (el) el.textContent = m || ''; };
 
+  /* Smooth reveal/hide for step sections — fade + slide + height expansion. */
+  function revealEl(el) {
+    if (!el) return;
+    const wasHidden = el.hidden;
+    el.hidden = false;
+    if (wasHidden) {
+      el.classList.remove('auth-reveal');
+      void el.offsetWidth; /* restart the animation */
+      el.classList.add('auth-reveal');
+    }
+  }
+  function hideEl(el) {
+    if (!el) return;
+    el.hidden = true;
+    el.classList.remove('auth-reveal');
+  }
+
   function setForgotStage(s) {
     forgotStage = s;
     const otpF = $('fpOtpField');
     const pwdSection = $('fpPwdSection');
     const resendRow = $('forgotResendRow');
-    if (otpF) otpF.hidden = s === 'email';
-    if (pwdSection) {
-      const revealing = s === 'pwd' && pwdSection.hidden;
-      pwdSection.hidden = s !== 'pwd';
-      if (revealing) {
-        pwdSection.classList.remove('auth-reveal');
-        void pwdSection.offsetWidth; /* restart the reveal animation */
-        pwdSection.classList.add('auth-reveal');
-      }
-    }
+    if (s === 'email') hideEl(otpF); else revealEl(otpF);
+    if (s === 'pwd') revealEl(pwdSection); else hideEl(pwdSection);
     if (resendRow) resendRow.hidden = s === 'email';
     if (forgotSubmit) {
       forgotSubmit.textContent = s === 'pwd' ? N.t('auth.reset.submit') : (s === 'otp' ? N.t('auth.reset.next') : N.t('auth.forgot.send'));
@@ -592,6 +611,29 @@
   /* real-time password strength + confirmation feedback (reuses signup scoring) */
   const fpMeter = $('fpPwdMeter');
   const fpLevel = $('fpPwdLevel');
+  const fpReq = $('fpPwdReq');
+  const fpReqItems = {
+    len:   (v) => v.length >= 8,
+    upper: (v) => /[A-Z]/.test(v),
+    lower: (v) => /[a-z]/.test(v),
+    num:   (v) => /\d/.test(v),
+    spec:  (v) => /[^A-Za-z0-9]/.test(v)
+  };
+  function updateFpReqs() {
+    const v = fpPwd ? fpPwd.value : '';
+    if (fpReq && fpReq.hidden && v) {
+      fpReq.hidden = false;
+      fpReq.classList.remove('auth-reveal');
+      void fpReq.offsetWidth;
+      fpReq.classList.add('auth-reveal');
+    }
+    if (fpReq) {
+      Object.keys(fpReqItems).forEach((k) => {
+        const el = fpReq.querySelector('[data-r="' + k + '"]');
+        if (el) el.classList.toggle('on', fpReqItems[k](v));
+      });
+    }
+  }
   function renderFpStrength() {
     const score = passwordScore(fpPwd ? fpPwd.value : '');
     if (!score) {
@@ -600,7 +642,7 @@
       return;
     }
     const lvl = passwordLevel(score);
-    const pct = { weak: 33, fair: 66, strong: 100 }[lvl];
+    const pct = { weak: 25, fair: 50, good: 75, strong: 100 }[lvl];
     if (fpMeter) { fpMeter.style.width = pct + '%'; fpMeter.className = 'lvl-' + lvl; }
     if (fpLevel) fpLevel.textContent = N.t('auth.pwd.' + lvl);
   }
@@ -617,9 +659,11 @@
     return ok;
   });
   if (fpPwd) {
-    fpPwd.addEventListener('input', renderFpStrength);
+    fpPwd.addEventListener('input', () => { renderFpStrength(); updateFpReqs(); });
     fpPwd.addEventListener('input', () => { if (fpPwd2 && fpPwd2.value) checkFpPwd2(); });
   }
+  /* immediate confirm feedback while typing (not only after blur/submit) */
+  if (fpPwd2) fpPwd2.addEventListener('input', () => checkFpPwd2());
 
   if (forgotForm) {
     forgotForm.addEventListener('submit', (e) => {
@@ -648,7 +692,7 @@
           .catch((err) => {
             setPending(forgotSubmit, false);
             if (err.code === 'EMAIL_NOT_FOUND') {
-              fpErr(N.t('auth.err.email.notfound'));
+              olFieldErr(fpEmail, $('fpEmailMsg'), N.t('auth.err.email.notfound'), false);
               if (fpEmail) fpEmail.focus();
               return;
             }
@@ -673,7 +717,7 @@
           })
           .catch((err) => {
             setPending(forgotSubmit, false);
-            fpErr(err.message || N.t('auth.verify.err'));
+            olFieldErr(fpOtp, $('fpOtpMsg'), err.message || N.t('auth.verify.err'), false);
             if (fpOtp) fpOtp.focus();
           });
         return;
@@ -701,9 +745,11 @@
         if (otpCodes.indexOf(err.code) !== -1 && forgotStage === 'pwd') {
           resetOtpCode = null;
           setForgotStage('otp');
+          olFieldErr(fpOtp, $('fpOtpMsg'), err.message || N.t('auth.verify.err'), false);
           if (fpOtp) fpOtp.focus();
+        } else {
+          fpErr(err.message || N.t('auth.err.req'));
         }
-        fpErr(err.message || N.t('auth.err.req'));
       });
     });
   }

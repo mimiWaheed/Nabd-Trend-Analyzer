@@ -1041,20 +1041,54 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
 }
 @keyframes authReveal {
   from { opacity: 0; transform: translateY(12px); max-height: 0; }
-  to   { opacity: 1; transform: translateY(0); max-height: 420px; }
+  to   { opacity: 1; transform: translateY(0); max-height: 520px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .auth-reveal { animation: none; }
 }
 
+/* compact password-requirements checklist (reset flow) */
+.fp-req {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 8px;
+}
+.fp-req-i {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: .72rem;
+  color: var(--text-muted);
+  transition: color .2s var(--ease);
+}
+.fp-req-i::before {
+  content: '✗';
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: .64rem;
+  line-height: 1;
+  transition: color .2s var(--ease);
+}
+.fp-req-i.on { color: var(--text-soft); }
+.fp-req-i.on::before { content: '✓'; color: var(--pos); }
+
 /* auth field validation */
 .field { position: relative; }
 .field-msg {
-  min-height: 1.5em;
-  margin-top: 6px;
+  min-height: 1.2em;
+  margin-top: 4px;
   font-size: .76rem;
   line-height: 1.4;
   color: var(--danger);
+}
+.field-msg-in { animation: fieldMsgIn .18s var(--ease) both; }
+@keyframes fieldMsgIn {
+  from { opacity: 0; transform: translateY(-3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .field-msg-in { animation: none; }
 }
 .field-hint {
   margin-top: 6px;
@@ -1101,10 +1135,12 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
   transition: width .3s var(--ease), background .3s var(--ease);
 }
 .pwd-meter i.lvl-fair { background: var(--warn); }
+.pwd-meter i.lvl-good { background: #A3CE5E; }
 .pwd-meter i.lvl-strong { background: var(--pos); }
 .pwd-level { font-size: .7rem; letter-spacing: .08em; color: var(--text-muted); text-transform: uppercase; }
 .pwd-strength:has(.lvl-weak) .pwd-level { color: var(--danger); }
 .pwd-strength:has(.lvl-fair) .pwd-level { color: var(--warn); }
+.pwd-strength:has(.lvl-good) .pwd-level { color: #A3CE5E; }
 .pwd-strength:has(.lvl-strong) .pwd-level { color: var(--pos); }
 
 /* social "coming soon" state */
