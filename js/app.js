@@ -171,6 +171,7 @@
     const display = u ? (u.name || ((u.firstName || u.first || '') + ' ' + (u.lastName || u.last || '')).trim() || null) : null;
     if (name) name.textContent = display || 'Guest Analyst';
     if (mail) mail.textContent = (u && u.email) || 'guest@nabd.ai';
+    document.querySelectorAll('#sideAvatar, .avatar-btn .avatar').forEach((a) => { a.textContent = initials(); });
   }
 
   function updateThemeBtn() {
@@ -1474,10 +1475,10 @@
       pv.classList.toggle('ok', ok);
       pv.classList.toggle('neu', !ok);
     };
+    const CITY_LIST = ['Cairo', 'Alexandria', 'Giza', 'Tanta', 'Mansoura', 'Zagazig', 'Ismailia', 'Port Said', 'Suez', 'Damietta', 'Damanhur', 'Kafr El Sheikh', 'Mahalla El Kubra', 'Shebin El Kom', 'Sadat City', 'Minya', 'Assiut', 'Sohag', 'Qena', 'Luxor', 'Aswan', 'Hurghada', 'Sharm El Sheikh', 'Fayoum', 'Beni Suef', '6th of October City', 'New Cairo'];
 
-    N.api('/api/users?action=me').then((d) => {
-      const u = d && d.user;
-      if (!u) return;
+    let lastUsage = {};
+    const renderProfile = (u) => {
       const first = (u.firstName || '').trim();
       const last = (u.lastName || '').trim();
       const full = (first + ' ' + last).trim();
@@ -1486,15 +1487,14 @@
       renderVerified(u);
       set('profRole', u.role);
       set('profOrg', u.organization);
-      set('profCountry', u.country);
+      set('profCity', u.country || '—');
       set('profLang', u.lang === 'ar' ? L('lng.ar') : L('lng.en'));
       set('profEmail', u.email);
       set('profPhone', u.phone);
       set('profJoined', fmtDate(u.createdAt));
-      const usage = d.usage || {};
-      set('profUseA', toNum(usage.analyses));
-      set('profUseE', toNum(usage.exports));
-      set('profUseS', toNum(usage.searches));
+      set('profUseA', toNum(lastUsage.analyses));
+      set('profUseE', toNum(lastUsage.exports));
+      set('profUseS', toNum(lastUsage.searches));
 
       set('profModalName', full || u.email);
       set('profModalEmail', u.email);
@@ -1504,7 +1504,19 @@
       fill('profEditRole', u.role);
       fill('profEditPhone', u.phone);
       fill('profEditOrg', u.organization);
-      fill('profEditCountry', u.country);
+      const cs = $('profEditCity');
+      const co = $('profEditCityOther');
+      if (cs) {
+        const city = (u.country || '').trim();
+        if (CITY_LIST.indexOf(city) !== -1) { cs.value = city; if (co) { co.hidden = true; co.value = ''; } }
+        else { cs.value = 'Other'; if (co) { co.hidden = false; co.value = city; } }
+      }
+    };
+    N.api('/api/users?action=me').then((d) => {
+      const u = d && d.user;
+      if (!u) return;
+      lastUsage = d.usage || {};
+      renderProfile(u);
     }).catch(() => renderVerified(null));
 
     N.api('/api/users?action=recent-researches').then((d) => {
@@ -1549,13 +1561,20 @@
     if (form) form.addEventListener('submit', (e) => {
       e.preventDefault();
       const msg = $('profEditMsg');
+      const cs = $('profEditCity');
+      const co = $('profEditCityOther');
+      let city = '';
+      if (cs) {
+        city = cs.value;
+        if (city === 'Other') city = (co ? co.value : '').trim();
+      }
       const patch = {
         firstName: ($('profEditFirst').value || '').trim(),
         lastName: ($('profEditLast').value || '').trim(),
         role: ($('profEditRole').value || '').trim(),
         phone: ($('profEditPhone').value || '').trim(),
         organization: ($('profEditOrg').value || '').trim(),
-        country: ($('profEditCountry').value || '').trim()
+        country: city
       };
       if (!patch.firstName && !patch.lastName) {
         if (msg) msg.textContent = L('auth.err.name');
@@ -1565,9 +1584,10 @@
       if (save) save.disabled = true;
       N.api('/api/users?action=me', { method: 'PATCH', body: patch }).then((d) => {
         const u = d && d.user;
-        if (u) N.persistUser(u);
+        if (u) { N.persistUser(u); renderProfile(u); }
         closeModal();
         T('app.toast.saved');
+        fillUser();
       }).catch((err) => {
         if (msg) msg.textContent = (err && err.message) || L('prof.edit.err');
       }).then(() => { if (save) save.disabled = false; });
@@ -1642,8 +1662,6 @@
       sel.value = N.lang;
       sel.addEventListener('change', () => { N.applyLang(sel.value); });
     }
-    const gs = $('setGeneralSave');
-    if (gs) gs.addEventListener('click', () => T('app.toast.saved'));
     const dg = $('setDanger');
     if (dg) dg.addEventListener('click', () => {
       if (window.confirm(L('set.danger.sub'))) {

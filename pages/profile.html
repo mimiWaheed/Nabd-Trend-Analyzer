@@ -45,7 +45,7 @@
         </div>
         <div class="prof-about-body">
           <div class="prof-hero">
-            <span class="avatar avatar-empty" id="profAvatar" style="width:64px;height:64px;border-radius:20px;font-size:1.3rem"></span>
+            <span class="avatar" id="profAvatar" style="width:64px;height:64px;border-radius:20px;font-size:1.3rem"><svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></span>
             <div>
               <div class="prof-hero-name" id="profName">—</div>
               <span class="status-chip ok" id="profVerified"><span class="d"></span></span>
@@ -54,7 +54,7 @@
           <div class="kv prof-kv">
             <span class="k" data-i18n="prof.role">Role</span><span class="v" id="profRole">—</span>
             <span class="k" data-i18n="prof.org">Organization</span><span class="v" id="profOrg">—</span>
-            <span class="k" data-i18n="prof.country">Country</span><span class="v" id="profCountry">—</span>
+            <span class="k" data-i18n="prof.city">City</span><span class="v" id="profCity">—</span>
             <span class="k" data-i18n="prof.lang">Language</span><span class="v" id="profLang">—</span>
             <span class="k" data-i18n="prof.email">Email</span><span class="v" id="profEmail">—</span>
             <span class="k" data-i18n="prof.phone">Phone</span><span class="v" id="profPhone">—</span>
@@ -66,11 +66,6 @@
       <!-- Stats + activity -->
       <div class="sp-4 prof-side">
         <div class="prof-stats">
-          <div class="prof-stat">
-            <span class="prof-stat-ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg></span>
-            <span class="prof-stat-label" data-i18n="prof.u1">Analyses</span>
-            <span class="prof-stat-value" id="profUseA">—</span>
-          </div>
           <div class="prof-stat">
             <span class="prof-stat-ic"><svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6zM14 2v6h6M9 13h7M9 17h5"/></svg></span>
             <span class="prof-stat-label" data-i18n="prof.u3">Exports</span>
@@ -108,7 +103,7 @@
     <div class="c-modal-mask" id="profModalMask"></div>
     <div class="c-modal-card prof-modal" role="dialog" aria-modal="true" aria-labelledby="profModalName">
       <div class="prof-modal-head">
-        <span class="avatar avatar-empty" id="profModalAvatar"></span>
+        <span class="avatar" id="profModalAvatar"><svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></span>
         <div class="grow">
           <div class="prof-modal-name" id="profModalName">—</div>
           <div class="prof-modal-mail" id="profModalEmail">—</div>
@@ -142,8 +137,39 @@
             <input type="text" id="profEditOrg" maxlength="120">
           </div>
           <div class="field">
-            <label data-i18n="prof.country">Country</label>
-            <input type="text" id="profEditCountry" maxlength="60">
+            <label data-i18n="prof.city">City</label>
+            <select id="profEditCity">
+              <option value="">—</option>
+              <option value="Cairo">Cairo</option>
+              <option value="Alexandria">Alexandria</option>
+              <option value="Giza">Giza</option>
+              <option value="Tanta">Tanta</option>
+              <option value="Mansoura">Mansoura</option>
+              <option value="Zagazig">Zagazig</option>
+              <option value="Ismailia">Ismailia</option>
+              <option value="Port Said">Port Said</option>
+              <option value="Suez">Suez</option>
+              <option value="Damietta">Damietta</option>
+              <option value="Damanhur">Damanhur</option>
+              <option value="Kafr El Sheikh">Kafr El Sheikh</option>
+              <option value="Mahalla El Kubra">Mahalla El Kubra</option>
+              <option value="Shebin El Kom">Shebin El Kom</option>
+              <option value="Sadat City">Sadat City</option>
+              <option value="Minya">Minya</option>
+              <option value="Assiut">Assiut</option>
+              <option value="Sohag">Sohag</option>
+              <option value="Qena">Qena</option>
+              <option value="Luxor">Luxor</option>
+              <option value="Aswan">Aswan</option>
+              <option value="Hurghada">Hurghada</option>
+              <option value="Sharm El Sheikh">Sharm El Sheikh</option>
+              <option value="Fayoum">Fayoum</option>
+              <option value="Beni Suef">Beni Suef</option>
+              <option value="6th of October City">6th of October City</option>
+              <option value="New Cairo">New Cairo</option>
+              <option value="Other">Other</option>
+            </select>
+            <input type="text" id="profEditCityOther" maxlength="60" hidden>
           </div>
         </div>
         <p class="field-msg" id="profEditMsg" role="alert"></p>
