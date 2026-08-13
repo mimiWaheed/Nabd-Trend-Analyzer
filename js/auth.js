@@ -563,23 +563,62 @@
   const forgotSubmit = $('forgotSubmit');
   const forgotResend = $('forgotResend');
   let resetEmail = null;
+  let resetOtpCode = null; /* reset OTP confirmed by the backend at the otp stage */
   let forgotStage = 'email'; /* email → otp → pwd */
   const fpErr = (m) => { const el = $('forgotError'); if (el) el.textContent = m || ''; };
 
   function setForgotStage(s) {
     forgotStage = s;
     const otpF = $('fpOtpField');
-    const pwdF = $('fpPwdField');
-    const pwd2F = $('fpPwd2Field');
+    const pwdSection = $('fpPwdSection');
     const resendRow = $('forgotResendRow');
     if (otpF) otpF.hidden = s === 'email';
-    if (pwdF) pwdF.hidden = s !== 'pwd';
-    if (pwd2F) pwd2F.hidden = s !== 'pwd';
+    if (pwdSection) {
+      const revealing = s === 'pwd' && pwdSection.hidden;
+      pwdSection.hidden = s !== 'pwd';
+      if (revealing) {
+        pwdSection.classList.remove('auth-reveal');
+        void pwdSection.offsetWidth; /* restart the reveal animation */
+        pwdSection.classList.add('auth-reveal');
+      }
+    }
     if (resendRow) resendRow.hidden = s === 'email';
     if (forgotSubmit) {
       forgotSubmit.textContent = s === 'pwd' ? N.t('auth.reset.submit') : (s === 'otp' ? N.t('auth.reset.next') : N.t('auth.forgot.send'));
     }
     fpErr('');
+  }
+
+  /* real-time password strength + confirmation feedback (reuses signup scoring) */
+  const fpMeter = $('fpPwdMeter');
+  const fpLevel = $('fpPwdLevel');
+  function renderFpStrength() {
+    const score = passwordScore(fpPwd ? fpPwd.value : '');
+    if (!score) {
+      if (fpMeter) { fpMeter.style.width = '0%'; fpMeter.className = ''; }
+      if (fpLevel) fpLevel.textContent = '';
+      return;
+    }
+    const lvl = passwordLevel(score);
+    const pct = { weak: 33, fair: 66, strong: 100 }[lvl];
+    if (fpMeter) { fpMeter.style.width = pct + '%'; fpMeter.className = 'lvl-' + lvl; }
+    if (fpLevel) fpLevel.textContent = N.t('auth.pwd.' + lvl);
+  }
+  const checkFpPwd = wireField(fpPwd, $('fpPwdMsg'), (v) => {
+    const empty = !(v || '');
+    const ok = !empty && v.length >= 8;
+    setFieldState(fpPwd, $('fpPwdMsg'), empty ? N.t('auth.err.pass.required') : (ok ? '' : N.t('auth.err.pass')), ok);
+    return ok;
+  });
+  const checkFpPwd2 = wireField(fpPwd2, $('fpPwd2Msg'), (v) => {
+    const empty = !(v || '');
+    const ok = !empty && fpPwd && v === fpPwd.value;
+    setFieldState(fpPwd2, $('fpPwd2Msg'), empty ? N.t('auth.err.confirm.req') : (ok ? '' : N.t('auth.err.match')), ok);
+    return ok;
+  });
+  if (fpPwd) {
+    fpPwd.addEventListener('input', renderFpStrength);
+    fpPwd.addEventListener('input', () => { if (fpPwd2 && fpPwd2.value) checkFpPwd2(); });
   }
 
   if (forgotForm) {
@@ -624,29 +663,31 @@
           if (fpOtp) fpOtp.focus();
           return;
         }
-        setForgotStage('pwd');
-        if (fpPwd) fpPwd.focus();
+        setPending(forgotSubmit, true);
+        N.api('/api/auth?action=verify-reset-otp', { method: 'POST', body: { email: resetEmail, otp: v } })
+          .then(() => {
+            setPending(forgotSubmit, false);
+            resetOtpCode = v;
+            setForgotStage('pwd');
+            if (fpPwd) fpPwd.focus();
+          })
+          .catch((err) => {
+            setPending(forgotSubmit, false);
+            fpErr(err.message || N.t('auth.verify.err'));
+            if (fpOtp) fpOtp.focus();
+          });
         return;
       }
       /* final stage: validate + submit the reset */
-      const otpVal = ((fpOtp && fpOtp.value) || '').trim();
+      const otpVal = resetOtpCode || ((fpOtp && fpOtp.value) || '').trim();
       const pv = (fpPwd && fpPwd.value) || '';
       const pv2 = (fpPwd2 && fpPwd2.value) || '';
       if (!/^\d{6}$/.test(otpVal)) {
         olFieldErr(fpOtp, $('fpOtpMsg'), N.t('auth.verify.err.digits'), false);
-        if (fpOtp) fpOtp.focus();
         return;
       }
-      if (pv.length < 8) {
-        olFieldErr(fpPwd, $('fpPwdMsg'), N.t('auth.err.pass'), false);
-        if (fpPwd) fpPwd.focus();
-        return;
-      }
-      if (!pv2 || pv !== pv2) {
-        olFieldErr(fpPwd2, $('fpPwd2Msg'), pv2 ? N.t('auth.err.match') : N.t('auth.err.confirm.req'), false);
-        if (fpPwd2) fpPwd2.focus();
-        return;
-      }
+      if (!checkFpPwd()) { if (fpPwd) fpPwd.focus(); return; }
+      if (!checkFpPwd2()) { if (fpPwd2) fpPwd2.focus(); return; }
       setPending(forgotSubmit, true);
       N.api('/api/auth?action=reset-password', {
         method: 'POST',
@@ -658,6 +699,7 @@
         setPending(forgotSubmit, false);
         const otpCodes = ['OTP_INVALID', 'OTP_EXPIRED', 'OTP_ALREADY_USED', 'OTP_TOO_MANY_ATTEMPTS', 'NOT_FOUND'];
         if (otpCodes.indexOf(err.code) !== -1 && forgotStage === 'pwd') {
+          resetOtpCode = null;
           setForgotStage('otp');
           if (fpOtp) fpOtp.focus();
         }
@@ -672,6 +714,8 @@
     N.api('/api/auth?action=forgot-password', { method: 'POST', body: { email: resetEmail } })
       .then(() => {
         forgotResend.disabled = false;
+        resetOtpCode = null;
+        if (forgotStage === 'pwd') setForgotStage('otp');
         N.toast(toastEl, N.t('auth.verify.sent'));
       })
       .catch((err) => {
@@ -685,6 +729,7 @@
   if (forgotLink) forgotLink.addEventListener('click', (e) => {
     e.preventDefault();
     resetEmail = null;
+    resetOtpCode = null;
     setForgotStage('email');
     showStep(forgotStep);
     if (fpEmail) fpEmail.focus();

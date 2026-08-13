@@ -5,6 +5,8 @@
    - forgot-password: OTP emailed for a known verified account; unknown email
      rejected with EMAIL_NOT_FOUND (no OTP, no reset row); unverified account
      rejected with EMAIL_NOT_VERIFIED
+   - verify-reset-otp: pre-verifies the reset OTP without consuming it; shared
+     attempt budget blocks reset-password once exhausted
    - reset-password: wrong/expired/reused OTP, password changed + old rejected,
      all existing sessions destroyed
    - remember-me: short (12h) vs persistent (30d) session TTL + cookie Max-Age,
@@ -188,6 +190,40 @@ async function seedVerified(email, password) {
   });
   r = await run(auth, 'POST', { email: B, otp: '654321', password: 'New!Passw0rd1', confirm: 'New!Passw0rd1' }, undefined, Q('reset-password'));
   assert(r.status === 400 && r.body.error === 'OTP_EXPIRED', 'expired reset OTP rejected with OTP_EXPIRED');
+
+  /* ================= RESET OTP PRE-VERIFICATION ================= */
+  /* verify-reset-otp lets the UI reveal the password fields only after the
+     backend confirms the code; it must NOT consume the OTP. */
+  const V = 'verify-reset@example.com';
+  await seedVerified(V);
+  r = await run(auth, 'POST', { email: V }, undefined, Q('forgot-password'));
+  assert(r.status === 200, 'forgot-password sends a reset code to V');
+  const vOtp = lastOtp();
+
+  r = await run(auth, 'POST', { email: V, otp: '000000' }, undefined, Q('verify-reset-otp'));
+  assert(r.status === 400 && r.body.error === 'OTP_INVALID', 'verify-reset-otp rejects a wrong OTP');
+
+  r = await run(auth, 'POST', { email: V, otp: vOtp }, undefined, Q('verify-reset-otp'));
+  assert(r.status === 200 && r.body.otpValid === true, 'verify-reset-otp accepts the correct OTP');
+
+  r = await run(auth, 'POST', { email: V, otp: vOtp, password: 'V!Passw0rd1', confirm: 'V!Passw0rd1' }, undefined, Q('reset-password'));
+  assert(r.status === 200 && r.body.passwordChanged === true, 'a pre-verified OTP still completes the reset (single-use preserved)');
+
+  r = await run(auth, 'POST', { email: V, otp: vOtp }, undefined, Q('verify-reset-otp'));
+  assert(r.status === 400 && r.body.error === 'OTP_ALREADY_USED', 'verify-reset-otp rejects an already-used OTP');
+
+  /* shared attempt counter: exhausting via verify-reset-otp blocks reset-password */
+  const W = 'exhaust@example.com';
+  await seedVerified(W);
+  r = await run(auth, 'POST', { email: W }, undefined, Q('forgot-password'));
+  assert(r.status === 200, 'forgot-password sends a reset code to W');
+  const wOtp = lastOtp();
+  for (let i = 0; i < 5; i++) {
+    r = await run(auth, 'POST', { email: W, otp: '999999' }, undefined, Q('verify-reset-otp'));
+  }
+  assert(r.status === 429 && r.body.error === 'OTP_TOO_MANY_ATTEMPTS', 'verify-reset-otp exhausts the shared attempt budget at the 5th mismatch');
+  r = await run(auth, 'POST', { email: W, otp: wOtp, password: 'W!Passw0rd1', confirm: 'W!Passw0rd1' }, undefined, Q('reset-password'));
+  assert(r.status === 429 && r.body.error === 'OTP_TOO_MANY_ATTEMPTS', 'reset-password is blocked once the shared attempt budget is exhausted');
 
   /* ================= REMEMBER ME ================= */
   const C = 'remember@example.com';

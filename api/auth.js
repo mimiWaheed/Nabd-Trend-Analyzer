@@ -1,6 +1,7 @@
 /* NABD — consolidated auth endpoint.
    /api/auth?action=login|signup|me|logout|verify-email|resend-verification|
-                   forgot-password|reset-password|login-otp|login-otp-verify
+                   forgot-password|verify-reset-otp|reset-password|login-otp|
+                   login-otp-verify
    Single Vercel function for all auth routes so the project stays within the
    Hobby plan's 12-function deployment limit. */
 
@@ -30,6 +31,27 @@ function otpFailure(rec) {
     return { status: 429, code: 'OTP_TOO_MANY_ATTEMPTS', message: 'Too many attempts. Request a new code.' };
   }
   return null;
+}
+
+/* Verify a reset OTP against the user's latest reset record WITHOUT consuming
+   it. Shares the attempt counter with reset-password, so brute-forcing either
+   endpoint exhausts the same budget. Returns { ok:true, reset } on success or
+   { ok:false, fail:{status,code,message} }. */
+async function verifyResetOtpRecord(store, user, email, otp) {
+  const reset = await store.findLatestPasswordResetByUser(user.id);
+  const failRec = otpFailure(reset);
+  if (failRec) return { ok: false, fail: failRec };
+
+  if (!verifyOtp(otp, email, reset.otpHash)) {
+    await store.incrementPasswordResetAttempts(reset.id);
+    const updated = await store.findLatestPasswordResetByUser(user.id);
+    if (updated && (updated.attempts || 0) >= (updated.maxAttempts || 5)) {
+      return { ok: false, fail: { status: 429, code: 'OTP_TOO_MANY_ATTEMPTS', message: 'Too many attempts. Request a new code.' } };
+    }
+    return { ok: false, fail: { status: 400, code: 'OTP_INVALID', message: 'Incorrect code' } };
+  }
+
+  return { ok: true, reset };
 }
 
 function clientIp(req) {
@@ -475,20 +497,10 @@ async function actionResetPassword(req, res) {
   const user = await store.findUserByEmail(email);
   if (!user) return fail(res, 400, 'OTP_INVALID', 'Incorrect code');
 
-  const reset = await store.findLatestPasswordResetByUser(user.id);
-  const failRec = otpFailure(reset);
-  if (failRec) return fail(res, failRec.status, failRec.code, failRec.message);
+  const check = await verifyResetOtpRecord(store, user, email, otp);
+  if (!check.ok) return fail(res, check.fail.status, check.fail.code, check.fail.message);
 
-  if (!verifyOtp(otp, email, reset.otpHash)) {
-    await store.incrementPasswordResetAttempts(reset.id);
-    const updated = await store.findLatestPasswordResetByUser(user.id);
-    if (updated && (updated.attempts || 0) >= (updated.maxAttempts || 5)) {
-      return fail(res, 429, 'OTP_TOO_MANY_ATTEMPTS', 'Too many attempts. Request a new code.');
-    }
-    return fail(res, 400, 'OTP_INVALID', 'Incorrect code');
-  }
-
-  await store.markPasswordResetUsed(reset.id);
+  await store.markPasswordResetUsed(check.reset.id);
   await store.updateUser(user.id, { passwordHash: hashPassword(password) });
   await store.deleteSessionsByUser(user.id);
 
@@ -496,6 +508,33 @@ async function actionResetPassword(req, res) {
   await events.createNotification(user.id, 'system', 'Password changed', 'Your password was updated successfully.');
 
   return ok(res, { passwordChanged: true });
+}
+
+/* POST verify-reset-otp — confirm a reset OTP WITHOUT consuming it so the UI
+   reveals the new-password fields only after the backend validates the code.
+   Consumption stays in reset-password (single-use, sessions destroyed). */
+async function actionVerifyResetOtp(req, res) {
+  if (req.method !== 'POST') return fail(res, 405, 'METHOD_NOT_ALLOWED');
+
+  let body;
+  try { body = await asyncBody(req); } catch (e) { return fail(res, 400, e.code || 'BAD_REQUEST'); }
+
+  const email = String((body && body.email) || '').trim().toLowerCase();
+  const otp = String((body && body.otp) || '').trim();
+
+  if (!isEmail(email)) return fail(res, 422, 'VALIDATION_ERROR', 'Email is invalid');
+  if (!/^\d{6}$/.test(otp)) return fail(res, 422, 'VALIDATION_ERROR', 'OTP must be 6 digits');
+
+  const store = storeApi.makeStore();
+  try { await store._ensureSchema && store._ensureSchema(); } catch (e) {}
+
+  const user = await store.findUserByEmail(email);
+  if (!user) return fail(res, 400, 'OTP_INVALID', 'Incorrect code');
+
+  const check = await verifyResetOtpRecord(store, user, email, otp);
+  if (!check.ok) return fail(res, check.fail.status, check.fail.code, check.fail.message);
+
+  return ok(res, { otpValid: true });
 }
 
 /* POST login-otp — request a one-time login code for an existing VERIFIED
@@ -624,6 +663,7 @@ module.exports = async function handler(req, res) {
     case 'verify-email': return actionVerifyEmail(req, res);
     case 'resend-verification': return actionResendVerification(req, res);
     case 'forgot-password': return actionForgotPassword(req, res);
+    case 'verify-reset-otp': return actionVerifyResetOtp(req, res);
     case 'reset-password': return actionResetPassword(req, res);
     case 'login-otp': return actionLoginOtp(req, res);
     case 'login-otp-verify': return actionLoginOtpVerify(req, res);

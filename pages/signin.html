@@ -128,25 +128,31 @@
             <input type="text" id="fpOtp" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" spellcheck="false" aria-describedby="fpOtpMsg">
             <p class="field-msg" id="fpOtpMsg" role="alert"></p>
           </div>
-          <div class="field" id="fpPwdField" hidden>
-            <label for="fpPwd" data-i18n="auth.reset.pass">New password</label>
-            <div class="pwd-wrap">
-              <input type="password" id="fpPwd" name="password" autocomplete="new-password" aria-describedby="fpPwdMsg">
-              <button type="button" class="pwd-toggle" data-pwd-toggle="fpPwd" aria-label="Show password">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
+          <div id="fpPwdSection" hidden>
+            <div class="field" id="fpPwdField">
+              <label for="fpPwd" data-i18n="auth.reset.pass">New password</label>
+              <div class="pwd-wrap">
+                <input type="password" id="fpPwd" name="password" autocomplete="new-password" aria-describedby="fpPwdMsg">
+                <button type="button" class="pwd-toggle" data-pwd-toggle="fpPwd" aria-label="Show password">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <div class="pwd-strength" aria-hidden="true">
+                <span class="pwd-meter"><i id="fpPwdMeter"></i></span>
+                <span class="pwd-level mono" id="fpPwdLevel"></span>
+              </div>
+              <p class="field-msg" id="fpPwdMsg" role="alert"></p>
             </div>
-            <p class="field-msg" id="fpPwdMsg" role="alert"></p>
-          </div>
-          <div class="field" id="fpPwd2Field" hidden>
-            <label for="fpPwd2" data-i18n="auth.reset.confirm">Confirm new password</label>
-            <div class="pwd-wrap">
-              <input type="password" id="fpPwd2" name="password2" autocomplete="new-password" aria-describedby="fpPwd2Msg">
-              <button type="button" class="pwd-toggle" data-pwd-toggle="fpPwd2" aria-label="Show password">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
+            <div class="field" id="fpPwd2Field">
+              <label for="fpPwd2" data-i18n="auth.reset.confirm">Confirm new password</label>
+              <div class="pwd-wrap">
+                <input type="password" id="fpPwd2" name="password2" autocomplete="new-password" aria-describedby="fpPwd2Msg">
+                <button type="button" class="pwd-toggle" data-pwd-toggle="fpPwd2" aria-label="Show password">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <p class="field-msg" id="fpPwd2Msg" role="alert"></p>
             </div>
-            <p class="field-msg" id="fpPwd2Msg" role="alert"></p>
           </div>
           <p class="auth-error" id="forgotError"></p>
           <button type="submit" class="btn btn-primary auth-submit" id="forgotSubmit" data-i18n="auth.forgot.send">Send code</button>

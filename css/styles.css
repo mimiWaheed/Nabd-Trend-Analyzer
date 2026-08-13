@@ -1034,6 +1034,19 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
 .auth-otp-resend button { background: none; border: 0; padding: 0; cursor: pointer; font-size: .85rem; }
 .auth-otp-resend button:disabled { opacity: .5; cursor: default; }
 
+/* password-reset section reveal (after OTP verified) — fade + slide + height */
+.auth-reveal {
+  animation: authReveal .5s var(--ease) both;
+  overflow: hidden;
+}
+@keyframes authReveal {
+  from { opacity: 0; transform: translateY(12px); max-height: 0; }
+  to   { opacity: 1; transform: translateY(0); max-height: 420px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-reveal { animation: none; }
+}
+
 /* auth field validation */
 .field { position: relative; }
 .field-msg {
