@@ -1,7 +1,7 @@
 /* ============================================================
    NABD (نبض) V3 — auth pages script (signin / signup)
-   client-side validation · password strength · social (soon) ·
-   submit flow
+   client-side validation · password strength · OTP login ·
+   forgot-password / reset · submit flow
    ============================================================ */
 (function () {
   'use strict';
@@ -437,12 +437,251 @@
   }
 
   /* ----------------------------------------------------------
-     SOCIAL BUTTONS — UI only, no auth backend yet
+     STEP SWITCHING — signin / forgot / reset / OTP login
      ---------------------------------------------------------- */
-  document.querySelectorAll('[data-social]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      N.toast(toastEl, N.t('auth.social'));
+  const signinStep = $('signinStep');
+  const forgotStep = $('forgotStep');
+  const resetOk = $('resetOk');
+  const otpLoginRequest = $('otpLoginRequest');
+  const otpLoginVerify = $('otpLoginVerify');
+
+  function showStep(el) {
+    [signinStep, forgotStep, resetOk, otpLoginRequest, otpLoginVerify].forEach((s) => {
+      if (s) s.hidden = true;
     });
+    if (el) el.hidden = false;
+  }
+
+  /* ----------------------------------------------------------
+     CONTINUE WITH OTP — request code
+     ---------------------------------------------------------- */
+  let otpLoginEmail = null;
+  const olErr = (m) => { const el = $('otpLoginError'); if (el) el.textContent = m || ''; };
+  const olFieldErr = (input, msgEl, msg, ok) => setFieldState(input, msgEl, msg, ok);
+
+  const otpLoginBtn = $('otpLoginBtn');
+  if (otpLoginBtn) otpLoginBtn.addEventListener('click', () => {
+    showStep(otpLoginRequest);
+    olErr('');
+    const em = $('olEmail');
+    if (em) em.focus();
+  });
+
+  const otpLoginForm = $('otpLoginForm');
+  if (otpLoginForm) {
+    otpLoginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const em = $('olEmail');
+      const mEm = $('olEmailMsg');
+      const v = ((em && em.value) || '').trim();
+      if (!isValidEmail(v)) {
+        olFieldErr(em, mEm, N.t('auth.err.email.bad'), false);
+        if (em) em.focus();
+        return;
+      }
+      const btn = $('otpLoginSend');
+      setPending(btn, true);
+      N.api('/api/auth?action=login-otp', { method: 'POST', body: { email: v } })
+        .then((d) => {
+          setPending(btn, false);
+          otpLoginEmail = v;
+          showStep(otpLoginVerify);
+          const show = $('olEmailShow');
+          if (show) show.textContent = v;
+          const otpInp = $('olOtp');
+          if (otpInp) otpInp.focus();
+          if (d && d.emailStatus === 'cooldown') {
+            olErr(N.t('auth.otp.cooldown').replace('{s}', String(d.resendAfterSeconds || 60)));
+          } else if (d && d.emailStatus === 'failed') {
+            olErr(N.t('auth.verify.err.sent'));
+          }
+        })
+        .catch((err) => {
+          setPending(btn, false);
+          olErr(err.message || N.t('auth.err.req'));
+        });
+    });
+  }
+
+  /* ----------------------------------------------------------
+     CONTINUE WITH OTP — verify + sign in
+     ---------------------------------------------------------- */
+  const otpLoginVerifyForm = $('otpLoginVerifyForm');
+  if (otpLoginVerifyForm) {
+    otpLoginVerifyForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const otpInp = $('olOtp');
+      const mOtp = $('olOtpMsg');
+      const val = ((otpInp && otpInp.value) || '').trim();
+      if (!/^\d{6}$/.test(val)) {
+        olFieldErr(otpInp, mOtp, N.t('auth.verify.err.digits'), false);
+        if (otpInp) otpInp.focus();
+        return;
+      }
+      const remember = $('olRemember');
+      const btn = $('otpLoginSubmit');
+      setPending(btn, true);
+      N.api('/api/auth?action=login-otp-verify', {
+        method: 'POST',
+        body: { email: otpLoginEmail, otp: val, remember: !!(remember && remember.checked) }
+      }).then((d) => {
+        N.persistUser(d.user, !!(remember && remember.checked));
+        N.notifAdd({ title: 'notif.auth.in.t', sub: 'notif.auth.in.s', cat: 'system', ts: Date.now() });
+        finishAuth(N.t('auth.ok.signin'));
+      }).catch((err) => {
+        setPending(btn, false);
+        olFieldErr(otpInp, mOtp, err.message || N.t('auth.verify.err'), false);
+        if (otpInp) otpInp.select();
+      });
+    });
+  }
+
+  const otpLoginResend = $('otpLoginResend');
+  if (otpLoginResend) otpLoginResend.addEventListener('click', () => {
+    if (otpLoginResend.disabled || !otpLoginEmail) return;
+    otpLoginResend.disabled = true;
+    N.api('/api/auth?action=login-otp', { method: 'POST', body: { email: otpLoginEmail } })
+      .then(() => {
+        otpLoginResend.disabled = false;
+        olErr('');
+        N.toast(toastEl, N.t('auth.verify.sent'));
+      })
+      .catch((err) => {
+        otpLoginResend.disabled = false;
+        olErr(err.message || N.t('auth.err.req'));
+      });
+  });
+
+  /* ----------------------------------------------------------
+     FORGOT PASSWORD / PASSWORD RESET
+     ---------------------------------------------------------- */
+  const forgotForm = $('forgotForm');
+  const fpEmail = $('fpEmail');
+  const fpOtp = $('fpOtp');
+  const fpPwd = $('fpPwd');
+  const fpPwd2 = $('fpPwd2');
+  const forgotSubmit = $('forgotSubmit');
+  const forgotResend = $('forgotResend');
+  let resetEmail = null;
+  let forgotStage = 'email'; /* email → otp → pwd */
+  const fpErr = (m) => { const el = $('forgotError'); if (el) el.textContent = m || ''; };
+
+  function setForgotStage(s) {
+    forgotStage = s;
+    const otpF = $('fpOtpField');
+    const pwdF = $('fpPwdField');
+    const pwd2F = $('fpPwd2Field');
+    const resendRow = $('forgotResendRow');
+    if (otpF) otpF.hidden = s === 'email';
+    if (pwdF) pwdF.hidden = s !== 'pwd';
+    if (pwd2F) pwd2F.hidden = s !== 'pwd';
+    if (resendRow) resendRow.hidden = s === 'email';
+    if (forgotSubmit) {
+      forgotSubmit.textContent = s === 'pwd' ? N.t('auth.reset.submit') : (s === 'otp' ? N.t('auth.reset.next') : N.t('auth.forgot.send'));
+    }
+    fpErr('');
+  }
+
+  if (forgotForm) {
+    forgotForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (forgotStage === 'email') {
+        const mEm = $('fpEmailMsg');
+        const v = ((fpEmail && fpEmail.value) || '').trim();
+        if (!isValidEmail(v)) {
+          olFieldErr(fpEmail, mEm, N.t('auth.err.email.bad'), false);
+          if (fpEmail) fpEmail.focus();
+          return;
+        }
+        setPending(forgotSubmit, true);
+        N.api('/api/auth?action=forgot-password', { method: 'POST', body: { email: v } })
+          .then((d) => {
+            setPending(forgotSubmit, false);
+            resetEmail = v;
+            setForgotStage('otp');
+            if (fpOtp) fpOtp.focus();
+            if (d && d.emailStatus === 'cooldown') {
+              fpErr(N.t('auth.otp.cooldown').replace('{s}', String(d.resendAfterSeconds || 60)));
+            } else if (d && d.emailStatus === 'failed') {
+              fpErr(N.t('auth.verify.err.sent'));
+            }
+          })
+          .catch((err) => {
+            setPending(forgotSubmit, false);
+            fpErr(err.message || N.t('auth.err.req'));
+          });
+        return;
+      }
+      if (forgotStage === 'otp') {
+        const v = ((fpOtp && fpOtp.value) || '').trim();
+        if (!/^\d{6}$/.test(v)) {
+          olFieldErr(fpOtp, $('fpOtpMsg'), N.t('auth.verify.err.digits'), false);
+          if (fpOtp) fpOtp.focus();
+          return;
+        }
+        setForgotStage('pwd');
+        if (fpPwd) fpPwd.focus();
+        return;
+      }
+      /* final stage: validate + submit the reset */
+      const otpVal = ((fpOtp && fpOtp.value) || '').trim();
+      const pv = (fpPwd && fpPwd.value) || '';
+      const pv2 = (fpPwd2 && fpPwd2.value) || '';
+      if (!/^\d{6}$/.test(otpVal)) {
+        olFieldErr(fpOtp, $('fpOtpMsg'), N.t('auth.verify.err.digits'), false);
+        if (fpOtp) fpOtp.focus();
+        return;
+      }
+      if (pv.length < 8) {
+        olFieldErr(fpPwd, $('fpPwdMsg'), N.t('auth.err.pass'), false);
+        if (fpPwd) fpPwd.focus();
+        return;
+      }
+      if (!pv2 || pv !== pv2) {
+        olFieldErr(fpPwd2, $('fpPwd2Msg'), pv2 ? N.t('auth.err.match') : N.t('auth.err.confirm.req'), false);
+        if (fpPwd2) fpPwd2.focus();
+        return;
+      }
+      setPending(forgotSubmit, true);
+      N.api('/api/auth?action=reset-password', {
+        method: 'POST',
+        body: { email: resetEmail, otp: otpVal, password: pv, confirm: pv2 }
+      }).then(() => {
+        setPending(forgotSubmit, false);
+        showStep(resetOk);
+      }).catch((err) => {
+        setPending(forgotSubmit, false);
+        fpErr(err.message || N.t('auth.err.req'));
+      });
+    });
+  }
+
+  if (forgotResend) forgotResend.addEventListener('click', () => {
+    if (forgotResend.disabled || !resetEmail) return;
+    forgotResend.disabled = true;
+    N.api('/api/auth?action=forgot-password', { method: 'POST', body: { email: resetEmail } })
+      .then(() => {
+        forgotResend.disabled = false;
+        N.toast(toastEl, N.t('auth.verify.sent'));
+      })
+      .catch((err) => {
+        forgotResend.disabled = false;
+        fpErr(err.message || N.t('auth.err.req'));
+      });
+  });
+
+  /* back links — step anchors are handled here (not native hash jumps) */
+  const forgotLink = $('forgotLink');
+  if (forgotLink) forgotLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    resetEmail = null;
+    setForgotStage('email');
+    showStep(forgotStep);
+    if (fpEmail) fpEmail.focus();
+  });
+  [['otpLoginBack', signinStep], ['otpLoginVerifyBack', signinStep], ['forgotBack', signinStep], ['resetOkBack', signinStep]].forEach(([id, target]) => {
+    const b = $(id);
+    if (b) b.addEventListener('click', (e) => { e.preventDefault(); showStep(target); });
   });
 
   /* ----------------------------------------------------------

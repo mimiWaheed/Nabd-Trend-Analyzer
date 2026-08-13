@@ -1442,16 +1442,96 @@
 
   /* ---------------- profile ---------------- */
   function initProfile() {
-    const bars = document.querySelectorAll('[data-usage]');
-    setTimeout(() => {
-      bars.forEach((b) => {
-        const w = b.dataset.usage;
-        const fill = b.classList.contains('bar-fill') ? b : b.querySelector('.bar-fill');
-        if (fill) fill.style.width = w + '%';
-      });
-    }, 150);
+    const escH = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const toNum = (v) => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+    const set = (id, v) => { const el = $(id); if (el) el.textContent = (v == null || v === '') ? '—' : String(v); };
+    const fmtDate = (v) => {
+      const d = new Date(v);
+      if (!v || isNaN(d.getTime())) return null;
+      return d.toLocaleDateString(N.lang === 'ar' ? 'ar-EG' : 'en-GB', { month: 'long', year: 'numeric' });
+    };
+
+    N.api('/api/users?action=me').then((d) => {
+      const u = d && d.user;
+      if (!u) return;
+      const first = (u.firstName || '').trim();
+      const last = (u.lastName || '').trim();
+      const full = (first + ' ' + last).trim();
+      set('profName', full || u.email);
+      const av = $('profAvatar');
+      if (av) {
+        const p = full ? full.trim().split(/\s+/) : [];
+        av.textContent = p.length ? ((p[0][0] || '') + (p[1] ? p[1][0] : '')).toUpperCase() : '—';
+      }
+      set('profVerified', u.emailVerified ? L('prof.verified') : L('prof.unverified'));
+      set('profOrg', u.organization);
+      set('profCountry', u.country);
+      set('profLang', u.lang === 'ar' ? L('lng.ar') : L('lng.en'));
+      set('profEmail', u.email);
+      set('profPhone', u.phone);
+      set('profJoined', fmtDate(u.createdAt));
+      const usage = d.usage || {};
+      const va = toNum(usage.analyses), ve = toNum(usage.exports), vs = toNum(usage.searches);
+      set('profUseA', va); set('profUseE', ve); set('profUseS', vs);
+      set('profMsA', va); set('profMsE', ve); set('profMsS', vs);
+      const ef = $('profEditFirst'), el2 = $('profEditLast');
+      if (ef) ef.value = first;
+      if (el2) el2.value = last;
+      const ep = $('profEditPhone'); if (ep) ep.value = u.phone || '';
+      const eo = $('profEditOrg'); if (eo) eo.value = u.organization || '';
+      const ec = $('profEditCountry'); if (ec) ec.value = u.country || '';
+    }).catch(() => set('profVerified', L('prof.unverified')));
+
+    N.api('/api/users?action=recent-researches').then((d) => {
+      const items = (d && d.researches) || [];
+      const empty = $('profTimelineEmpty');
+      const tl = $('profTimeline');
+      if (!tl) return;
+      if (empty) empty.hidden = items.length > 0;
+      if (!items.length) return;
+      tl.innerHTML = items.map((r) => {
+        const scope = r.scope === 'private' ? 'PRIVATE' : r.scope ? String(r.scope).toUpperCase() : '';
+        const when = r.createdAt ? N.formatRelativeTime(r.createdAt) : '';
+        return '<div class="tl-item"><div class="tl-title">' + escH(r.query || '—') + '</div>'
+          + (scope ? '<div class="tl-sub mono">' + escH(scope) + '</div>' : '')
+          + (when ? '<div class="tl-time">' + escH(when) + '</div>' : '') + '</div>';
+      }).join('');
+    }).catch(() => {});
+
     const ed = $('profEdit');
-    if (ed) ed.addEventListener('click', () => T('app.toast.saved'));
+    const form = $('profForm');
+    if (ed) ed.addEventListener('click', () => { if (form) form.hidden = false; });
+    const cancel = $('profEditCancel');
+    if (cancel) cancel.addEventListener('click', () => {
+      if (form) form.hidden = true;
+      const msg = $('profEditMsg'); if (msg) msg.textContent = '';
+    });
+    if (form) form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const msg = $('profEditMsg');
+      const patch = {
+        firstName: ($('profEditFirst').value || '').trim(),
+        lastName: ($('profEditLast').value || '').trim(),
+        phone: ($('profEditPhone').value || '').trim(),
+        organization: ($('profEditOrg').value || '').trim(),
+        country: ($('profEditCountry').value || '').trim()
+      };
+      if (!patch.firstName && !patch.lastName) {
+        if (msg) msg.textContent = L('auth.err.name');
+        return;
+      }
+      const save = $('profEditSave');
+      if (save) save.disabled = true;
+      N.api('/api/users?action=me', { method: 'PATCH', body: patch }).then((d) => {
+        const u = d && d.user;
+        if (u) N.persistUser(u);
+        if (form) form.hidden = true;
+        if (msg) msg.textContent = '';
+        T('app.toast.saved');
+      }).catch((err) => {
+        if (msg) msg.textContent = (err && err.message) || L('prof.edit.err');
+      }).then(() => { if (save) save.disabled = false; });
+    });
   }
 
   /* ---------------- settings ---------------- */

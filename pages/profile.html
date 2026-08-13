@@ -43,65 +43,90 @@
         <div class="card-head"><span class="card-title" data-i18n="prof.about">About</span></div>
         <div style="padding:6px 22px 22px;display:flex;flex-direction:column;gap:16px">
           <div style="display:flex;align-items:center;gap:16px">
-            <span class="avatar" style="width:64px;height:64px;border-radius:20px;font-size:1.3rem">NB</span>
+            <span class="avatar" id="profAvatar" style="width:64px;height:64px;border-radius:20px;font-size:1.3rem">—</span>
             <div>
-              <div style="font-weight:800;font-size:1.15rem;color:var(--text)">Nour Badea</div>
-              <div style="font-size:.83rem;color:var(--text-muted)" data-i18n="prof.role.v">Senior Analyst</div>
+              <div style="font-weight:800;font-size:1.15rem;color:var(--text)" id="profName">—</div>
+              <div style="font-size:.83rem;color:var(--text-muted)" id="profVerified">—</div>
             </div>
           </div>
           <div class="kv">
-            <span class="k" data-i18n="prof.org">Organization</span><span class="v" data-i18n="prof.org.v">Delta Digital Group</span>
-            <span class="k" data-i18n="prof.country">Country</span><span class="v" data-i18n="c.eg">Egypt</span>
-            <span class="k" data-i18n="prof.lang">Language</span><span class="v">English</span>
-            <span class="k" data-i18n="prof.email">Email</span><span class="v">nour@deltadigital.eg</span>
-            <span class="k" data-i18n="prof.joined">Joined</span><span class="v">March 2025</span>
+            <span class="k" data-i18n="prof.org">Organization</span><span class="v" id="profOrg">—</span>
+            <span class="k" data-i18n="prof.country">Country</span><span class="v" id="profCountry">—</span>
+            <span class="k" data-i18n="prof.lang">Language</span><span class="v" id="profLang">—</span>
+            <span class="k" data-i18n="prof.email">Email</span><span class="v" id="profEmail">—</span>
+            <span class="k" data-i18n="prof.phone">Phone</span><span class="v" id="profPhone">—</span>
+            <span class="k" data-i18n="prof.joined">Joined</span><span class="v" id="profJoined">—</span>
           </div>
+          <form id="profForm" hidden style="display:flex;flex-direction:column;gap:0;border-top:1px solid var(--border);padding-top:16px">
+            <div class="field-row" style="margin:0;align-items:flex-start">
+              <div class="field" style="flex:1;margin:0">
+                <label data-i18n="auth.first">First name</label>
+                <input type="text" id="profEditFirst" autocomplete="given-name" maxlength="80">
+              </div>
+              <div class="field" style="flex:1;margin:0">
+                <label data-i18n="auth.last">Last name</label>
+                <input type="text" id="profEditLast" autocomplete="family-name" maxlength="80">
+              </div>
+            </div>
+            <div class="field" style="margin:14px 0 0">
+              <label data-i18n="auth.phone">Phone number</label>
+              <input type="tel" id="profEditPhone" autocomplete="tel" maxlength="30">
+            </div>
+            <div class="field-row" style="margin:14px 0 0;align-items:flex-start">
+              <div class="field" style="flex:1;margin:0">
+                <label data-i18n="prof.org">Organization</label>
+                <input type="text" id="profEditOrg" maxlength="120">
+              </div>
+              <div class="field" style="flex:1;margin:0">
+                <label data-i18n="prof.country">Country</label>
+                <input type="text" id="profEditCountry" maxlength="60">
+              </div>
+            </div>
+            <p class="field-msg" id="profEditMsg" role="alert"></p>
+            <div style="display:flex;gap:10px;margin-top:6px">
+              <button type="submit" class="btn btn-primary btn-sm" id="profEditSave" data-i18n="prof.save">Save changes</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="profEditCancel" data-i18n="prof.cancel">Cancel</button>
+            </div>
+          </form>
         </div>
       </div>
 
       <div class="ws-card sp-4">
-        <div class="card-head"><span class="card-title" data-i18n="prof.sub">Subscription</span></div>
-        <div style="padding:6px 22px 22px;display:flex;flex-direction:column;gap:14px">
-          <div>
-            <div style="font-weight:800;font-size:1.2rem;color:var(--text)" data-i18n="prof.plan">Intelligence Pro</div>
-            <div style="font-size:.8rem;color:var(--text-muted)" data-i18n="prof.renew">Renews in 12 days</div>
-          </div>
-          <div class="note-row"><span data-i18n="prof.u1">Analyses</span><b>142 / 400</b></div>
-          <div class="note-row"><span data-i18n="prof.u2">Alerts</span><b>12 / 50</b></div>
-          <div class="note-row"><span data-i18n="prof.u3">Exports</span><b>31 / 100</b></div>
-          <div class="note-row"><span data-i18n="prof.u4">Searches</span><b>17 / ∞</b></div>
+        <div class="card-head"><span class="card-title" data-i18n="prof.usage">Usage</span></div>
+        <div style="padding:6px 22px 22px;display:flex;flex-direction:column;gap:0">
+          <div class="note-row"><span data-i18n="prof.u1">Analyses</span><b id="profUseA">—</b></div>
+          <div class="note-row"><span data-i18n="prof.u3">Exports</span><b id="profUseE">—</b></div>
+          <div class="note-row"><span data-i18n="prof.u4">Searches</span><b id="profUseS">—</b></div>
         </div>
       </div>
 
       <div class="ws-card sp-3">
         <div class="card-head"><span class="card-title" data-i18n="prof.cats">Favorite categories</span></div>
         <div style="padding:6px 22px 22px;display:flex;flex-direction:column;gap:8px">
-          <span class="status-chip ok"><span class="d"></span><span data-i18n="app.cat.business">Business</span></span>
-          <span class="status-chip warn"><span class="d"></span><span data-i18n="app.cat.gov">Government</span></span>
-          <span class="status-chip neu"><span class="d"></span><span data-i18n="app.cat.news">News</span></span>
-          <span class="status-chip neu"><span class="d"></span><span data-i18n="app.cat.social">Social</span></span>
+          <p class="muted-empty" id="profCatsEmpty" data-i18n="prof.favorites.empty" hidden>No favorite categories yet.</p>
+          <div id="profCats" hidden>
+            <span class="status-chip ok"><span class="d"></span><span data-i18n="app.cat.business">Business</span></span>
+            <span class="status-chip warn"><span class="d"></span><span data-i18n="app.cat.gov">Government</span></span>
+            <span class="status-chip neu"><span class="d"></span><span data-i18n="app.cat.news">News</span></span>
+            <span class="status-chip neu"><span class="d"></span><span data-i18n="app.cat.social">Social</span></span>
+          </div>
         </div>
       </div>
 
       <div class="ws-card sp-12">
-        <div class="card-head"><span class="card-title" data-i18n="prof.usage">Usage this month</span></div>
+        <div class="card-head"><span class="card-title" data-i18n="prof.usage">Usage</span></div>
         <div style="padding:6px 22px 22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
-          <div class="mini-stat"><span class="ms-label" data-i18n="prof.u1">Analyses</span><span class="ms-value">142</span><div class="bar-track"><div class="bar-fill" data-usage="35" style="width:0"></div></div><span class="ms-sub">of 400 included</span></div>
-          <div class="mini-stat"><span class="ms-label" data-i18n="prof.u2">Alerts</span><span class="ms-value">12</span><div class="bar-track"><div class="bar-fill" data-usage="24" style="width:0"></div></div><span class="ms-sub">of 50 included</span></div>
-          <div class="mini-stat"><span class="ms-label" data-i18n="prof.u3">Exports</span><span class="ms-value">31</span><div class="bar-track"><div class="bar-fill" data-usage="31" style="width:0"></div></div><span class="ms-sub">of 100 included</span></div>
-          <div class="mini-stat"><span class="ms-label" data-i18n="prof.u4">Searches</span><span class="ms-value">17</span><div class="bar-track"><div class="bar-fill" data-usage="40" style="width:0"></div></div><span class="ms-sub">unlimited plan</span></div>
+          <div class="mini-stat"><span class="ms-label" data-i18n="prof.u1">Analyses</span><span class="ms-value" id="profMsA">—</span></div>
+          <div class="mini-stat"><span class="ms-label" data-i18n="prof.u3">Exports</span><span class="ms-value" id="profMsE">—</span></div>
+          <div class="mini-stat"><span class="ms-label" data-i18n="prof.u4">Searches</span><span class="ms-value" id="profMsS">—</span></div>
         </div>
       </div>
 
       <div class="ws-card sp-12">
         <div class="card-head"><span class="card-title" data-i18n="prof.activity">Recent activity</span></div>
         <div style="padding:8px 22px 22px">
-          <div class="timeline">
-            <div class="tl-item"><div class="tl-title" data-i18n="dash.act.t1">Analysis completed — Cairo food prices</div><div class="tl-time">Today · 09:42</div></div>
-            <div class="tl-item"><div class="tl-title" data-i18n="dash.act.t2">Report exported — Weekly Egypt Brief</div><div class="tl-time">Today · 08:05</div></div>
-            <div class="tl-item"><div class="tl-title" data-i18n="dash.act.t3">Facebook page connected</div><div class="tl-time">Yesterday</div></div>
-            <div class="tl-item"><div class="tl-title" data-i18n="dash.act.t4">Alert created — inflation release</div><div class="tl-time">Yesterday</div></div>
-          </div>
+          <p class="muted-empty" id="profTimelineEmpty" data-i18n="prof.activity.empty" hidden>No recent activity yet.</p>
+          <div class="timeline" id="profTimeline"></div>
         </div>
       </div>
     </div>

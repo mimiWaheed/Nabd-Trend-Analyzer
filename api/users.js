@@ -23,7 +23,15 @@ async function actionMe(req, res) {
   const store = storeApi.makeStore();
 
   if (req.method === 'GET') {
-    return ok(res, { user: auth.public });
+    const [analyses, searches, exports] = await Promise.all([
+      store.countAnalyses(auth.user.id),
+      store.countSearches(auth.user.id),
+      store.countDownloads(auth.user.id)
+    ]);
+    return ok(res, {
+      user: auth.public,
+      usage: { analyses, searches, exports }
+    });
   }
 
   let body;
