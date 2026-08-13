@@ -608,6 +608,11 @@
           })
           .catch((err) => {
             setPending(forgotSubmit, false);
+            if (err.code === 'EMAIL_NOT_FOUND') {
+              fpErr(N.t('auth.err.email.notfound'));
+              if (fpEmail) fpEmail.focus();
+              return;
+            }
             fpErr(err.message || N.t('auth.err.req'));
           });
         return;
@@ -651,6 +656,11 @@
         showStep(resetOk);
       }).catch((err) => {
         setPending(forgotSubmit, false);
+        const otpCodes = ['OTP_INVALID', 'OTP_EXPIRED', 'OTP_ALREADY_USED', 'OTP_TOO_MANY_ATTEMPTS', 'NOT_FOUND'];
+        if (otpCodes.indexOf(err.code) !== -1 && forgotStage === 'pwd') {
+          setForgotStage('otp');
+          if (fpOtp) fpOtp.focus();
+        }
         fpErr(err.message || N.t('auth.err.req'));
       });
     });

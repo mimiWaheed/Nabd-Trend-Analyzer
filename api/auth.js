@@ -385,9 +385,11 @@ async function actionResendVerification(req, res) {
 }
 
 /* POST forgot-password — email a reset OTP for an existing VERIFIED account.
-   Responds generically for unknown/unverified emails so account existence is
-   not disclosed. Reuses the existing OTP/mailer primitives in a dedicated
-   password_resets table (never mixed with signup verification records). */
+   Unknown emails are rejected up front with EMAIL_NOT_FOUND (no OTP is issued,
+   no password_resets row is created, so the UI never advances to the OTP step).
+   Unverified accounts are rejected with EMAIL_NOT_VERIFIED. Reuses the existing
+   OTP/mailer primitives in a dedicated password_resets table (never mixed with
+   signup verification records). */
 async function actionForgotPassword(req, res) {
   if (req.method !== 'POST') return fail(res, 405, 'METHOD_NOT_ALLOWED');
 
@@ -401,50 +403,50 @@ async function actionForgotPassword(req, res) {
   try { await store._ensureSchema && store._ensureSchema(); } catch (e) {}
 
   const user = await store.findUserByEmail(email);
+  if (!user) return failCode(res, 'EMAIL_NOT_FOUND', 'No account found for this email');
+  if (!user.emailVerified) return failCode(res, 'EMAIL_NOT_VERIFIED', 'Please verify your email before resetting your password.');
+
   let emailStatus = 'pending';
   const resendAfterSeconds = RESEND_COOLDOWN_MS / 1000;
 
-  if (user && user.emailVerified) {
-    let reset = await store.findLatestPasswordResetByUser(user.id);
-    if (reset && reset.resendAt && new Date(reset.resendAt) > new Date()) {
-      return ok(res, { emailStatus: 'cooldown', resendAfterSeconds });
-    }
-
-    const otp = generateOtp();
-    const patch = {
-      otpHash: hashOtp(otp, email),
-      expiresAt: new Date(Date.now() + OTP_TTL_MS).toISOString(),
-      resendAt: new Date(Date.now() + RESEND_COOLDOWN_MS).toISOString(),
-      userId: user.id
-    };
-
-    if (reset) {
-      await store.replacePasswordReset(reset.id, patch);
-    } else {
-      await store.createPasswordReset({
-        id: randomToken(16),
-        userId: user.id,
-        otpHash: patch.otpHash,
-        expiresAt: patch.expiresAt,
-        resendAt: patch.resendAt,
-        attempts: 0,
-        maxAttempts: 5,
-        usedAt: null,
-        createdAt: new Date().toISOString()
-      });
-    }
-
-    try {
-      const out = await mailer.sendOtpEmail(email, otp, user.lang || 'en');
-      emailStatus = out.mode;
-    } catch (e) {
-      emailStatus = 'failed';
-    }
-
-    await events.logActivity(user.id, 'PASSWORD_RESET_REQUESTED', {});
+  let reset = await store.findLatestPasswordResetByUser(user.id);
+  if (reset && reset.resendAt && new Date(reset.resendAt) > new Date()) {
+    return ok(res, { emailStatus: 'cooldown', resendAfterSeconds });
   }
 
-  /* Generic response for all outcomes — no account enumeration. */
+  const otp = generateOtp();
+  const patch = {
+    otpHash: hashOtp(otp, email),
+    expiresAt: new Date(Date.now() + OTP_TTL_MS).toISOString(),
+    resendAt: new Date(Date.now() + RESEND_COOLDOWN_MS).toISOString(),
+    userId: user.id
+  };
+
+  if (reset) {
+    await store.replacePasswordReset(reset.id, patch);
+  } else {
+    await store.createPasswordReset({
+      id: randomToken(16),
+      userId: user.id,
+      otpHash: patch.otpHash,
+      expiresAt: patch.expiresAt,
+      resendAt: patch.resendAt,
+      attempts: 0,
+      maxAttempts: 5,
+      usedAt: null,
+      createdAt: new Date().toISOString()
+    });
+  }
+
+  try {
+    const out = await mailer.sendOtpEmail(email, otp, user.lang || 'en');
+    emailStatus = out.mode;
+  } catch (e) {
+    emailStatus = 'failed';
+  }
+
+  await events.logActivity(user.id, 'PASSWORD_RESET_REQUESTED', {});
+
   return ok(res, { emailStatus, resendAfterSeconds });
 }
 

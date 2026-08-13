@@ -2,7 +2,9 @@
    real profile).
    Runs against the in-memory store (NABD_DATA=memory) with a stubbed mailer.
    Covers:
-   - forgot-password: generic (no-enumeration) response, OTP emailed
+   - forgot-password: OTP emailed for a known verified account; unknown email
+     rejected with EMAIL_NOT_FOUND (no OTP, no reset row); unverified account
+     rejected with EMAIL_NOT_VERIFIED
    - reset-password: wrong/expired/reused OTP, password changed + old rejected,
      all existing sessions destroyed
    - remember-me: short (12h) vs persistent (30d) session TTL + cookie Max-Age,
@@ -100,19 +102,45 @@ async function seedVerified(email, password) {
   const A = 'reset-a@example.com';
   await seedVerified(A);
 
-  /* forgot-password emits a generic 200 and emails a 6-digit OTP */
+  /* forgot-password emails a 6-digit OTP to a known verified account */
   let r = await run(auth, 'POST', { email: A }, undefined, Q('forgot-password'));
   assert(r.status === 200, 'forgot-password returns 200 for an existing account');
   assert(r.body.emailStatus === 'smtp', 'forgot-password reports the email was sent');
   const resetOtp = lastOtp();
   assert(/^\d{6}$/.test(resetOtp), 'forgot-password emails a 6-digit OTP');
 
-  /* unknown email gets the SAME generic response (no enumeration) */
+  /* unknown email is rejected up front: no OTP, no reset row, no account */
   const callsBefore = mailer.calls.length;
+  const resetsBefore = store._mem.passwordResets.length;
   r = await run(auth, 'POST', { email: 'nobody@example.com' }, undefined, Q('forgot-password'));
-  assert(r.status === 200 && r.body.emailStatus !== undefined, 'forgot-password returns a generic 200 for an unknown email');
+  assert(r.status === 404 && r.body.error === 'EMAIL_NOT_FOUND', 'forgot-password rejects an unknown email with EMAIL_NOT_FOUND');
   assert(mailer.calls.length === callsBefore, 'forgot-password does NOT email an unknown email');
+  assert(store._mem.passwordResets.length === resetsBefore, 'forgot-password does NOT create a reset row for an unknown email');
   assert(!store._mem.users.find((u) => u.email === 'nobody@example.com'), 'forgot-password does NOT create an account');
+
+  /* a registered but unverified account gets EMAIL_NOT_VERIFIED, no OTP */
+  const UV = 'unverified@example.com';
+  await store.createUser({
+    id: crypto.randomToken(16),
+    firstName: 'Nour',
+    lastName: 'Badea',
+    email: UV,
+    passwordHash: crypto.hashPassword(PASSWORD),
+    emailVerified: false,
+    phone: null,
+    organization: null,
+    country: null,
+    lang: 'en',
+    createdAt: crypto.nowIso(),
+    updatedAt: crypto.nowIso(),
+    lastLoginAt: null
+  });
+  const callsBeforeUv = mailer.calls.length;
+  const resetsBeforeUv = store._mem.passwordResets.length;
+  r = await run(auth, 'POST', { email: UV }, undefined, Q('forgot-password'));
+  assert(r.status === 403 && r.body.error === 'EMAIL_NOT_VERIFIED', 'forgot-password rejects an unverified account with EMAIL_NOT_VERIFIED');
+  assert(mailer.calls.length === callsBeforeUv, 'forgot-password does NOT email an unverified account');
+  assert(store._mem.passwordResets.length === resetsBeforeUv, 'forgot-password does NOT create a reset row for an unverified account');
 
   /* wrong OTP */
   r = await run(auth, 'POST', { email: A, otp: '000000', password: 'New!Passw0rd1', confirm: 'New!Passw0rd1' }, undefined, Q('reset-password'));
