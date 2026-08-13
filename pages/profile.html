@@ -31,25 +31,26 @@
     <div class="app-head">
       <div>
         <h1 data-i18n="app.title.profile">Profile</h1>
-        <p data-i18n="app.sub.profile">Your identity, subscription and usage at a glance.</p>
-      </div>
-      <div class="app-head-actions">
-        <button class="btn btn-primary btn-sm" id="profEdit" data-i18n="prof.edit">Edit profile</button>
+        <p data-i18n="app.sub.profile">Your identity and usage at a glance.</p>
       </div>
     </div>
 
     <div class="dash-grid">
       <div class="ws-card sp-5">
-        <div class="card-head"><span class="card-title" data-i18n="prof.about">About</span></div>
+        <div class="card-head">
+          <span class="card-title" data-i18n="prof.about">About</span>
+          <button class="btn btn-primary btn-sm" id="profEdit" data-i18n="prof.edit">Edit profile</button>
+        </div>
         <div style="padding:6px 22px 22px;display:flex;flex-direction:column;gap:16px">
           <div style="display:flex;align-items:center;gap:16px">
-            <span class="avatar" id="profAvatar" style="width:64px;height:64px;border-radius:20px;font-size:1.3rem">—</span>
+            <span class="avatar avatar-empty" id="profAvatar" style="width:64px;height:64px;border-radius:20px;font-size:1.3rem"></span>
             <div>
               <div style="font-weight:800;font-size:1.15rem;color:var(--text)" id="profName">—</div>
               <div style="font-size:.83rem;color:var(--text-muted)" id="profVerified">—</div>
             </div>
           </div>
           <div class="kv">
+            <span class="k" data-i18n="prof.role">Role</span><span class="v" id="profRole">—</span>
             <span class="k" data-i18n="prof.org">Organization</span><span class="v" id="profOrg">—</span>
             <span class="k" data-i18n="prof.country">Country</span><span class="v" id="profCountry">—</span>
             <span class="k" data-i18n="prof.lang">Language</span><span class="v" id="profLang">—</span>
@@ -68,9 +69,15 @@
                 <input type="text" id="profEditLast" autocomplete="family-name" maxlength="80">
               </div>
             </div>
-            <div class="field" style="margin:14px 0 0">
-              <label data-i18n="auth.phone">Phone number</label>
-              <input type="tel" id="profEditPhone" autocomplete="tel" maxlength="30">
+            <div class="field-row" style="margin:14px 0 0;align-items:flex-start">
+              <div class="field" style="flex:1;margin:0">
+                <label data-i18n="prof.role">Role</label>
+                <input type="text" id="profEditRole" maxlength="80" placeholder="e.g. Data Engineer">
+              </div>
+              <div class="field" style="flex:1;margin:0">
+                <label data-i18n="auth.phone">Phone number</label>
+                <input type="tel" id="profEditPhone" autocomplete="tel" maxlength="30">
+              </div>
             </div>
             <div class="field-row" style="margin:14px 0 0;align-items:flex-start">
               <div class="field" style="flex:1;margin:0">
@@ -128,6 +135,11 @@
           <p class="muted-empty" id="profTimelineEmpty" data-i18n="prof.activity.empty" hidden>No recent activity yet.</p>
           <div class="timeline" id="profTimeline"></div>
         </div>
+      </div>
+
+      <div class="ws-card sp-12">
+        <div class="card-head"><span class="card-title" data-i18n="prof.nav.title">Looking for something?</span></div>
+        <div style="padding:6px 22px 22px" id="profNav"></div>
       </div>
     </div>
   </main>

@@ -21,7 +21,7 @@ const FakePool = class {
       return Promise.resolve({ rows: [{
         id: p[0], firstName: p[1], lastName: p[2], email: p[3],
         passwordHash: p[4], emailVerified: p[5], phone: p[6],
-        organization: p[7], country: p[8], lang: p[9]
+        organization: p[7], country: p[8], lang: p[9], role: p[10]
       }] });
     }
     return Promise.resolve({ rows: [] });
@@ -57,7 +57,7 @@ function findInsert() {
   await store.createUser(Object.assign({}, base, { id: 'u_true_0001', email: 'v1@example.com', emailVerified: true }));
   const q1 = findInsert();
   assert(/\bemail_verified\b/.test(q1.text), 'INSERT column list includes email_verified');
-  assert(q1.params.length === 10, 'INSERT binds 10 parameters');
+  assert(q1.params.length === 11, 'INSERT binds 11 parameters');
   assert(q1.params[5] === true, 'emailVerified=true binds TRUE as $6');
 
   const r1 = await store.createUser(Object.assign({}, base, { id: 'u_true_0002', email: 'v2@example.com', emailVerified: true }));

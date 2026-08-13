@@ -56,6 +56,11 @@ async function actionMe(req, res) {
   if (body.organization !== undefined) {
     patch.organization = String(body.organization).trim() || null;
   }
+  if (body.role !== undefined) {
+    const v = String(body.role).trim();
+    if (v.length > 80) return fail(res, 422, 'VALIDATION_ERROR', 'Role is too long');
+    patch.role = v || null;
+  }
   if (body.country !== undefined) {
     patch.country = String(body.country).trim() || null;
   }

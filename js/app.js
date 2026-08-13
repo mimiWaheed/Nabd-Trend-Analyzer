@@ -1460,10 +1460,20 @@
       set('profName', full || u.email);
       const av = $('profAvatar');
       if (av) {
-        const p = full ? full.trim().split(/\s+/) : [];
-        av.textContent = p.length ? ((p[0][0] || '') + (p[1] ? p[1][0] : '')).toUpperCase() : '—';
+        if (u.avatarUrl) {
+          av.classList.remove('avatar-empty');
+          av.innerHTML = '<img src="' + escH(u.avatarUrl) + '" alt="">';
+        } else if (full) {
+          av.classList.remove('avatar-empty');
+          const p = full.trim().split(/\s+/);
+          av.textContent = ((p[0][0] || '') + (p[1] ? p[1][0] : '')).toUpperCase();
+        } else {
+          av.classList.add('avatar-empty');
+          av.innerHTML = svg(IC.user);
+        }
       }
       set('profVerified', u.emailVerified ? L('prof.verified') : L('prof.unverified'));
+      set('profRole', u.role);
       set('profOrg', u.organization);
       set('profCountry', u.country);
       set('profLang', u.lang === 'ar' ? L('lng.ar') : L('lng.en'));
@@ -1477,6 +1487,7 @@
       const ef = $('profEditFirst'), el2 = $('profEditLast');
       if (ef) ef.value = first;
       if (el2) el2.value = last;
+      const er = $('profEditRole'); if (er) er.value = u.role || '';
       const ep = $('profEditPhone'); if (ep) ep.value = u.phone || '';
       const eo = $('profEditOrg'); if (eo) eo.value = u.organization || '';
       const ec = $('profEditCountry'); if (ec) ec.value = u.country || '';
@@ -1512,6 +1523,7 @@
       const patch = {
         firstName: ($('profEditFirst').value || '').trim(),
         lastName: ($('profEditLast').value || '').trim(),
+        role: ($('profEditRole').value || '').trim(),
         phone: ($('profEditPhone').value || '').trim(),
         organization: ($('profEditOrg').value || '').trim(),
         country: ($('profEditCountry').value || '').trim()
@@ -1532,6 +1544,22 @@
         if (msg) msg.textContent = (err && err.message) || L('prof.edit.err');
       }).then(() => { if (save) save.disabled = false; });
     });
+
+    const nav = $('profNav');
+    if (nav) {
+      const items = [
+        { href: 'connections.html', ic: IC.link, tKey: 'prof.nav.connections', sKey: 'prof.nav.connections.d' },
+        { href: 'history.html', ic: IC.clock, tKey: 'prof.nav.history', sKey: 'prof.nav.history.d' },
+        { href: 'settings.html', ic: IC.sliders, tKey: 'prof.nav.settings', sKey: 'prof.nav.settings.d' }
+      ];
+      nav.innerHTML = items.map((it) => (
+        '<a class="app-row" href="' + it.href + '">'
+        + '<span class="row-icon">' + svg(it.ic) + '</span>'
+        + '<div class="grow"><div class="row-title">' + escH(L(it.tKey)) + '</div>'
+        + '<div class="row-sub">' + escH(L(it.sKey)) + '</div></div>'
+        + '</a>'
+      )).join('');
+    }
   }
 
   /* ---------------- settings ---------------- */
