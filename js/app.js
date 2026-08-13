@@ -55,7 +55,8 @@
     logout: 'M9 4H5v16h4M13 8l4 4-4 4M17 12H9',
     burger: 'M4 7h16M4 12h16M4 17h16',
     plus: 'M12 5v14M5 12h14',
-    copy: 'M8 8h12v12H8zM4 16V4h12'
+    copy: 'M8 8h12v12H8zM4 16V4h12',
+    chev: 'M9 6l6 6-6 6'
   };
   const svg = (d, cls) => '<svg viewBox="0 0 24 24" class="' + (cls || '') + '"><path d="' + d + '"/></svg>';
 
@@ -1445,10 +1446,33 @@
     const escH = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const toNum = (v) => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
     const set = (id, v) => { const el = $(id); if (el) el.textContent = (v == null || v === '') ? '—' : String(v); };
+    const fill = (id, v) => { const el = $(id); if (el) el.value = v == null ? '' : String(v); };
     const fmtDate = (v) => {
       const d = new Date(v);
       if (!v || isNaN(d.getTime())) return null;
       return d.toLocaleDateString(N.lang === 'ar' ? 'ar-EG' : 'en-GB', { month: 'long', year: 'numeric' });
+    };
+    const renderAvatar = (el, u, full) => {
+      if (!el) return;
+      if (u.avatarUrl) {
+        el.classList.remove('avatar-empty');
+        el.innerHTML = '<img src="' + escH(u.avatarUrl) + '" alt="">';
+      } else if (full) {
+        el.classList.remove('avatar-empty');
+        const p = full.trim().split(/\s+/);
+        el.textContent = ((p[0][0] || '') + (p[1] ? p[1][0] : '')).toUpperCase();
+      } else {
+        el.classList.add('avatar-empty');
+        el.innerHTML = svg(IC.user);
+      }
+    };
+    const renderVerified = (u) => {
+      const pv = $('profVerified');
+      if (!pv) return;
+      const ok = !!(u && u.emailVerified);
+      pv.innerHTML = '<span class="d"></span>' + escH(ok ? L('prof.verified') : L('prof.unverified'));
+      pv.classList.toggle('ok', ok);
+      pv.classList.toggle('neu', !ok);
     };
 
     N.api('/api/users?action=me').then((d) => {
@@ -1458,21 +1482,8 @@
       const last = (u.lastName || '').trim();
       const full = (first + ' ' + last).trim();
       set('profName', full || u.email);
-      const av = $('profAvatar');
-      if (av) {
-        if (u.avatarUrl) {
-          av.classList.remove('avatar-empty');
-          av.innerHTML = '<img src="' + escH(u.avatarUrl) + '" alt="">';
-        } else if (full) {
-          av.classList.remove('avatar-empty');
-          const p = full.trim().split(/\s+/);
-          av.textContent = ((p[0][0] || '') + (p[1] ? p[1][0] : '')).toUpperCase();
-        } else {
-          av.classList.add('avatar-empty');
-          av.innerHTML = svg(IC.user);
-        }
-      }
-      set('profVerified', u.emailVerified ? L('prof.verified') : L('prof.unverified'));
+      renderAvatar($('profAvatar'), u, full);
+      renderVerified(u);
       set('profRole', u.role);
       set('profOrg', u.organization);
       set('profCountry', u.country);
@@ -1481,17 +1492,20 @@
       set('profPhone', u.phone);
       set('profJoined', fmtDate(u.createdAt));
       const usage = d.usage || {};
-      const va = toNum(usage.analyses), ve = toNum(usage.exports), vs = toNum(usage.searches);
-      set('profUseA', va); set('profUseE', ve); set('profUseS', vs);
-      set('profMsA', va); set('profMsE', ve); set('profMsS', vs);
-      const ef = $('profEditFirst'), el2 = $('profEditLast');
-      if (ef) ef.value = first;
-      if (el2) el2.value = last;
-      const er = $('profEditRole'); if (er) er.value = u.role || '';
-      const ep = $('profEditPhone'); if (ep) ep.value = u.phone || '';
-      const eo = $('profEditOrg'); if (eo) eo.value = u.organization || '';
-      const ec = $('profEditCountry'); if (ec) ec.value = u.country || '';
-    }).catch(() => set('profVerified', L('prof.unverified')));
+      set('profUseA', toNum(usage.analyses));
+      set('profUseE', toNum(usage.exports));
+      set('profUseS', toNum(usage.searches));
+
+      set('profModalName', full || u.email);
+      set('profModalEmail', u.email);
+      renderAvatar($('profModalAvatar'), u, full);
+      fill('profEditFirst', first);
+      fill('profEditLast', last);
+      fill('profEditRole', u.role);
+      fill('profEditPhone', u.phone);
+      fill('profEditOrg', u.organization);
+      fill('profEditCountry', u.country);
+    }).catch(() => renderVerified(null));
 
     N.api('/api/users?action=recent-researches').then((d) => {
       const items = (d && d.researches) || [];
@@ -1509,14 +1523,29 @@
       }).join('');
     }).catch(() => {});
 
-    const ed = $('profEdit');
-    const form = $('profForm');
-    if (ed) ed.addEventListener('click', () => { if (form) form.hidden = false; });
-    const cancel = $('profEditCancel');
-    if (cancel) cancel.addEventListener('click', () => {
-      if (form) form.hidden = true;
+    const modal = $('profModal');
+    const openModal = () => {
+      if (modal) modal.hidden = false;
+      const f = $('profEditFirst');
+      if (f) f.focus();
+    };
+    const closeModal = () => {
+      if (modal) modal.hidden = true;
       const msg = $('profEditMsg'); if (msg) msg.textContent = '';
+    };
+    const ed = $('profEdit');
+    if (ed) ed.addEventListener('click', openModal);
+    const closeBtn = $('profModalClose');
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    const cancel = $('profEditCancel');
+    if (cancel) cancel.addEventListener('click', closeModal);
+    const mask = $('profModalMask');
+    if (mask) mask.addEventListener('click', closeModal);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal && !modal.hidden) closeModal();
     });
+
+    const form = $('profForm');
     if (form) form.addEventListener('submit', (e) => {
       e.preventDefault();
       const msg = $('profEditMsg');
@@ -1537,8 +1566,7 @@
       N.api('/api/users?action=me', { method: 'PATCH', body: patch }).then((d) => {
         const u = d && d.user;
         if (u) N.persistUser(u);
-        if (form) form.hidden = true;
-        if (msg) msg.textContent = '';
+        closeModal();
         T('app.toast.saved');
       }).catch((err) => {
         if (msg) msg.textContent = (err && err.message) || L('prof.edit.err');
@@ -1553,10 +1581,11 @@
         { href: 'settings.html', ic: IC.sliders, tKey: 'prof.nav.settings', sKey: 'prof.nav.settings.d' }
       ];
       nav.innerHTML = items.map((it) => (
-        '<a class="app-row" href="' + it.href + '">'
+        '<a class="app-row prof-nav-row" href="' + it.href + '">'
         + '<span class="row-icon">' + svg(it.ic) + '</span>'
         + '<div class="grow"><div class="row-title">' + escH(L(it.tKey)) + '</div>'
         + '<div class="row-sub">' + escH(L(it.sKey)) + '</div></div>'
+        + '<span class="row-chev">' + svg(IC.chev) + '</span>'
         + '</a>'
       )).join('');
     }

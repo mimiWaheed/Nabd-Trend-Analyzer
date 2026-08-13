@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="NABD (نبض) - user profile: identity, subscription and usage statistics.">
+  <meta name="description" content="NABD (نبض) - user profile: identity and usage statistics.">
   <title>Profile - NABD (نبض)</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%235EA2FF'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%23070B14'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,20 +36,22 @@
     </div>
 
     <div class="dash-grid">
-      <div class="ws-card sp-5">
+
+      <!-- About -->
+      <div class="ws-card sp-8">
         <div class="card-head">
           <span class="card-title" data-i18n="prof.about">About</span>
           <button class="btn btn-primary btn-sm" id="profEdit" data-i18n="prof.edit">Edit profile</button>
         </div>
-        <div style="padding:6px 22px 22px;display:flex;flex-direction:column;gap:16px">
-          <div style="display:flex;align-items:center;gap:16px">
+        <div class="prof-about-body">
+          <div class="prof-hero">
             <span class="avatar avatar-empty" id="profAvatar" style="width:64px;height:64px;border-radius:20px;font-size:1.3rem"></span>
             <div>
-              <div style="font-weight:800;font-size:1.15rem;color:var(--text)" id="profName">—</div>
-              <div style="font-size:.83rem;color:var(--text-muted)" id="profVerified">—</div>
+              <div class="prof-hero-name" id="profName">—</div>
+              <span class="status-chip ok" id="profVerified"><span class="d"></span></span>
             </div>
           </div>
-          <div class="kv">
+          <div class="kv prof-kv">
             <span class="k" data-i18n="prof.role">Role</span><span class="v" id="profRole">—</span>
             <span class="k" data-i18n="prof.org">Organization</span><span class="v" id="profOrg">—</span>
             <span class="k" data-i18n="prof.country">Country</span><span class="v" id="profCountry">—</span>
@@ -58,91 +60,100 @@
             <span class="k" data-i18n="prof.phone">Phone</span><span class="v" id="profPhone">—</span>
             <span class="k" data-i18n="prof.joined">Joined</span><span class="v" id="profJoined">—</span>
           </div>
-          <form id="profForm" hidden style="display:flex;flex-direction:column;gap:0;border-top:1px solid var(--border);padding-top:16px">
-            <div class="field-row" style="margin:0;align-items:flex-start">
-              <div class="field" style="flex:1;margin:0">
-                <label data-i18n="auth.first">First name</label>
-                <input type="text" id="profEditFirst" autocomplete="given-name" maxlength="80">
-              </div>
-              <div class="field" style="flex:1;margin:0">
-                <label data-i18n="auth.last">Last name</label>
-                <input type="text" id="profEditLast" autocomplete="family-name" maxlength="80">
-              </div>
-            </div>
-            <div class="field-row" style="margin:14px 0 0;align-items:flex-start">
-              <div class="field" style="flex:1;margin:0">
-                <label data-i18n="prof.role">Role</label>
-                <input type="text" id="profEditRole" maxlength="80" placeholder="e.g. Data Engineer">
-              </div>
-              <div class="field" style="flex:1;margin:0">
-                <label data-i18n="auth.phone">Phone number</label>
-                <input type="tel" id="profEditPhone" autocomplete="tel" maxlength="30">
-              </div>
-            </div>
-            <div class="field-row" style="margin:14px 0 0;align-items:flex-start">
-              <div class="field" style="flex:1;margin:0">
-                <label data-i18n="prof.org">Organization</label>
-                <input type="text" id="profEditOrg" maxlength="120">
-              </div>
-              <div class="field" style="flex:1;margin:0">
-                <label data-i18n="prof.country">Country</label>
-                <input type="text" id="profEditCountry" maxlength="60">
-              </div>
-            </div>
-            <p class="field-msg" id="profEditMsg" role="alert"></p>
-            <div style="display:flex;gap:10px;margin-top:6px">
-              <button type="submit" class="btn btn-primary btn-sm" id="profEditSave" data-i18n="prof.save">Save changes</button>
-              <button type="button" class="btn btn-ghost btn-sm" id="profEditCancel" data-i18n="prof.cancel">Cancel</button>
-            </div>
-          </form>
         </div>
       </div>
 
-      <div class="ws-card sp-4">
-        <div class="card-head"><span class="card-title" data-i18n="prof.usage">Usage</span></div>
-        <div style="padding:6px 22px 22px;display:flex;flex-direction:column;gap:0">
-          <div class="note-row"><span data-i18n="prof.u1">Analyses</span><b id="profUseA">—</b></div>
-          <div class="note-row"><span data-i18n="prof.u3">Exports</span><b id="profUseE">—</b></div>
-          <div class="note-row"><span data-i18n="prof.u4">Searches</span><b id="profUseS">—</b></div>
+      <!-- Stats + activity -->
+      <div class="sp-4 prof-side">
+        <div class="prof-stats">
+          <div class="prof-stat">
+            <span class="prof-stat-ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg></span>
+            <span class="prof-stat-label" data-i18n="prof.u1">Analyses</span>
+            <span class="prof-stat-value" id="profUseA">—</span>
+          </div>
+          <div class="prof-stat">
+            <span class="prof-stat-ic"><svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6zM14 2v6h6M9 13h7M9 17h5"/></svg></span>
+            <span class="prof-stat-label" data-i18n="prof.u3">Exports</span>
+            <span class="prof-stat-value" id="profUseE">—</span>
+          </div>
+          <div class="prof-stat">
+            <span class="prof-stat-ic"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></svg></span>
+            <span class="prof-stat-label" data-i18n="prof.u4">Searches</span>
+            <span class="prof-stat-value" id="profUseS">—</span>
+          </div>
         </div>
-      </div>
 
-      <div class="ws-card sp-3">
-        <div class="card-head"><span class="card-title" data-i18n="prof.cats">Favorite categories</span></div>
-        <div style="padding:6px 22px 22px;display:flex;flex-direction:column;gap:8px">
-          <p class="muted-empty" id="profCatsEmpty" data-i18n="prof.favorites.empty" hidden>No favorite categories yet.</p>
-          <div id="profCats" hidden>
-            <span class="status-chip ok"><span class="d"></span><span data-i18n="app.cat.business">Business</span></span>
-            <span class="status-chip warn"><span class="d"></span><span data-i18n="app.cat.gov">Government</span></span>
-            <span class="status-chip neu"><span class="d"></span><span data-i18n="app.cat.news">News</span></span>
-            <span class="status-chip neu"><span class="d"></span><span data-i18n="app.cat.social">Social</span></span>
+        <div class="ws-card prof-activity">
+          <div class="card-head"><span class="card-title" data-i18n="prof.activity">Recent activity</span></div>
+          <div class="prof-activity-body">
+            <div class="prof-empty" id="profTimelineEmpty" hidden>
+              <span class="prof-empty-ic"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></svg></span>
+              <p data-i18n="prof.activity.empty">No recent activity yet.</p>
+            </div>
+            <div class="timeline" id="profTimeline"></div>
           </div>
         </div>
       </div>
 
-      <div class="ws-card sp-12">
-        <div class="card-head"><span class="card-title" data-i18n="prof.usage">Usage</span></div>
-        <div style="padding:6px 22px 22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
-          <div class="mini-stat"><span class="ms-label" data-i18n="prof.u1">Analyses</span><span class="ms-value" id="profMsA">—</span></div>
-          <div class="mini-stat"><span class="ms-label" data-i18n="prof.u3">Exports</span><span class="ms-value" id="profMsE">—</span></div>
-          <div class="mini-stat"><span class="ms-label" data-i18n="prof.u4">Searches</span><span class="ms-value" id="profMsS">—</span></div>
-        </div>
-      </div>
-
-      <div class="ws-card sp-12">
-        <div class="card-head"><span class="card-title" data-i18n="prof.activity">Recent activity</span></div>
-        <div style="padding:8px 22px 22px">
-          <p class="muted-empty" id="profTimelineEmpty" data-i18n="prof.activity.empty" hidden>No recent activity yet.</p>
-          <div class="timeline" id="profTimeline"></div>
-        </div>
-      </div>
-
+      <!-- Looking for something? -->
       <div class="ws-card sp-12">
         <div class="card-head"><span class="card-title" data-i18n="prof.nav.title">Looking for something?</span></div>
-        <div style="padding:6px 22px 22px" id="profNav"></div>
+        <div class="prof-nav-body" id="profNav"></div>
       </div>
     </div>
   </main>
+
+  <!-- Edit profile modal -->
+  <div class="c-modal" id="profModal" hidden>
+    <div class="c-modal-mask" id="profModalMask"></div>
+    <div class="c-modal-card prof-modal" role="dialog" aria-modal="true" aria-labelledby="profModalName">
+      <div class="prof-modal-head">
+        <span class="avatar avatar-empty" id="profModalAvatar"></span>
+        <div class="grow">
+          <div class="prof-modal-name" id="profModalName">—</div>
+          <div class="prof-modal-mail" id="profModalEmail">—</div>
+        </div>
+        <button type="button" class="icon-btn sm" id="profModalClose" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <form id="profForm" class="prof-modal-body">
+        <div class="field-row prof-field-row">
+          <div class="field">
+            <label data-i18n="auth.first">First name</label>
+            <input type="text" id="profEditFirst" autocomplete="given-name" maxlength="80">
+          </div>
+          <div class="field">
+            <label data-i18n="auth.last">Last name</label>
+            <input type="text" id="profEditLast" autocomplete="family-name" maxlength="80">
+          </div>
+        </div>
+        <div class="field-row prof-field-row">
+          <div class="field">
+            <label data-i18n="prof.role">Role</label>
+            <input type="text" id="profEditRole" maxlength="80" placeholder="e.g. Data Engineer">
+          </div>
+          <div class="field">
+            <label data-i18n="auth.phone">Phone number</label>
+            <input type="tel" id="profEditPhone" autocomplete="tel" maxlength="30">
+          </div>
+        </div>
+        <div class="field-row prof-field-row">
+          <div class="field">
+            <label data-i18n="prof.org">Organization</label>
+            <input type="text" id="profEditOrg" maxlength="120">
+          </div>
+          <div class="field">
+            <label data-i18n="prof.country">Country</label>
+            <input type="text" id="profEditCountry" maxlength="60">
+          </div>
+        </div>
+        <p class="field-msg" id="profEditMsg" role="alert"></p>
+        <div class="prof-modal-actions">
+          <button type="button" class="btn btn-ghost btn-sm" id="profEditCancel" data-i18n="prof.cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm" id="profEditSave" data-i18n="prof.save">Save changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script src="../js/script.js"></script>
   <script src="../js/app.js"></script>
