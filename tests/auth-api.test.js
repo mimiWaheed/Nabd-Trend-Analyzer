@@ -1,13 +1,31 @@
 /* NABD — auth backend tests.
    Exercises the consolidated /api/auth handler (action-dispatched) against
    the in-memory store (NABD_DATA=memory) so no live Postgres/credentials are
-   required. Signup auto-verifies and auto-logs-in (no OTP step); the OTP
-   verify / resend actions are still covered via directly seeded unverified
-   users. Covers: signup, duplicate/invalid input, password hashing, email OTP
-   (verify / invalid / expired / max attempts), login (success / bad creds /
-   unverified blocked), /auth/me, logout and session persistence. */
+   required. Signup creates an UNVERIFIED account and emails a 6-digit OTP
+   (captured via a stubbed mailer — no real SMTP). Covers: signup + OTP issue,
+   duplicate/invalid input, password hashing, email OTP (verify / invalid /
+   expired / max attempts / resend), login (success / bad creds / unverified
+   blocked), /auth/me, logout and session persistence. */
 
 process.env.NABD_DATA = 'memory';
+
+/* Stub the mailer so no test ever reaches a real SMTP server. The stub records
+   every OTP email so tests can assert a send happened and read the exact code
+   that would have been delivered. Installed in require.cache BEFORE
+   api/auth.js loads so the handler receives the stubbed module. */
+const mailer = {
+  calls: [],
+  sendOtpEmail(to, otp, lang) {
+    this.calls.push({ to, otp, lang });
+    return Promise.resolve({ ok: true, mode: 'smtp' });
+  }
+};
+require.cache[require.resolve('../lib/mailer')] = {
+  id: require.resolve('../lib/mailer'),
+  filename: require.resolve('../lib/mailer'),
+  loaded: true,
+  exports: mailer
+};
 
 const storeApi = require('../lib/store');
 const store = storeApi.makeStore();
@@ -55,7 +73,7 @@ const run = async (handler, method, body, headers, query) => {
 };
 
 /* seed an UNVERIFIED user with a hashed verification record directly in the
-   store (signup no longer issues OTP codes) */
+   store, bypassing signup (used for the failure-path OTP tests) */
 async function seedUnverified(email, opts) {
   const user = {
     id: crypto.randomToken(16),
@@ -88,7 +106,7 @@ async function seedUnverified(email, opts) {
 }
 
 (async () => {
-  /* ---- signup (auto-verified, auto-login) ---- */
+  /* ---- signup (unverified account + OTP email) ---- */
   let r = await run(auth, 'POST', {
     firstName: 'Omar', lastName: 'Salem', email: EMAIL, password: PASSWORD,
     phone: '+20 100 123 4567', organization: 'Acme', country: 'eg', lang: 'en'
@@ -96,10 +114,20 @@ async function seedUnverified(email, opts) {
   assert(r.status === 201, 'signup returns 201');
   assert(r.body && r.body.ok === true, 'signup returns ok:true');
   assert(r.body.user.email === EMAIL, 'signup returns the created user email');
-  assert(r.body.user.emailVerified === true, 'signup creates a VERIFIED account (auto-verify)');
-  assert(r.body.token, 'signup auto-logs-in the new user (token returned)');
+  assert(r.body.user.emailVerified === false, 'signup creates an UNVERIFIED account (emailVerified=false)');
+  assert(r.body.verified !== true, 'signup does not auto-verify');
+  assert(!r.body.token, 'signup does not auto-login (no session token returned)');
+  assert(!('Set-Cookie' in r.headers), 'signup sets no session cookie');
   assert(!JSON.stringify(r.body).includes('passwordHash'), 'signup response never leaks passwordHash');
   assert(!JSON.stringify(r.body).includes('otp'), 'signup response never leaks the OTP');
+
+  /* signup issued a hashed OTP verification record and emailed it once */
+  const signupUser = store._mem.users.find((u) => u.email === EMAIL);
+  const signupVRec = store._mem.verifications.find((v) => v.userId === signupUser.id);
+  assert(signupVRec && /^[0-9a-f]{64}$/.test(signupVRec.otpHash), 'stored OTP is hashed (never plaintext)');
+  assert(mailer.calls.length === 1 && mailer.calls[0].to === EMAIL, 'signup emails the OTP exactly once');
+  const signupOtp = mailer.calls[0].otp;
+  assert(/^\d{6}$/.test(signupOtp), 'emailed OTP is a 6-digit code');
 
   /* password is stored hashed, not plaintext */
   const mem = store._mem.users.find((u) => u.email === EMAIL);
@@ -132,15 +160,13 @@ async function seedUnverified(email, opts) {
   r = await run(auth, 'GET', undefined, undefined, Q('bogus'));
   assert(r.status === 404 && r.body.error === 'NOT_FOUND', 'unknown auth action rejected with 404');
 
-  /* ---- OTP verify ---- */
-  const VERIFIED_EMAIL = 'verify@example.com';
-  const knownOtp = '123456';
-  await seedUnverified(VERIFIED_EMAIL, { otp: knownOtp });
+  /* ---- OTP verify (the code emailed at signup) ---- */
+  const VERIFIED_EMAIL = EMAIL;
   const vUser = store._mem.users.find((u) => u.email === VERIFIED_EMAIL);
   const vRec = store._mem.verifications.find((v) => v.userId === vUser.id);
-  assert(vRec && vRec.otpHash, 'seeded unverified user has a hashed OTP verification record');
+  assert(vRec && vRec.otpHash, 'signup user has a hashed OTP verification record');
 
-  r = await run(auth, 'POST', { email: VERIFIED_EMAIL, otp: knownOtp }, undefined, Q('verify-email'));
+  r = await run(auth, 'POST', { email: VERIFIED_EMAIL, otp: signupOtp }, undefined, Q('verify-email'));
   assert(r.status === 200 && r.body.verified === true, 'correct OTP verifies the account');
   assert(r.body.token, 'successful OTP verify establishes a session (token returned)');
   const verifyToken = r.body.token;
@@ -176,6 +202,13 @@ async function seedUnverified(email, opts) {
   /* resend action exists and is rate-limited / already-verified guarded */
   r = await run(auth, 'POST', { email: VERIFIED_EMAIL }, undefined, Q('resend-verification'));
   assert(r.status === 409 && r.body.error === 'ALREADY_VERIFIED', 'resend on a verified account rejected with ALREADY_VERIFIED');
+
+  /* resend on an UNVERIFIED account issues a fresh OTP */
+  const RESEND_EMAIL = 'resend@example.com';
+  await seedUnverified(RESEND_EMAIL, { otp: '000000' });
+  r = await run(auth, 'POST', { email: RESEND_EMAIL }, undefined, Q('resend-verification'));
+  assert(r.status === 200 && r.body.emailStatus === 'smtp', 'resend on an unverified account returns ok with emailStatus');
+  assert(mailer.calls.length === 2 && mailer.calls[1].to === RESEND_EMAIL, 'resend emails a fresh OTP');
 
   /* ---- login ---- */
   /* unverified user cannot sign in yet */

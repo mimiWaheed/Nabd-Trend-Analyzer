@@ -71,9 +71,10 @@ async function actionLogin(req, res) {
   return ok(res, { user: publicUser(Object.assign({}, user, { emailVerified: user.emailVerified, lastLoginAt: new Date().toISOString() })), token: session.token });
 }
 
-/* POST signup — create a verified account and sign the user in.
-   No email-verification OTP step: the account is verified immediately and a
-   session is established so the user lands straight in the app. */
+/* POST signup — create an UNVERIFIED account and email a one-time OTP.
+   No session is established here: the account must pass email verification
+   (actionVerifyEmail) before it can sign in, matching the OTP flow already
+   used by actionResendVerification. */
 async function actionSignup(req, res) {
   if (req.method !== 'POST') return fail(res, 405, 'METHOD_NOT_ALLOWED');
 
@@ -107,7 +108,7 @@ async function actionSignup(req, res) {
     lastName,
     email,
     passwordHash: hashPassword(password),
-    emailVerified: true,
+    emailVerified: false,
     phone: phone || null,
     organization: organization || null,
     country: country || null,
@@ -118,19 +119,40 @@ async function actionSignup(req, res) {
   };
   await store.createUser(user);
 
-  const session = await sessionLib.createSession(req, user.id, true);
+  /* Generate, persist and email a 6-digit OTP for email verification,
+     mirroring actionResendVerification exactly. The user stays unverified
+     and gets no session until the OTP is confirmed. */
+  const otp = generateOtp();
+  await store.createVerification({
+    id: randomToken(16),
+    userId: user.id,
+    otpHash: hashOtp(otp, email),
+    expiresAt: new Date(Date.now() + OTP_TTL_MS).toISOString(),
+    resendAt: new Date(Date.now() + RESEND_COOLDOWN_MS).toISOString(),
+    attempts: 0,
+    maxAttempts: 5,
+    usedAt: null,
+    createdAt: new Date().toISOString()
+  });
+
+  let emailStatus = 'pending';
+  try {
+    const out = await mailer.sendOtpEmail(email, otp, user.lang || 'en');
+    emailStatus = out.mode;
+  } catch (e) {
+    emailStatus = 'failed';
+  }
 
   await events.logActivity(user.id, 'USER_REGISTERED', { email });
 
-  res.setHeader('Set-Cookie', session.cookie);
   return created(res, {
     user: {
       id: user.id, firstName, lastName, email,
-      emailVerified: true, phone: user.phone, organization: user.organization,
+      emailVerified: false, phone: user.phone, organization: user.organization,
       country: user.country, lang, createdAt: user.createdAt
     },
-    token: session.token,
-    verified: true
+    emailStatus,
+    verified: false
   });
 }
 
