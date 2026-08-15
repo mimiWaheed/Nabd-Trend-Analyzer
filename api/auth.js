@@ -18,6 +18,13 @@ const WINDOW_MS = 15 * 60 * 1000;
 const MAX_FAILURES = 10;
 const RESEND_COOLDOWN_MS = 60 * 1000;
 
+/* Surface OTP email send failures in the function logs so "code never
+   arrived" reports can be traced (flow + recipient + SMTP error). */
+function logMailError(flow, email, err) {
+  if (typeof console === 'undefined' || typeof console.error !== 'function') return;
+  console.error('[nabd-mail] ' + flow + ' OTP email to ' + email + ' failed: ' + ((err && err.message) || String(err)));
+}
+
 /* Read-only OTP guard shared by every OTP flow. Returns a failure object when
    the record is missing, already used, expired, or exhausted; null otherwise.
    Callers increment the per-record attempt counter on an OTP mismatch. */
@@ -175,6 +182,7 @@ async function actionSignup(req, res) {
     emailStatus = out.mode;
   } catch (e) {
     emailStatus = 'failed';
+    logMailError('signup', email, e);
   }
 
   return created(res, {
@@ -355,6 +363,7 @@ async function actionResendVerification(req, res) {
       emailStatus = out.mode;
     } catch (e) {
       emailStatus = 'failed';
+      logMailError('resend-verification', email, e);
     }
     return ok(res, { emailStatus, resendAfterSeconds: RESEND_COOLDOWN_MS / 1000 });
   }
@@ -396,6 +405,7 @@ async function actionResendVerification(req, res) {
       emailStatus = out.mode;
     } catch (e) {
       emailStatus = 'failed';
+      logMailError('resend-verification-user', email, e);
     }
 
     await events.logActivity(user.id, 'EMAIL_VERIFICATION_RESENT', {});
@@ -465,6 +475,7 @@ async function actionForgotPassword(req, res) {
     emailStatus = out.mode;
   } catch (e) {
     emailStatus = 'failed';
+    logMailError('forgot-password', email, e);
   }
 
   await events.logActivity(user.id, 'PASSWORD_RESET_REQUESTED', {});
@@ -591,6 +602,7 @@ async function actionLoginOtp(req, res) {
       emailStatus = out.mode;
     } catch (e) {
       emailStatus = 'failed';
+      logMailError('login-otp', email, e);
     }
 
     await events.logActivity(user.id, 'OTP_LOGIN_REQUESTED', {});

@@ -20,8 +20,13 @@ process.env.NABD_DATA = 'memory';
 
 const mailer = {
   calls: [],
+  failNext: false,
   sendOtpEmail(to, otp, lang) {
     this.calls.push({ to, otp, lang });
+    if (this.failNext) {
+      this.failNext = false;
+      return Promise.reject(new Error('simulated SMTP outage'));
+    }
     return Promise.resolve({ ok: true, mode: 'smtp' });
   }
 };
@@ -285,10 +290,12 @@ async function seedVerified(email, password) {
   r = await run(auth, 'POST', { email: D, otp: loginOtp, remember: false }, undefined, Q('login-otp-verify'));
   assert(r.status === 400 && r.body.error === 'OTP_ALREADY_USED', 'login OTP is single-use (reuse rejected)');
 
-  /* unknown email: generic request response + no account created */
+  /* unknown email: generic request response + no account + no OTP record */
+  const loginOtpsBefore = store._mem.loginOtps.length;
   r = await run(auth, 'POST', { email: 'ghost@example.com' }, undefined, Q('login-otp'));
-  assert(r.status === 200 && r.body.emailStatus !== undefined, 'login-otp gives a generic response for an unknown email');
+  assert(r.status === 200 && r.body.emailStatus === 'pending', 'login-otp returns emailStatus "pending" (no code dispatched) for an unknown email');
   assert(!store._mem.users.find((u) => u.email === 'ghost@example.com'), 'login-otp does NOT create an account');
+  assert(store._mem.loginOtps.length === loginOtpsBefore, 'login-otp does NOT create an OTP record for an unknown email');
   r = await run(auth, 'POST', { email: 'ghost@example.com', otp: '123456', remember: false }, undefined, Q('login-otp-verify'));
   assert(r.status === 400 && r.body.error === 'OTP_INVALID', 'login-otp-verify fails for an unknown email');
 
@@ -302,10 +309,29 @@ async function seedVerified(email, password) {
   });
   const beforeUnv = mailer.calls.length;
   r = await run(auth, 'POST', { email: UNV }, undefined, Q('login-otp'));
-  assert(r.status === 200, 'login-otp returns a generic response for an unverified account');
+  assert(r.status === 200 && r.body.emailStatus === 'pending', 'login-otp returns emailStatus "pending" for an unverified account');
   assert(mailer.calls.length === beforeUnv, 'login-otp does NOT email an unverified account');
   r = await run(auth, 'POST', { email: UNV, otp: '123456', remember: false }, undefined, Q('login-otp-verify'));
   assert(r.status === 400 && r.body.error === 'OTP_INVALID', 'unverified account cannot log in via OTP');
+
+  /* ================= SIGNUP — SMTP failure is surfaced, not a 500 ================= */
+  mailer.failNext = true;
+  const callsBeforeFail = mailer.calls.length;
+  const pendingBeforeFail = store._mem.pendingSignups.length;
+  r = await run(auth, 'POST', {
+    firstName: 'Sara', lastName: 'Omar', email: 'fail-send@example.com',
+    password: PASSWORD, phone: '+201005556677', lang: 'en'
+  }, undefined, Q('signup'));
+  assert(r.status === 201 && r.body.emailStatus === 'failed', 'signup returns 201 with emailStatus "failed" when SMTP fails (not a 500)');
+  assert(r.body.pending && r.body.pending.email === 'fail-send@example.com', 'signup still records the pending signup for a later resend');
+  assert(mailer.calls.length === callsBeforeFail + 1, 'signup attempted the email despite the failure');
+  assert(store._mem.pendingSignups.length === pendingBeforeFail + 1, 'a pending signup row exists after a failed send');
+
+  /* a later resend succeeds once SMTP recovers, using the stored pending record */
+  const failedPending = store._mem.pendingSignups.find((p) => p.email === 'fail-send@example.com');
+  await store.updatePendingSignup(failedPending.id, { resendAt: null });
+  r = await run(auth, 'POST', { email: 'fail-send@example.com' }, undefined, Q('resend-verification'));
+  assert(r.status === 200 && r.body.emailStatus === 'smtp', 'resend-verification sends after SMTP recovers');
 
   /* ================= PROFILE (real data + PATCH) ================= */
   const E = 'profile@example.com';

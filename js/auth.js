@@ -378,9 +378,14 @@
       if (otpResend.disabled) return;
       otpResend.disabled = true;
       N.api('/api/auth?action=resend-verification', { method: 'POST', body: { email: pendingEmail } })
-        .then(() => {
+        .then((d) => {
           otpResend.disabled = false;
-          N.toast(toastEl, N.t('auth.verify.sent'));
+          if (d && d.emailStatus === 'failed') {
+            setOtpError(N.t('auth.verify.err.sent'));
+          } else {
+            setOtpError('');
+            N.toast(toastEl, N.t('auth.verify.sent'));
+          }
         })
         .catch((err) => {
           otpResend.disabled = false;
@@ -436,8 +441,15 @@
           country: countrySel ? countrySel.value : '',
           lang: langSel ? langSel.value : ''
         }
-      }).then(() => {
+      }).then((d) => {
         showOtp(suEmail.value.trim());
+        if (d && (d.emailStatus === 'failed' || d.emailStatus === 'pending')) {
+          setOtpError(N.t('auth.verify.err.sent'));
+          const resend = $('otpResend');
+          if (resend) resend.disabled = false;
+        } else if (d && d.emailStatus === 'dev') {
+          setOtpError(N.t('auth.verify.err.dev'));
+        }
       }).catch((err) => {
         busy = false;
         setPending(suSubmit, false);
@@ -494,16 +506,23 @@
       N.api('/api/auth?action=login-otp', { method: 'POST', body: { email: v } })
         .then((d) => {
           setPending(btn, false);
-          otpLoginEmail = v;
-          showStep(otpLoginVerify);
-          const show = $('olEmailShow');
-          if (show) show.textContent = v;
-          const otpInp = $('olOtp');
-          if (otpInp) otpInp.focus();
-          if (d && d.emailStatus === 'cooldown') {
-            olErr(N.t('auth.otp.cooldown').replace('{s}', String(d.resendAfterSeconds || 60)));
-          } else if (d && d.emailStatus === 'failed') {
-            olErr(N.t('auth.verify.err.sent'));
+          const st = d && d.emailStatus;
+          if (st === 'smtp' || st === 'dev' || st === 'cooldown') {
+            otpLoginEmail = v;
+            showStep(otpLoginVerify);
+            const show = $('olEmailShow');
+            if (show) show.textContent = v;
+            const otpInp = $('olOtp');
+            if (otpInp) otpInp.focus();
+            if (st === 'cooldown') {
+              olErr(N.t('auth.otp.cooldown').replace('{s}', String(d.resendAfterSeconds || 60)));
+            } else if (st === 'dev') {
+              olErr(N.t('auth.verify.err.dev'));
+            }
+          } else if (st === 'failed') {
+            olErr(N.t('auth.otp.err.send'));
+          } else {
+            olErr(N.t('auth.otp.err.nomatch'));
           }
         })
         .catch((err) => {
@@ -551,10 +570,16 @@
     if (otpLoginResend.disabled || !otpLoginEmail) return;
     otpLoginResend.disabled = true;
     N.api('/api/auth?action=login-otp', { method: 'POST', body: { email: otpLoginEmail } })
-      .then(() => {
+      .then((d) => {
         otpLoginResend.disabled = false;
-        olErr('');
-        N.toast(toastEl, N.t('auth.verify.sent'));
+        if (d && d.emailStatus === 'failed') {
+          olErr(N.t('auth.otp.err.send'));
+        } else if (d && d.emailStatus === 'cooldown') {
+          olErr(N.t('auth.otp.cooldown').replace('{s}', String(d.resendAfterSeconds || 60)));
+        } else {
+          olErr('');
+          N.toast(toastEl, N.t('auth.verify.sent'));
+        }
       })
       .catch((err) => {
         otpLoginResend.disabled = false;
@@ -758,11 +783,16 @@
     if (forgotResend.disabled || !resetEmail) return;
     forgotResend.disabled = true;
     N.api('/api/auth?action=forgot-password', { method: 'POST', body: { email: resetEmail } })
-      .then(() => {
+      .then((d) => {
         forgotResend.disabled = false;
         resetOtpCode = null;
         if (forgotStage === 'pwd') setForgotStage('otp');
-        N.toast(toastEl, N.t('auth.verify.sent'));
+        if (d && d.emailStatus === 'failed') {
+          fpErr(N.t('auth.verify.err.sent'));
+        } else {
+          fpErr('');
+          N.toast(toastEl, N.t('auth.verify.sent'));
+        }
       })
       .catch((err) => {
         forgotResend.disabled = false;
