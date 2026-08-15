@@ -1145,26 +1145,27 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
 }
 
 /* OTP delivery guidance — prominent info box (shared component on every
-   OTP screen). Keeps .field-hint on the inner text so it stays a real
-   hint element; the box itself adds the info icon + tinted container. */
+   OTP screen). Two logical columns only: icon (::before) + one message
+   content block (.field-hint). The text is a single flex child so it flows
+   naturally — never per-word flex/grid items. */
 .otp-info {
-  position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 11px;
+  gap: 12px;
   margin: 4px 0 20px;
   padding: 12px 14px;
   border-radius: 12px;
   background: color-mix(in srgb, var(--accent) 7%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
   color: var(--text-soft);
 }
+.otp-info[hidden] { display: none; }
 .otp-info::before {
   content: 'i';
   flex: none;
   width: 19px;
   height: 19px;
-  margin-top: 1px;
+  margin-top: 2px;
   border-radius: 50%;
   border: 1.5px solid var(--accent);
   color: var(--accent);
@@ -1176,42 +1177,50 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
   place-items: center;
   box-shadow: 0 0 12px rgba(94, 162, 255, .28);
 }
-.otp-info .field-hint,
-.otp-info .otp-info-t {
+.otp-info .field-hint {
+  flex: 1 1 0%;
+  min-width: 0;
   margin: 0;
   font-size: .78rem;
   line-height: 1.55;
   color: var(--text-soft);
 }
-.otp-info strong,
-.otp-info .field-hint strong,
-.otp-info .otp-info-t strong { color: var(--text); font-weight: 600; }
-.otp-info.field-hint { margin-top: 4px; }
+.otp-info strong { color: var(--text); font-weight: 600; }
 
-/* Secondary auth steps — subtle Back action (icon + label, keyboard friendly) */
+/* Secondary auth steps — compact Back action (icon + label). Content-width,
+   transparent at rest; a subtle border/background highlight appears only on
+   hover / keyboard focus / active. Keyboard focus stays clearly visible. */
 .auth-back {
   display: inline-flex;
   align-items: center;
+  align-self: flex-start;
   gap: 7px;
   margin: 0 0 22px;
-  padding: 8px 13px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--surface-1);
+  padding: 6px 14px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
   color: var(--text-soft);
   font-size: .82rem;
   font-weight: 500;
   cursor: pointer;
-  transition: color .25s var(--ease), border-color .25s var(--ease), background .25s var(--ease), transform .25s var(--ease);
+  transition: color .2s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
 }
-.auth-back svg { width: 15px; height: 15px; flex: none; }
-.auth-back:hover {
+.auth-back svg { width: 15px; height: 15px; flex: none; color: var(--text-muted); }
+.auth-back:hover,
+.auth-back:focus-visible,
+.auth-back:active {
   color: var(--text);
-  border-color: var(--border-strong);
-  background: var(--surface-2);
-  transform: translateX(-2px);
+  border-color: var(--border);
+  background: var(--surface-1);
 }
-html[dir="rtl"] .auth-back:hover { transform: translateX(2px); }
+.auth-back:hover svg,
+.auth-back:focus-visible svg,
+.auth-back:active svg { color: var(--text-soft); }
+.auth-back:focus-visible {
+  outline: 2px solid rgba(94, 162, 255, .6);
+  outline-offset: 2px;
+}
 html[dir="rtl"] .auth-back svg { transform: scaleX(-1); }
 .field input.field-invalid,
 .field select.field-invalid,

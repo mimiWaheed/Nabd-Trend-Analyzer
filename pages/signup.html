@@ -152,7 +152,9 @@
             <input type="text" id="suOtp" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" spellcheck="false" aria-describedby="suOtpMsg">
             <p class="field-msg" id="suOtpMsg" role="alert"></p>
           </div>
-          <p class="field-hint otp-info" data-i18n-html="auth.otp.hint"><strong>Can't find your OTP?</strong> Check your <strong>Spam or Junk</strong> folder. Depending on your email provider, the message may also appear under <strong>Promotions or Other</strong>.</p>
+          <div class="otp-info">
+            <span class="field-hint" data-i18n-html="auth.otp.hint"><strong>Can't find your OTP?</strong> Check your <strong>Spam or Junk</strong> folder. Depending on your email provider, the message may also appear under <strong>Promotions or Other</strong>.</span>
+          </div>
           <p class="auth-error" id="otpError"></p>
           <button type="submit" class="btn btn-primary auth-submit" data-i18n="auth.verify.btn">Verify</button>
         </form>

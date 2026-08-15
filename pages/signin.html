@@ -133,7 +133,9 @@
             <input type="text" id="fpOtp" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" spellcheck="false" aria-describedby="fpOtpMsg">
             <p class="field-msg" id="fpOtpMsg" role="alert"></p>
           </div>
-          <p class="field-hint otp-info" id="fpOtpHint" data-i18n-html="auth.otp.hint" hidden><strong>Can't find your OTP?</strong> Check your <strong>Spam or Junk</strong> folder. Depending on your email provider, the message may also appear under <strong>Promotions or Other</strong>.</p>
+          <div class="otp-info" hidden>
+            <span class="field-hint" id="fpOtpHint" data-i18n-html="auth.otp.hint" hidden><strong>Can't find your OTP?</strong> Check your <strong>Spam or Junk</strong> folder. Depending on your email provider, the message may also appear under <strong>Promotions or Other</strong>.</span>
+          </div>
           <div id="fpPwdSection" hidden>
             <div class="field" id="fpPwdField">
               <label for="fpPwd" data-i18n="auth.reset.pass">New password</label>
@@ -237,7 +239,9 @@
             <input type="text" id="olOtp" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" spellcheck="false" aria-describedby="olOtpMsg">
             <p class="field-msg" id="olOtpMsg" role="alert"></p>
           </div>
-          <p class="field-hint otp-info" data-i18n-html="auth.otp.hint"><strong>Can't find your OTP?</strong> Check your <strong>Spam or Junk</strong> folder. Depending on your email provider, the message may also appear under <strong>Promotions or Other</strong>.</p>
+          <div class="otp-info">
+            <span class="field-hint" data-i18n-html="auth.otp.hint"><strong>Can't find your OTP?</strong> Check your <strong>Spam or Junk</strong> folder. Depending on your email provider, the message may also appear under <strong>Promotions or Other</strong>.</span>
+          </div>
           <label class="check" style="margin:0 0 18px">
             <input type="checkbox" id="olRemember">
             <span class="box" aria-hidden="true"></span>

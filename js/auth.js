@@ -637,7 +637,12 @@
     if (s === 'pwd') revealEl(pwdSection); else hideEl(pwdSection);
     if (resendRow) resendRow.hidden = s === 'email';
     const fpHint = $('fpOtpHint');
-    if (fpHint) fpHint.hidden = s === 'email';
+    if (fpHint) {
+      const fpHintBox = fpHint.closest('.otp-info');
+      const isEmail = s === 'email';
+      fpHint.hidden = isEmail;
+      if (fpHintBox) fpHintBox.hidden = isEmail;
+    }
     if (forgotSubmit) {
       forgotSubmit.textContent = s === 'pwd' ? N.t('auth.reset.submit') : (s === 'otp' ? N.t('auth.reset.next') : N.t('auth.forgot.send'));
     }
