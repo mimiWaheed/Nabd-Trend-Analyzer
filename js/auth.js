@@ -332,6 +332,8 @@
     function showOtp(email) {
       pendingEmail = email;
       if (signupForm) signupForm.style.display = 'none';
+      const goSignin = $('goSignin');
+      if (goSignin) goSignin.hidden = true;
       if (otpWrap) {
         const em = $('otpEmail');
         if (em) em.textContent = email;
@@ -398,6 +400,8 @@
     if (otpStepBack) otpStepBack.addEventListener('click', () => {
       if (otpWrap) otpWrap.hidden = true;
       if (signupForm) signupForm.style.display = '';
+      const goSignin = $('goSignin');
+      if (goSignin) goSignin.hidden = false;
       setOtpError('');
       if (suEmail) suEmail.focus();
     });
