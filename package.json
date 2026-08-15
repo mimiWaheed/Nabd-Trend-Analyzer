@@ -9,7 +9,7 @@
   "scripts": {
     "start": "vercel dev",
     "dev": "node dev-server.js",
-    "test": "node tests/parser.test.js && node tests/metrics-node.test.js && node tests/e2e-dashboard.test.js && node tests/workflow-validation.test.js && node tests/api-meta.test.js && node tests/auth-api.test.js && node tests/auth-improvements.test.js && node tests/store-createuser.test.js && node tests/legal-pages.test.js && node tests/ui/profile-settings.test.js"
+    "test": "node tests/parser.test.js && node tests/metrics-node.test.js && node tests/e2e-dashboard.test.js && node tests/workflow-validation.test.js && node tests/api-meta.test.js && node tests/auth-api.test.js && node tests/auth-improvements.test.js && node tests/store-createuser.test.js && node tests/legal-pages.test.js && node tests/ui/profile-settings.test.js && node tests/ui/otp-hint.test.js"
   },
   "devDependencies": {
     "jsdom": "^24.1.0",
