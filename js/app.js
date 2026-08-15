@@ -304,6 +304,7 @@
     const fbBtn = $('dbFbBtn');
     const fbChip = $('dbFbChip');
     const resetBtn = $('dbResetBtn');
+    const exportBtn = $('dbExportBtn');
     const scanText = $('dbScanText');
     const scanSteps = $('dbScanSteps');
     const queryEl = $('dbQuery');
@@ -474,6 +475,23 @@
       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
     }
 
+    /* ---------- report export → dedicated PDF-ready page ---------- */
+    function startExport() {
+      if (analysisState !== 'success' || !lastResult) { T('app.toast.noexport'); return; }
+      const draft = {
+        q: query,
+        t: Date.now(),
+        r: Object.assign({}, lastResult, {
+          articles: (Array.isArray(lastResult.articles) ? lastResult.articles.slice(0, 30) : []),
+          raw: undefined
+        })
+      };
+      let saved = false;
+      try { window.sessionStorage.setItem('nabd-export', JSON.stringify(draft)); saved = true; } catch (e) {}
+      if (!saved) { T('app.toast.exported'); return; }
+      N.navigate('export.html');
+    }
+
     function submit() {
       if (running) return;
       const q = (input ? input.value : '').trim();
@@ -495,6 +513,7 @@
       });
     }
     if (resetBtn) resetBtn.addEventListener('click', () => { resetToPreview(); T('ws.toast.new'); });
+    if (exportBtn) exportBtn.addEventListener('click', startExport);
 
     /* ---------- Facebook connector (real state via N.fb layer) ---------- */
     const fbDis = $('dbFbDis');
@@ -555,7 +574,7 @@
         const act = c.dataset.qa;
         if (act === 'new') { resetToPreview(); T('ws.toast.new'); }
         else if (act === 'saved') runAnalysis(L('dash.fav.q1'));
-        else if (act === 'export') T('app.toast.exported');
+        else if (act === 'export') startExport();
         else if (act === 'alert') T('app.toast.alert');
       });
     });

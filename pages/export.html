@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NABD (نبض) - analysis report: printable PDF export of your latest intelligence analysis.">
+  <title>Report - NABD (نبض)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%235EA2FF'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%23070B14'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('nabd-theme') || 'dark';
+        if (t === 'system') t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+        var l = localStorage.getItem('nabd-lang') || 'en';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('lang', l);
+        document.documentElement.setAttribute('dir', l === 'ar' ? 'rtl' : 'ltr');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/export.css">
+</head>
+<body class="export-page">
+
+  <div class="exp-toolbar" id="expToolbar">
+    <a class="exp-back" href="dashboard.html" data-page="dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 5-7 7 7 7"/></svg>
+      <span data-i18n="export.back">Back to dashboard</span>
+    </a>
+    <div class="exp-tools">
+      <label class="exp-lang-label mono" data-i18n="export.lang">Report language</label>
+      <button type="button" class="lang-toggle" aria-label="Switch language">العربية</button>
+      <button type="button" class="btn btn-primary btn-sm" id="expPrint">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg>
+        <span data-i18n="export.print">Download PDF</span>
+      </button>
+    </div>
+  </div>
+
+  <main class="exp-main" id="expMain">
+
+    <!-- no draft on hand -->
+    <div class="exp-empty" id="expEmpty" hidden>
+      <span class="exp-empty-ic" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>
+      </span>
+      <h2 class="card-title" data-i18n="export.noData.t">No report to export</h2>
+      <p data-i18n="export.noData.s">Run an analysis on the dashboard first — your latest results will appear here.</p>
+      <a class="btn btn-primary btn-sm" href="dashboard.html" data-page="dashboard.html" data-i18n="export.goDashboard">Go to dashboard</a>
+    </div>
+
+    <!-- the report itself -->
+    <article class="exp-report" id="report" hidden>
+
+      <header class="rep-head">
+        <div class="rep-brand">
+          <span class="app-logo" aria-hidden="true">N</span>
+          <div class="rep-brand-txt">
+            <div class="rep-brand-name">NABD <span class="grad">نبض</span></div>
+            <div class="rep-brand-sub mono" data-i18n="export.sub">NABD INTELLIGENCE · PDF EXPORT</div>
+          </div>
+        </div>
+        <div class="rep-head-meta">
+          <div class="rep-query-line">
+            <span class="rep-query-label mono" data-i18n="ws.querylabel">TRACKING</span>
+            <span class="rep-query" id="repQuery"></span>
+          </div>
+          <div class="rep-generated mono" id="repGenerated"></div>
+        </div>
+      </header>
+
+      <div class="ws-grid rep-grid">
+
+        <!-- AI brief -->
+        <div class="ws-card summary-card">
+          <div class="summary-orb" aria-hidden="true">
+            <span></span><span></span><span></span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12a10 10 0 0 1 10-10"/><path d="M2 12a10 10 0 0 0 10 10"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 2a10 10 0 0 0 0 20"/></svg>
+          </div>
+          <div class="summary-body">
+            <div class="summary-head">
+              <h2 class="card-title" id="repBriefTitle">Analysis report</h2>
+              <div class="summary-meta mono">
+                <span class="live-badge"><span class="live-dot"></span> <span data-i18n="ws.brief">AI BRIEF</span></span>
+                <span id="repMeta1" hidden></span>
+                <span id="repMeta2" hidden></span>
+                <span id="repMeta3" hidden></span>
+              </div>
+            </div>
+            <div class="summary-text" id="repSummary"></div>
+            <div class="empty-state" id="repEmptySummary" hidden><p data-i18n="ws.sum.na">No AI brief returned for this query — signals are still displayed below.</p></div>
+            <div class="summary-chips" id="repChips" hidden></div>
+          </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="ws-card kpi-card">
+          <div class="kpi-head">
+            <span class="kpi-label" data-i18n="ws.kpi.posts">RESOURCES ANALYZED</span>
+            <span class="delta" id="repKpiPostsDelta">—</span>
+          </div>
+          <div class="kpi-value" id="repKpiPosts">—</div>
+        </div>
+        <div class="ws-card kpi-card">
+          <div class="kpi-head">
+            <span class="kpi-label" data-i18n="ws.kpi.active">ACTIVE TOPICS</span>
+            <span class="delta" id="repKpiActiveDelta">—</span>
+          </div>
+          <div class="kpi-value" id="repKpiActive">—</div>
+        </div>
+        <div class="ws-card kpi-card">
+          <div class="kpi-head">
+            <span class="kpi-label" data-i18n="ws.kpi.sentiment">OVERALL SENTIMENT</span>
+            <span class="delta" id="repKpiSentDelta">—</span>
+          </div>
+          <div class="kpi-value" id="repKpiSentiment">—</div>
+        </div>
+        <div class="ws-card kpi-card">
+          <div class="kpi-head">
+            <span class="kpi-label" data-i18n="ws.kpi.emergency">EMERGENCY ALERTS</span>
+            <span class="delta" id="repKpiCrisesDelta">—</span>
+          </div>
+          <div class="kpi-value" id="repKpiCrises">—</div>
+        </div>
+
+        <!-- Regional intelligence -->
+        <div class="ws-card card gov-card">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title" data-i18n="ws.regional.t">Regional intelligence</h3>
+              <p class="card-sub mono" data-i18n="ws.regional.s">DETECTED LOCATIONS FROM THIS ANALYSIS</p>
+            </div>
+          </div>
+          <div class="region-grid" id="repRegions"></div>
+          <div class="empty-state" id="repNational" hidden><p data-i18n="ws.loc.egypt">Egypt</p><p class="mono" data-i18n="ws.national.s">Egypt-wide signal</p></div>
+          <div class="empty-state" id="repEmptyLocations" hidden><p data-i18n="ws.loc.na">No city-level geographic data available for this query.</p></div>
+        </div>
+
+        <!-- Trending topics -->
+        <div class="ws-card card topics-card">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title" data-i18n="ws.topics.t">Trending topics</h3>
+              <p class="card-sub" data-i18n="ws.topics.s2">RANKED BY SEVERITY</p>
+            </div>
+          </div>
+          <div class="trend-list" id="repTrendList"></div>
+          <div class="empty-state" id="repEmptyTopics" hidden><p data-i18n="ws.nodata">No data available</p></div>
+        </div>
+
+        <!-- Top keywords -->
+        <div class="ws-card card kw-card">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title" data-i18n="ws.kw.t">Top keywords</h3>
+              <p class="card-sub" data-i18n="ws.kw.s">DETERMINISTIC · COMPUTED FROM AGGREGATION</p>
+            </div>
+          </div>
+          <div class="src-list" id="repKwList"></div>
+          <div class="empty-state" id="repEmptyKw" hidden><p data-i18n="ws.nodata">No data available</p></div>
+        </div>
+
+        <!-- Top phrases -->
+        <div class="ws-card card ph-card">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title" data-i18n="ws.ph.t">Top phrases</h3>
+              <p class="card-sub" data-i18n="ws.ph.s">EMERGING 2–3 WORD PHRASES</p>
+            </div>
+          </div>
+          <div class="src-list" id="repPhList"></div>
+          <div class="empty-state" id="repEmptyPh" hidden><p data-i18n="ws.nodata">No data available</p></div>
+        </div>
+
+        <!-- Hashtags -->
+        <div class="ws-card card ht-card">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title" data-i18n="ws.ht.t">Hashtags</h3>
+              <p class="card-sub" data-i18n="ws.ht.s">EXTRACTED FROM SIGNALS</p>
+            </div>
+          </div>
+          <div class="ht-wrap" id="repHtList"></div>
+          <div class="empty-state" id="repEmptyHt" hidden><p data-i18n="ws.nodata">No data available</p></div>
+        </div>
+
+        <!-- Historical trend strength -->
+        <div class="ws-card card chart-card timeline-card">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title" data-i18n="ws.timeline.t">Historical trend strength</h3>
+              <p class="card-sub" data-i18n="ws.timeline.s">WEEKLY TREND INDEX · SIGNAL VOLUME</p>
+            </div>
+          </div>
+          <div class="chart-body">
+            <div class="exp-trend" id="repTrendChart" role="img" aria-label="Trend"></div>
+            <div class="empty-state" id="repEmptyTrend" hidden><p data-i18n="ws.timeline.na">No timestamped historical trend data available for this query.</p></div>
+          </div>
+        </div>
+
+        <!-- Sentiment donut -->
+        <div class="ws-card card donut-card">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title" data-i18n="ws.donut.t">Sentiment split</h3>
+              <p class="card-sub mono" id="repSentSub" data-i18n="ws.sent.sub"></p>
+            </div>
+          </div>
+          <div class="donut-wrap">
+            <div class="donut" id="repDonut"></div>
+            <div class="donut-legend" id="repDonutLegend">
+              <div class="legend-row"><span class="legend-dot" style="--c:#35D07F"></span> <span data-i18n="ws.donut.pos">Positive</span> <b>—</b></div>
+              <div class="legend-row"><span class="legend-dot" style="--c:#7A8BB5"></span> <span data-i18n="ws.donut.neu">Neutral</span> <b>—</b></div>
+              <div class="legend-row"><span class="legend-dot" style="--c:#F45D5D"></span> <span data-i18n="ws.donut.neg">Negative</span> <b>—</b></div>
+            </div>
+            <div class="empty-state" id="repEmptySentiment" hidden><p data-i18n="ws.sent.na">Sentiment data unavailable</p></div>
+          </div>
+        </div>
+
+        <!-- Live feed -->
+        <div class="ws-card card feed-card">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title" data-i18n="ws.feed.t">Live feed</h3>
+              <p class="card-sub" data-i18n="ws.feed.s2">REAL SOURCES · CLICK TO OPEN</p>
+            </div>
+          </div>
+          <span class="live-badge mono" style="margin-top:-2px"><span class="live-dot"></span> LIVE</span>
+          <div class="exp-feed" id="repFeedList"></div>
+          <div class="empty-state" id="repEmptyFeed" hidden><p data-i18n="ws.feed.na">No live signals returned for this query.</p></div>
+        </div>
+
+        <!-- AI highlights -->
+        <div class="ws-card card hl-card">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title" data-i18n="ws.hl.t">AI highlights</h3>
+              <p class="card-sub" data-i18n="ws.hl.s">GENERATED THIS CYCLE</p>
+            </div>
+          </div>
+          <div class="hl-list" id="repHlList"></div>
+          <div class="empty-state" id="repEmptyHl" hidden><p data-i18n="ws.hl.na">No AI highlights generated for this query.</p></div>
+        </div>
+
+        <!-- Influencers -->
+        <div class="ws-card card inf-card">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title" data-i18n="ws.inf.t">Influencers</h3>
+              <p class="card-sub" data-i18n="ws.inf.s">TOP VOICES THIS HOUR</p>
+            </div>
+          </div>
+          <div class="rank-list" id="repRankList"></div>
+          <div class="empty-state" id="repEmptyInf" hidden><p data-i18n="ws.influencers.na">No influencers identified in this analysis.</p></div>
+        </div>
+
+        <!-- Sources -->
+        <div class="ws-card card src-card">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title" data-i18n="ws.src.t">Sources</h3>
+              <p class="card-sub" data-i18n="ws.src.s2">PUBLISHERS FROM THIS ANALYSIS</p>
+            </div>
+          </div>
+          <div class="src-list" id="repSrcList"></div>
+          <div class="empty-state" id="repEmptySrc" hidden><p data-i18n="ws.src.na">No source data available for this analysis.</p></div>
+        </div>
+
+        <!-- Signal health -->
+        <div class="ws-card card health-card">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title" data-i18n="ws.health.t">Signal health</h3>
+              <p class="card-sub" data-i18n="ws.health.s">MOMENTUM · STRENGTH · DIVERSITY · FRESHNESS · RELEVANCE · COVERAGE</p>
+            </div>
+          </div>
+          <div class="health-grid" id="repHealthGrid"></div>
+          <div class="empty-state" id="repEmptyHealth" hidden><p data-i18n="ws.nodata">No data available</p></div>
+        </div>
+
+      </div>
+
+      <footer class="ws-foot">
+        <p class="mono" data-i18n="ws.foot">NABD INTELLIGENCE · REAL-TIME ANALYSIS</p>
+      </footer>
+
+    </article>
+  </main>
+
+  <script src="../js/script.js"></script>
+  <script src="../js/export.js"></script>
+</body>
+</html>

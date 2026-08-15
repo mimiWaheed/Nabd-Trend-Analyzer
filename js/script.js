@@ -329,6 +329,19 @@
       'app.toast.conn': 'Demo mode — connection mocked.',
       'app.toast.signedout': 'Signed out.', 'app.toast.copied': 'Copied to clipboard.',
       'app.toast.moved': 'Moved to folder.', 'app.toast.folder': 'Folder created.',
+      'app.toast.noexport': 'Run an analysis first — then export its report.',
+
+      /* report export */
+      'export.back': 'Back to dashboard', 'export.title': 'Analysis report',
+      'export.sub': 'NABD INTELLIGENCE · PDF EXPORT',
+      'export.print': 'Download PDF', 'export.generated': 'Generated',
+      'export.lang': 'Report language', 'export.noData.t': 'No report to export',
+      'export.noData.s': 'Run an analysis on the dashboard first — your latest results will appear here.',
+      'export.goDashboard': 'Go to dashboard', 'export.printHint': 'Choose “Save as PDF” in the print dialog.',
+      'export.h.momentum': 'Momentum', 'export.h.signal': 'Signal strength',
+      'export.h.diversity': 'Source diversity', 'export.h.freshness': 'Freshness',
+      'export.h.relevance': 'Relevance', 'export.h.coverage': 'Coverage',
+      'export.score': 'Score', 'export.top': 'top', 'export.recent': 'recent', 'export.articles': 'articles',
 
       /* dashboard */
       'dash.qa': 'Quick actions',
@@ -825,6 +838,19 @@
       'app.toast.conn': 'وضع تجريبي — الاتصال محاكى.',
       'app.toast.signedout': 'تم تسجيل الخروج.', 'app.toast.copied': 'تم النسخ إلى الحافظة.',
       'app.toast.moved': 'تم النقل إلى المجلد.', 'app.toast.folder': 'تم إنشاء المجلد.',
+      'app.toast.noexport': 'شغّل تحليلًا أولًا ثم صدّر تقريره.',
+
+      /* report export */
+      'export.back': 'العودة إلى لوحة التحكم', 'export.title': 'تقرير التحليل',
+      'export.sub': 'ذكاء نبض · تصدير PDF',
+      'export.print': 'تنزيل PDF', 'export.generated': 'أُنشئ في',
+      'export.lang': 'لغة التقرير', 'export.noData.t': 'لا يوجد تقرير للتصدير',
+      'export.noData.s': 'شغّل تحليلًا من لوحة التحكم أولًا — ستظهر أحدث نتائجك هنا.',
+      'export.goDashboard': 'الانتقال إلى لوحة التحكم', 'export.printHint': 'اختر “حفظ كملف PDF” في نافذة الطباعة.',
+      'export.h.momentum': 'الزخم', 'export.h.signal': 'قوة الإشارة',
+      'export.h.diversity': 'تنوع المصادر', 'export.h.freshness': 'حداثة المعلومات',
+      'export.h.relevance': 'الملاءمة', 'export.h.coverage': 'التغطية',
+      'export.score': 'الدرجة', 'export.top': 'الأعلى', 'export.recent': 'حديث', 'export.articles': 'مقال',
 
       /* dashboard */
       'dash.qa': 'إجراءات سريعة',
