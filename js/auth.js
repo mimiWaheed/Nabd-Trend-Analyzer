@@ -393,6 +393,15 @@
         });
     });
 
+    /* back to the signup form — keep the pending email so the code can be re-sent later */
+    const otpStepBack = $('otpStepBack');
+    if (otpStepBack) otpStepBack.addEventListener('click', () => {
+      if (otpWrap) otpWrap.hidden = true;
+      if (signupForm) signupForm.style.display = '';
+      setOtpError('');
+      if (suEmail) suEmail.focus();
+    });
+
     /* open the OTP step directly when arriving with ?verify=<email> */
     (function () {
       try {
@@ -810,11 +819,27 @@
     resetOtpCode = null;
     setForgotStage('email');
     showStep(forgotStep);
-    if (fpEmail) fpEmail.focus();
+    if (fpEmail) {
+      if (!fpEmail.value && siEmail && siEmail.value) fpEmail.value = siEmail.value;
+      fpEmail.focus();
+    }
   });
-  [['otpLoginBack', signinStep], ['otpLoginVerifyBack', signinStep], ['forgotBack', signinStep], ['resetOkBack', signinStep]].forEach(([id, target]) => {
+  [['otpLoginBack', signinStep], ['forgotBack', signinStep], ['resetOkBack', signinStep]].forEach(([id, target]) => {
     const b = $(id);
     if (b) b.addEventListener('click', (e) => { e.preventDefault(); showStep(target); });
+  });
+
+  /* verify → request: back to the email screen with the address prefilled */
+  const otpLoginVerifyBack = $('otpLoginVerifyBack');
+  if (otpLoginVerifyBack) otpLoginVerifyBack.addEventListener('click', (e) => {
+    e.preventDefault();
+    showStep(otpLoginRequest);
+    olErr('');
+    const em = $('olEmail');
+    if (em) {
+      if (otpLoginEmail && !em.value) em.value = otpLoginEmail;
+      em.focus();
+    }
   });
 
   /* ----------------------------------------------------------

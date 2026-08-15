@@ -999,15 +999,62 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
 .pwd-toggle:hover { color: var(--text); }
 .pwd-toggle svg { width: 18px; height: 18px; }
 .field-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 2px 0 22px; font-size: .85rem; flex-wrap: wrap; }
-.check { display: inline-flex; align-items: center; gap: 9px; color: var(--text-soft); cursor: pointer; user-select: none; }
+.check {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-soft);
+  cursor: pointer;
+  user-select: none;
+  font-size: .85rem;
+}
 .check input {
-  appearance: auto;
-  -webkit-appearance: auto;
-  accent-color: var(--accent);
-  width: 16px;
-  height: 16px;
+  position: absolute;
+  inset-inline-start: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  opacity: 0;
   cursor: pointer;
 }
+.check .box {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface-1);
+  display: grid;
+  place-items: center;
+  transition: border-color .25s var(--ease), background .25s var(--ease), box-shadow .25s var(--ease), transform .2s var(--ease);
+}
+.check .box::after {
+  content: '';
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg) scale(0);
+  transition: transform .2s var(--ease);
+}
+.check:hover .box {
+  border-color: rgba(94, 162, 255, .55);
+  background: rgba(94, 162, 255, .08);
+}
+.check input:checked + .box {
+  background: var(--grad);
+  border-color: transparent;
+  box-shadow: 0 0 14px rgba(94, 162, 255, .45);
+}
+.check input:checked + .box::after { transform: rotate(-45deg) scale(1); }
+.check input:focus-visible + .box {
+  outline: 2px solid rgba(94, 162, 255, .75);
+  outline-offset: 2px;
+}
+.check input:disabled + .box { opacity: .5; cursor: default; }
 .link-soft { color: var(--accent); font-weight: 500; }
 .link-soft:hover { text-decoration: underline; }
 .auth-submit { width: 100%; margin-top: 4px; }
@@ -1096,6 +1143,76 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
   line-height: 1.45;
   color: var(--text-muted);
 }
+
+/* OTP delivery guidance — prominent info box (shared component on every
+   OTP screen). Keeps .field-hint on the inner text so it stays a real
+   hint element; the box itself adds the info icon + tinted container. */
+.otp-info {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin: 4px 0 20px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--text-soft);
+}
+.otp-info::before {
+  content: 'i';
+  flex: none;
+  width: 19px;
+  height: 19px;
+  margin-top: 1px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 12px rgba(94, 162, 255, .28);
+}
+.otp-info .field-hint,
+.otp-info .otp-info-t {
+  margin: 0;
+  font-size: .78rem;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+.otp-info strong,
+.otp-info .field-hint strong,
+.otp-info .otp-info-t strong { color: var(--text); font-weight: 600; }
+.otp-info.field-hint { margin-top: 4px; }
+
+/* Secondary auth steps — subtle Back action (icon + label, keyboard friendly) */
+.auth-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 22px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-soft);
+  font-size: .82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color .25s var(--ease), border-color .25s var(--ease), background .25s var(--ease), transform .25s var(--ease);
+}
+.auth-back svg { width: 15px; height: 15px; flex: none; }
+.auth-back:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+  transform: translateX(-2px);
+}
+html[dir="rtl"] .auth-back:hover { transform: translateX(2px); }
+html[dir="rtl"] .auth-back svg { transform: scaleX(-1); }
 .field input.field-invalid,
 .field select.field-invalid,
 .field textarea.field-invalid {
@@ -1109,7 +1226,11 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
   border-color: rgba(94, 162, 255, .6);
   box-shadow: 0 0 0 3px rgba(94, 162, 255, .18);
 }
-.check input.field-invalid { outline: 2px solid rgba(244, 93, 93, .6); outline-offset: 2px; }
+.check input.field-invalid + .box {
+  outline: 2px solid rgba(244, 93, 93, .6);
+  outline-offset: 2px;
+  border-color: rgba(244, 93, 93, .55);
+}
 
 /* password strength meter */
 .pwd-strength {

@@ -86,6 +86,7 @@
           <div class="field-row">
             <label class="check">
               <input type="checkbox" id="siRemember">
+              <span class="box" aria-hidden="true"></span>
               <span data-i18n="auth.remember">Remember me</span>
             </label>
             <a class="link-soft" href="#forgotStep" id="forgotLink" data-i18n="auth.forgot">Forgot password?</a>
@@ -111,6 +112,10 @@
       <!--  FORGOT PASSWORD (email → OTP → new password)                 -->
       <!-- ============================================================ -->
       <div class="auth-otp" id="forgotStep" hidden>
+        <button type="button" class="auth-back" id="forgotBack">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+          <span data-i18n="auth.back.to.signin">Back to sign in</span>
+        </button>
         <a class="auth-logo" href="../index.html" data-page="../index.html" aria-label="NABD home">
           <span class="brand-orb"><span class="brand-orb-core"></span></span>
           <span class="brand-name" data-i18n="brand">NABD</span>
@@ -128,7 +133,7 @@
             <input type="text" id="fpOtp" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" spellcheck="false" aria-describedby="fpOtpMsg">
             <p class="field-msg" id="fpOtpMsg" role="alert"></p>
           </div>
-          <p class="field-hint" id="fpOtpHint" data-i18n-html="auth.otp.hint" hidden><strong>Can't find your OTP?</strong> Check your <strong>Spam or Junk</strong> folder. Depending on your email provider, the message may also appear under <strong>Promotions or Other</strong>.</p>
+          <p class="field-hint otp-info" id="fpOtpHint" data-i18n-html="auth.otp.hint" hidden><strong>Can't find your OTP?</strong> Check your <strong>Spam or Junk</strong> folder. Depending on your email provider, the message may also appear under <strong>Promotions or Other</strong>.</p>
           <div id="fpPwdSection" hidden>
             <div class="field" id="fpPwdField">
               <label for="fpPwd" data-i18n="auth.reset.pass">New password</label>
@@ -169,26 +174,32 @@
           <span data-i18n="auth.verify.no">Didn't get a code?</span>
           <button type="button" class="link-soft" id="forgotResend" data-i18n="auth.verify.resend">Resend code</button>
         </p>
-        <p class="auth-switch"><a class="link-soft" href="#signinStep" id="forgotBack" data-i18n="auth.back.to.signin">Back to sign in</a></p>
       </div>
 
       <!-- ============================================================ -->
       <!--  RESET COMPLETE                                               -->
       <!-- ============================================================ -->
       <div class="auth-otp" id="resetOk" hidden>
+        <button type="button" class="auth-back" id="resetOkBack">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+          <span data-i18n="auth.back.to.signin">Back to sign in</span>
+        </button>
         <a class="auth-logo" href="../index.html" data-page="../index.html" aria-label="NABD home">
           <span class="brand-orb"><span class="brand-orb-core"></span></span>
           <span class="brand-name" data-i18n="brand">NABD</span>
         </a>
         <h2 class="auth-title" data-i18n="auth.reset.ok.t">Password updated</h2>
         <p class="auth-sub" data-i18n="auth.reset.ok.s">You can now sign in with your new password.</p>
-        <p class="auth-switch"><a class="link-soft" href="#signinStep" id="resetOkBack" data-i18n="auth.back.to.signin">Back to sign in</a></p>
       </div>
 
       <!-- ============================================================ -->
       <!--  CONTINUE WITH OTP — request code                             -->
       <!-- ============================================================ -->
       <div class="auth-otp" id="otpLoginRequest" hidden>
+        <button type="button" class="auth-back" id="otpLoginBack">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+          <span data-i18n="auth.back.to.signin">Back to sign in</span>
+        </button>
         <a class="auth-logo" href="../index.html" data-page="../index.html" aria-label="NABD home">
           <span class="brand-orb"><span class="brand-orb-core"></span></span>
           <span class="brand-name" data-i18n="brand">NABD</span>
@@ -204,13 +215,16 @@
           <p class="auth-error" id="otpLoginError"></p>
           <button type="submit" class="btn btn-primary auth-submit" id="otpLoginSend" data-i18n="auth.otp.send">Send code</button>
         </form>
-        <p class="auth-switch"><a class="link-soft" href="#signinStep" id="otpLoginBack" data-i18n="auth.back.to.signin">Back to sign in</a></p>
       </div>
 
       <!-- ============================================================ -->
       <!--  CONTINUE WITH OTP — verify code + sign in                    -->
       <!-- ============================================================ -->
       <div class="auth-otp" id="otpLoginVerify" hidden>
+        <button type="button" class="auth-back" id="otpLoginVerifyBack">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+          <span data-i18n="auth.back.to.request">Change email</span>
+        </button>
         <a class="auth-logo" href="../index.html" data-page="../index.html" aria-label="NABD home">
           <span class="brand-orb"><span class="brand-orb-core"></span></span>
           <span class="brand-name" data-i18n="brand">NABD</span>
@@ -223,9 +237,10 @@
             <input type="text" id="olOtp" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" spellcheck="false" aria-describedby="olOtpMsg">
             <p class="field-msg" id="olOtpMsg" role="alert"></p>
           </div>
-          <p class="field-hint" data-i18n-html="auth.otp.hint"><strong>Can't find your OTP?</strong> Check your <strong>Spam or Junk</strong> folder. Depending on your email provider, the message may also appear under <strong>Promotions or Other</strong>.</p>
+          <p class="field-hint otp-info" data-i18n-html="auth.otp.hint"><strong>Can't find your OTP?</strong> Check your <strong>Spam or Junk</strong> folder. Depending on your email provider, the message may also appear under <strong>Promotions or Other</strong>.</p>
           <label class="check" style="margin:0 0 18px">
             <input type="checkbox" id="olRemember">
+            <span class="box" aria-hidden="true"></span>
             <span data-i18n="auth.remember">Remember me</span>
           </label>
           <p class="auth-error" id="otpLoginVerifyError"></p>
@@ -235,7 +250,6 @@
           <span data-i18n="auth.verify.no">Didn't get a code?</span>
           <button type="button" class="link-soft" id="otpLoginResend" data-i18n="auth.verify.resend">Resend code</button>
         </p>
-        <p class="auth-switch"><a class="link-soft" href="#signinStep" id="otpLoginVerifyBack" data-i18n="auth.back.to.signin">Back to sign in</a></p>
       </div>
 
     </div>
