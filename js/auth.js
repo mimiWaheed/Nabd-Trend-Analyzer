@@ -14,32 +14,6 @@
   const errEl = $('authError');
 
   /* ----------------------------------------------------------
-     SELECTS — country + language
-     ---------------------------------------------------------- */
-  const COUNTRIES = ['eg', 'sa', 'ae', 'us', 'gb', 'de', 'fr', 'qa'];
-
-  function fillSelect(sel, values, tKey) {
-    if (!sel) return;
-    const prev = sel.value;
-    sel.innerHTML = '';
-    values.forEach((v) => {
-      const opt = document.createElement('option');
-      opt.value = v;
-      opt.textContent = N.t(tKey(v));
-      sel.appendChild(opt);
-    });
-    if (prev) sel.value = prev;
-  }
-
-  const countrySel = $('suCountry');
-  const langSel = $('suLang');
-  if (countrySel) fillSelect(countrySel, COUNTRIES, (v) => 'c.' + v);
-  if (langSel) {
-    fillSelect(langSel, ['en', 'ar'], (v) => 'lng.' + v);
-    langSel.value = N.lang;
-  }
-
-  /* ----------------------------------------------------------
      PASSWORD VISIBILITY TOGGLES
      ---------------------------------------------------------- */
   document.querySelectorAll('[data-pwd-toggle]').forEach((btn) => {
@@ -451,8 +425,7 @@
           password: suPwd.value,
           phone: suPhone.value,
           organization: (suOrg ? suOrg.value : '').trim(),
-          country: countrySel ? countrySel.value : '',
-          lang: langSel ? langSel.value : ''
+          lang: N.lang
         }
       }).then((d) => {
         showOtp(suEmail.value.trim());
@@ -855,11 +828,6 @@
      LANGUAGE SWITCH — keep inline validation state consistent
      ---------------------------------------------------------- */
   document.addEventListener('nabd-lang', () => {
-    if (countrySel) fillSelect(countrySel, COUNTRIES, (v) => 'c.' + v);
-    if (langSel) {
-      fillSelect(langSel, ['en', 'ar'], (v) => 'lng.' + v);
-      langSel.value = N.lang;
-    }
     if (errEl) errEl.textContent = '';
     renderStrength && renderStrength();
   });
