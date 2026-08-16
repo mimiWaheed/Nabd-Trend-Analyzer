@@ -84,16 +84,42 @@
           <div class="summary-body">
             <div class="summary-head">
               <h2 class="card-title" id="repBriefTitle">Analysis report</h2>
-              <div class="summary-meta mono">
-                <span class="live-badge"><span class="live-dot"></span> <span data-i18n="ws.brief">AI BRIEF</span></span>
-                <span id="repMeta1" hidden></span>
-                <span id="repMeta2" hidden></span>
-                <span id="repMeta3" hidden></span>
-              </div>
+                <div class="summary-meta mono">
+                  <span class="live-badge"><span class="live-dot"></span> <span data-i18n="ws.brief">AI BRIEF</span></span>
+                  <span class="gen-note" id="repGenNote" hidden></span>
+                </div>
             </div>
             <div class="summary-text" id="repSummary"></div>
             <div class="empty-state" id="repEmptySummary" hidden><p data-i18n="ws.sum.na">No AI brief returned for this query — signals are still displayed below.</p></div>
             <div class="summary-chips" id="repChips" hidden></div>
+          </div>
+        </div>
+
+        <!-- Suggested actions (kept at the top so they catch attention) -->
+        <div class="ws-card card actions-card">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title" data-i18n="ws.actions.t">Suggested actions</h3>
+              <p class="card-sub" data-i18n="ws.actions.s">QUICK ACTIONS FOR THIS ANALYSIS</p>
+            </div>
+          </div>
+          <div class="act-list" id="repActList">
+            <button type="button" class="act-btn act-primary" data-act="send">
+              <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg></span>
+              <span data-i18n="ws.actions.send">Send report to facility</span>
+            </button>
+            <button type="button" class="act-btn" data-act="save">
+              <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg></span>
+              <span data-i18n="ws.actions.save">Save report for later</span>
+            </button>
+            <button type="button" class="act-btn" data-act="share">
+              <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></span>
+              <span data-i18n="ws.actions.share">Export / share report</span>
+            </button>
+            <button type="button" class="act-btn" data-act="remind">
+              <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+              <span data-i18n="ws.reminder.set">Set reminder</span>
+            </button>
           </div>
         </div>
 
@@ -135,9 +161,7 @@
               <p class="card-sub mono" data-i18n="ws.regional.s">DETECTED LOCATIONS FROM THIS ANALYSIS</p>
             </div>
           </div>
-          <div class="region-grid" id="repRegions"></div>
-          <div class="empty-state" id="repNational" hidden><p data-i18n="ws.loc.egypt">Egypt</p><p class="mono" data-i18n="ws.national.s">Egypt-wide signal</p></div>
-          <div class="empty-state" id="repEmptyLocations" hidden><p data-i18n="ws.loc.na">No city-level geographic data available for this query.</p></div>
+          <div class="region-heat-wrap" id="repRegions"></div>
         </div>
 
         <!-- Trending topics -->
@@ -160,7 +184,7 @@
               <p class="card-sub" data-i18n="ws.kw.s">DETERMINISTIC · COMPUTED FROM AGGREGATION</p>
             </div>
           </div>
-          <div class="src-list" id="repKwList"></div>
+          <div class="vbar-chart" id="repKwList"></div>
           <div class="empty-state" id="repEmptyKw" hidden><p data-i18n="ws.nodata">No data available</p></div>
         </div>
 
@@ -172,7 +196,7 @@
               <p class="card-sub" data-i18n="ws.ph.s">EMERGING 2–3 WORD PHRASES</p>
             </div>
           </div>
-          <div class="src-list" id="repPhList"></div>
+          <div class="heat-grid" id="repPhList"></div>
           <div class="empty-state" id="repEmptyPh" hidden><p data-i18n="ws.nodata">No data available</p></div>
         </div>
 
@@ -242,8 +266,9 @@
               <p class="card-sub" data-i18n="ws.hl.s">GENERATED THIS CYCLE</p>
             </div>
           </div>
-          <div class="hl-list" id="repHlList"></div>
-          <div class="empty-state" id="repEmptyHl" hidden><p data-i18n="ws.hl.na">No AI highlights generated for this query.</p></div>
+            <div class="total-summary" id="repTotalSummary" hidden></div>
+            <div class="hl-list" id="repHlList"></div>
+            <div class="empty-state" id="repEmptyHl" hidden><p data-i18n="ws.hl.na">No AI highlights generated for this query.</p></div>
         </div>
 
         <!-- Influencers -->
@@ -266,8 +291,9 @@
               <p class="card-sub" data-i18n="ws.src.s2">PUBLISHERS FROM THIS ANALYSIS</p>
             </div>
           </div>
-          <div class="src-list" id="repSrcList"></div>
+          <div class="vbar-chart" id="repSrcList"></div>
           <div class="empty-state" id="repEmptySrc" hidden><p data-i18n="ws.src.na">No source data available for this analysis.</p></div>
+          <div id="repSrcFoot"></div>
         </div>
 
         <!-- Signal health -->
@@ -278,6 +304,7 @@
               <p class="card-sub" data-i18n="ws.health.s">MOMENTUM · STRENGTH · DIVERSITY · FRESHNESS · RELEVANCE · COVERAGE</p>
             </div>
           </div>
+          <div class="health-chart" id="repHealthChart" hidden></div>
           <div class="health-grid" id="repHealthGrid"></div>
           <div class="empty-state" id="repEmptyHealth" hidden><p data-i18n="ws.nodata">No data available</p></div>
         </div>

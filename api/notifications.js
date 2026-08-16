@@ -8,6 +8,7 @@ const { requireAuth } = require('../lib/auth');
 const storeApi = require('../lib/store');
 const { asyncBody, fail, ok, created, queryOf } = require('../lib/respond');
 const { randomToken, nowIso } = require('../lib/crypto');
+const mailer = require('../lib/mailer');
 
 const TYPES = ['ai', 'trend', 'system', 'reports', 'conn', 'export'];
 
@@ -106,6 +107,43 @@ async function actionReadAll(req, res) {
   return ok(res, { updated: true });
 }
 
+/* POST send-reminder — email the user a nudge for a query (set via the
+   dashboard reminder picker; the due alert is already in local storage). */
+async function actionSendReminder(req, res) {
+  if (req.method !== 'POST') return fail(res, 405, 'METHOD_NOT_ALLOWED');
+  const auth = await requireAuth(req, res);
+  if (!auth) return;
+
+  let body;
+  try { body = await asyncBody(req); } catch (e) { return fail(res, 400, e.code || 'BAD_REQUEST'); }
+  const query = String((body && body.query) || '').trim().slice(0, 300);
+  if (!query) return fail(res, 422, 'VALIDATION_ERROR', 'query is required');
+
+  const email = auth.user.email || String((body && body.email) || '').trim();
+  if (!email) return fail(res, 422, 'VALIDATION_ERROR', 'email is required');
+
+  const ar = String(auth.user.lang) === 'ar';
+  const escHtml = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const subject = ar ? 'تذكير — نبض: ' + query : 'NABD reminder — ' + query;
+  const text = ar
+    ? ('مرحبًا،\n\nهذا تذكيرك من نبض للمتابعة على:\n\n    ' + query + '\n\nافتح لوحة التحكم لاستكمال التحليل.\n\nفريق نبض')
+    : ('Hello,\n\nThis is your NABD reminder to check on:\n\n    ' + query + '\n\nOpen the dashboard to continue the analysis.\n\nThe NABD team');
+  const html = ar
+    ? '<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto"><h2 style="color:#0B1B33">نبض</h2><p>تذكيرك من نبض:</p><p style="font-size:16px;font-weight:600;color:#2563EB">' + escHtml(query) + '</p><p style="color:#555">افتح لوحة التحكم لاستكمال التحليل.</p></div>'
+    : '<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto"><h2 style="color:#0B1B33">NABD</h2><p>Your NABD reminder:</p><p style="font-size:16px;font-weight:600;color:#2563EB">' + escHtml(query) + '</p><p style="color:#555">Open the dashboard to continue the analysis.</p></div>';
+
+  let emailStatus = 'pending';
+  try {
+    const out = await mailer.sendMail({ to: email, subject, text, html });
+    emailStatus = out.mode;
+  } catch (e) {
+    emailStatus = 'failed';
+    if (typeof console !== 'undefined') console.log('[nabd-mail] reminder email to ' + email + ' failed: ' + (e && e.message));
+  }
+
+  return ok(res, { sent: true, emailStatus });
+}
+
 module.exports = async function handler(req, res) {
   const q = queryOf(req);
   let action = String(q.action || '');
@@ -115,6 +153,7 @@ module.exports = async function handler(req, res) {
     case 'create': return actionCreate(req, res);
     case 'read': return actionRead(req, res, q);
     case 'read-all': return actionReadAll(req, res);
+    case 'send-reminder': return actionSendReminder(req, res);
     default: return fail(res, 404, 'NOT_FOUND', 'Unknown notifications action: ' + (action || '(none)'));
   }
 };

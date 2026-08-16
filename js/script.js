@@ -103,6 +103,7 @@
       'ws.tab.day': '24H', 'ws.tab.week': '7D', 'ws.tab.month': '30D',
       'ws.donut.t': 'Sentiment split',
       'ws.donut.pos': 'Positive', 'ws.donut.neu': 'Neutral', 'ws.donut.neg': 'Negative',
+      'ws.pie.c': 'VOLUME',
       'ws.nodata': 'No data available',
       'ws.sent.na': 'Sentiment data unavailable',
       'ws.sent.sparse': 'Based on {n} signals — low volume, interpret with caution.',
@@ -299,6 +300,7 @@
       'app.crumb.app': 'App',
       'app.theme.light': 'Switch to light theme', 'app.theme.dark': 'Switch to dark theme',
       'app.st.done': 'Completed', 'app.st.running': 'Running', 'app.st.failed': 'Failed',
+      'app.st.remove': 'Remove',
       'app.cat.news': 'News', 'app.cat.social': 'Social', 'app.cat.gov': 'Government',
       'app.cat.sport': 'Sports', 'app.cat.business': 'Business',
       'app.soon': 'Coming soon',
@@ -330,6 +332,14 @@
       'app.toast.signedout': 'Signed out.', 'app.toast.copied': 'Copied to clipboard.',
       'app.toast.moved': 'Moved to folder.', 'app.toast.folder': 'Folder created.',
       'app.toast.noexport': 'Run an analysis first — then export its report.',
+      'app.toast.facility': 'Report queued to the responsive facility.',
+      'app.toast.savedReport': 'Report saved for later.',
+      'app.toast.fav': 'Added to favorites.',
+      'app.toast.favOff': 'Removed from favorites.',
+      'app.toast.email': 'Preparing your email…',
+      'app.toast.avatar': 'Profile photo updated.',
+      'app.toast.savedNotif': 'Saved report — re-run it from the Dashboard to view.',
+      'app.toast.savedFail': 'Could not save the report — it may be too large.',
 
       /* report export */
       'export.back': 'Back to dashboard', 'export.title': 'Analysis report',
@@ -342,11 +352,83 @@
       'export.h.diversity': 'Source diversity', 'export.h.freshness': 'Freshness',
       'export.h.relevance': 'Relevance', 'export.h.coverage': 'Coverage',
       'export.score': 'Score', 'export.top': 'top', 'export.recent': 'recent', 'export.articles': 'articles',
+      'ws.gen.note': 'generated {t} · {n} resources',
+      'ws.actions.t': 'Suggested actions',
+      'ws.actions.s': 'QUICK ACTIONS FOR THIS ANALYSIS',
+      'ws.actions.send': 'Send report to facility',
+      'ws.actions.save': 'Save report for later',
+      'ws.actions.share': 'Export / share report',
+      'ws.actions.pick': 'Send the report to a facility',
+      'ws.actions.pick.s': 'Choose a destination — the report will be drafted with their contact placeholder.',
+      'ws.actions.pick.to': 'Recipient email',
+      'ws.actions.pick.to.ph': 'facility@example.com',
+      'ws.actions.pick.body': 'Ready complaint draft',
+      'ws.actions.pick.send': 'Send report',
+      'ws.actions.pick.err': 'Enter a recipient email first.',
+      'ws.actions.fav': 'Add to favorites',
+      'ws.actions.fav.on': 'Added to favorites',
+      'ws.actions.fav.off': 'Removed from favorites',
+      'ws.fac.email.line1': 'NABD report for query "{q}"',
+      'ws.fac.email.line2': 'Generated {t}',
+      'ws.fac.email.line3': 'Brief: {b}',
+      'ws.fac.email.line4': 'Full report: {u}',
+      'ws.fac.email.line5': 'Dear team, we are flagging the signals detected by the NABD analysis of "{q}". Please review and take the necessary action.',
+      'ws.fac.email.sign': '— NABD (نبض)',
+      'ws.actions.close': 'Close',
+      'ws.src.more': 'Show all ({n})',
+      'ws.src.fewer': 'Show fewer',
+
+      /* overall analysis summary (generated from the real results) */
+      'ws.hl.total': 'Overall analysis summary',
+      'ws.total.momentum': 'Momentum is {dir} with a strength score of {score}.',
+      'ws.total.sentiment': 'The overall tone is {label} — {pos}% positive, {neu}% neutral, {neg}% negative.',
+      'ws.total.kw': 'Leading keyword: {kw}.',
+      'ws.total.coverage': '{art} resources from {src} sources were analyzed.',
+      'ws.total.crisis': 'Heads-up: {e} emergency signal(s) were flagged.',
+
+      /* reminder (create alert) */
+      'ws.reminder.t': 'Set a reminder',
+      'ws.reminder.s': 'Based on this analysis, we recommend checking again later.',
+      'ws.reminder.email': 'Reminder email',
+      'ws.reminder.12h': 'Check again in 12 hours',
+      'ws.reminder.24h': 'Check again in 24 hours',
+      'ws.reminder.2d': 'Check again in 2 days',
+      'ws.reminder.3d': 'Check again in 3 days',
+      'ws.reminder.1w': 'Check again in 1 week',
+      'ws.reminder.2w': 'Check again in 2 weeks',
+      'ws.reminder.1mo': 'Check again in 1 month',
+      'ws.reminder.alert.t': 'Create alert',
+      'ws.reminder.alert.s': 'NABD stores this report and emails you when it is time to check again.',
+      'ws.reminder.reco': 'RECOMMENDED',
+      'ws.reminder.set': 'Set reminder',
+      'ws.reminder.will': 'We will email you a reminder when it is due.',
+      'app.toast.reminder': 'Reminder set — we will email you when it is due.',
+      'app.toast.reminderErr': 'Could not set the reminder. Try again.',
+
+      /* report facilities */
+      'ws.facility.elec': 'Electricity companies',
+      'ws.facility.water': 'Water companies',
+      'ws.facility.gas': 'Gas companies',
+      'ws.facility.complaints': 'General complaints',
+      'ws.facility.hospitals': 'Hospitals',
+      'ws.facility.emergencies': 'Emergencies',
+      'ws.facility.police': 'Police stations',
+      'ws.facility.emergencynumbers': 'Emergency numbers',
 
       /* dashboard */
       'dash.qa': 'Quick actions',
       'dash.qa.new': 'New analysis', 'dash.qa.saved': 'Run saved search',
       'dash.qa.export': 'Export report', 'dash.qa.alert': 'Create alert',
+      'dash.qa.nav': 'Jump back in',
+      'dash.qa.nav.connections': 'Connect a source',
+      'dash.qa.nav.connections.d': 'Add Facebook or an n8n API',
+      'dash.qa.nav.settings': 'Open settings',
+      'dash.qa.nav.settings.d': 'Theme, language and more',
+      'dash.qa.nav.profile': 'View profile',
+      'dash.qa.nav.profile.d': 'Your details and activity',
+      'dash.qa.nav.history': 'Browse history',
+      'dash.qa.nav.history.d': 'Re-run past analyses',
+      'dash.suggest.t': 'Suggested for you',
       'dash.brief': 'Daily AI briefing', 'dash.brief.sub': 'EGYPT · PREPARED FOR YOU',
       'dash.brief.b1': 'Good morning. <strong>Economy</strong> leads today: Egyptian Pound strength is drawing inflows, inflation expectations are easing in Cairo, and Suez Canal volumes remain at record levels.',
       'dash.brief.b2': 'In <strong>society</strong>, the New Capital openings are dominating positive conversation, while staple-price chatter across the Delta needs monitoring. Two currency-rumor clusters flagged for review.',
@@ -404,6 +486,9 @@
       'rep.e1': 'Suez Canal dataset', 'rep.e2': 'Sentiment export — Cairo', 'rep.e3': 'Crisis event log',
       'rep.preview': 'Preview', 'rep.download': 'Download', 'rep.duplicate': 'Duplicate',
       'rep.share': 'Share', 'rep.delete': 'Delete',
+      'rep.saved.empty': 'No saved reports yet — save one from the dashboard.',
+      'rep.open': 'Open',
+      'rep.downloaded': 'Download recorded.',
 
       /* profile */
       'prof.about': 'About',
@@ -418,6 +503,21 @@
       'prof.favorites.empty': 'No favorite categories yet.',
       'prof.activity.empty': 'No recent activity yet.',
       'prof.u3': 'Exports', 'prof.u4': 'Searches',
+      'prof.photo': 'Profile photo',
+      'prof.photo.add': 'Add photo',
+      'prof.photo.remove': 'Remove photo',
+      'prof.crop.t': 'Crop photo',
+      'prof.crop.s': 'Drag to reposition. Use the corner handle to resize the square.',
+      'prof.crop.save': 'Crop & save',
+      'act.analysis': 'Analysis completed — {q}',
+      'act.export': 'Report exported — {q}',
+      'act.save': 'Report saved — {q}',
+      'act.fav': 'Report favorited — {q}',
+      'act.alert': 'Alert created — {q}',
+      'act.reminder': 'Reminder set — {q}',
+      'act.profile': 'Profile updated',
+      'act.avatar': 'Profile photo updated',
+      'act.conn': '{n} connected',
       'prof.cats': 'Favorite categories',
       'prof.activity': 'Recent activity',
       'prof.edit': 'Edit profile',
@@ -467,6 +567,14 @@
       'conn.rss.d': 'Custom RSS feeds', 'conn.gn.d': 'Global headlines',
       'conn.gt.d': 'Search interest curves', 'conn.na.d': 'News API aggregation',
       'conn.sp.d': 'Search engine results', 'conn.gq.d': 'Ultra-fast inference for AI',
+      'conn.n8n': 'n8n resources',
+      'conn.n8n.s': 'Extend NABD with automation resources. Add an API key to enable each one.',
+      'conn.add': 'Add API',
+      'conn.remove': 'Remove API',
+      'conn.api.ph': 'Paste your API key…',
+      'conn.api.saved': 'API key added.',
+      'conn.api.removed': 'API key removed.',
+      'conn.soon.more': 'More sources are on the way.',
 
       /* api */
       'api.keys': 'API keys', 'api.keys.create': 'Create key', 'api.keys.revoke': 'Revoke',
@@ -502,6 +610,12 @@
       'notif.empty.new': 'No notifications yet — completed analyses and account events will appear here.',
       'notif.fb.t': 'Facebook connected', 'notif.fb.s': 'Page: {p}',
       'notif.run.t': 'Analysis completed', 'notif.run.s': 'Query: {q}',
+      'notif.alert.t': 'Reminder due',
+      'notif.alert.s': 'Re-run your analysis of "{q}" for the latest signals.',
+      'notif.saved.t': 'Saved report — {q}',
+      'notif.saved.s': 'This report is a saved draft. Re-run the analysis from the Dashboard to see full results.',
+      'notif.email.reminder': 'Reminder email sent.',
+      'notif.email.reminderErr': 'Could not send the reminder email.',
       'notif.auth.in.t': 'Signed in', 'notif.auth.in.s': 'Welcome back to NABD.',
       'notif.auth.up.t': 'Account created', 'notif.auth.up.s': 'Welcome to NABD — your workspace is ready.',
 
@@ -512,6 +626,10 @@
       'fav.s1': 'Egyptian Pound', 'fav.s2': 'Suez Canal', 'fav.s3': 'New Capital',
       'fav.d1': 'Governorate overview', 'fav.d2': 'Crisis command board', 'fav.d3': 'Social pulse',
       'fav.t1': 'Economy', 'fav.t2': 'Suez Canal', 'fav.t3': 'Education',
+      'fav.empty.reports': 'No favorited reports yet — star a report from the dashboard.',
+      'fav.empty.searches': 'No favorited searches yet — pin a search from history.',
+      'fav.empty.dashboards': 'Saved dashboards will appear here.',
+      'fav.empty.topics': 'Followed topics will appear here.',
 
       /* saved searches */
       'srch.new': 'New folder', 'srch.rename': 'Rename', 'srch.dup': 'Duplicate',
@@ -613,6 +731,7 @@
       'ws.tab.day': '24 س', 'ws.tab.week': '7 أيام', 'ws.tab.month': '30 يومًا',
       'ws.donut.t': 'توزيع المشاعر',
       'ws.donut.pos': 'إيجابي', 'ws.donut.neu': 'محايد', 'ws.donut.neg': 'سلبي',
+      'ws.pie.c': 'الحجم',
       'ws.nodata': 'لا توجد بيانات',
       'ws.sent.na': 'بيانات المشاعر غير متاحة',
       'ws.sent.sparse': 'استنادًا إلى {n} إشارة — حجم منخفض، يُفسَّر بحذر.',
@@ -808,6 +927,7 @@
       'app.crumb.app': 'التطبيق',
       'app.theme.light': 'التبديل إلى الوضع الفاتح', 'app.theme.dark': 'التبديل إلى الوضع الداكن',
       'app.st.done': 'مكتمل', 'app.st.running': 'قيد التشغيل', 'app.st.failed': 'فشل',
+      'app.st.remove': 'إزالة',
       'app.cat.news': 'أخبار', 'app.cat.social': 'تواصل اجتماعي', 'app.cat.gov': 'حكومة',
       'app.cat.sport': 'رياضة', 'app.cat.business': 'أعمال',
       'app.soon': 'قريباً',
@@ -839,6 +959,14 @@
       'app.toast.signedout': 'تم تسجيل الخروج.', 'app.toast.copied': 'تم النسخ إلى الحافظة.',
       'app.toast.moved': 'تم النقل إلى المجلد.', 'app.toast.folder': 'تم إنشاء المجلد.',
       'app.toast.noexport': 'شغّل تحليلًا أولًا ثم صدّر تقريره.',
+      'app.toast.facility': 'تم إرسال التقرير إلى المنشأة المسؤولة.',
+      'app.toast.savedReport': 'تم حفظ التقرير لاحقًا.',
+      'app.toast.fav': 'أُضيف إلى المفضلة.',
+      'app.toast.favOff': 'أُزيل من المفضلة.',
+      'app.toast.email': 'جارٍ تجهيز بريدك…',
+      'app.toast.avatar': 'تم تحديث الصورة الشخصية.',
+      'app.toast.savedNotif': 'تقرير محفوظ — أعد تشغيله من لوحة التحكم لعرضه.',
+      'app.toast.savedFail': 'تعذر حفظ التقرير — ربما يكون حجمه كبيرًا جدًا.',
 
       /* report export */
       'export.back': 'العودة إلى لوحة التحكم', 'export.title': 'تقرير التحليل',
@@ -851,11 +979,83 @@
       'export.h.diversity': 'تنوع المصادر', 'export.h.freshness': 'حداثة المعلومات',
       'export.h.relevance': 'الملاءمة', 'export.h.coverage': 'التغطية',
       'export.score': 'الدرجة', 'export.top': 'الأعلى', 'export.recent': 'حديث', 'export.articles': 'مقال',
+      'ws.gen.note': 'أُنشئ منذ {t} · {n} مصدرًا',
+      'ws.actions.t': 'إجراءات مقترحة',
+      'ws.actions.s': 'إجراءات سريعة لهذا التحليل',
+      'ws.actions.send': 'إرسال التقرير إلى المنشأة',
+      'ws.actions.save': 'حفظ التقرير لاحقًا',
+      'ws.actions.share': 'تصدير ومشاركة التقرير',
+      'ws.actions.pick': 'أرسل التقرير إلى منشأة',
+      'ws.actions.pick.s': 'اختر الوجهة — سيُجهّز التقرير ببيانات تواصلها.',
+      'ws.actions.pick.to': 'البريد الإلكتروني للمستلم',
+      'ws.actions.pick.to.ph': 'facility@example.com',
+      'ws.actions.pick.body': 'مسودة البلاغ الجاهزة',
+      'ws.actions.pick.send': 'إرسال التقرير',
+      'ws.actions.pick.err': 'أدخل بريد المستلم أولًا.',
+      'ws.actions.fav': 'أضف إلى المفضلة',
+      'ws.actions.fav.on': 'أُضيف إلى المفضلة',
+      'ws.actions.fav.off': 'أُزيل من المفضلة',
+      'ws.fac.email.line1': 'تقرير NABD عن الاستعلام "{q}"',
+      'ws.fac.email.line2': 'أُنشئ {t}',
+      'ws.fac.email.line3': 'الملخص: {b}',
+      'ws.fac.email.line4': 'التقرير الكامل: {u}',
+      'ws.fac.email.line5': 'فريقنا العزيز، نرفع إليكم الإشارات التي رصدها تحليل NABD للاستعلام "{q}". يرجى المراجعة واتخاذ الإجراء اللازم.',
+      'ws.fac.email.sign': '— NABD (نبض)',
+      'ws.actions.close': 'إغلاق',
+      'ws.src.more': 'عرض الكل ({n})',
+      'ws.src.fewer': 'عرض أقل',
+
+      /* ملخص التحليل الإجمالي */
+      'ws.hl.total': 'ملخص التحليل الإجمالي',
+      'ws.total.momentum': 'الزخم {dir} بدرجة قوة {score}.',
+      'ws.total.sentiment': 'الاتجاه العام {label} — {pos}% إيجابي، {neu}% محايد، {neg}% سلبي.',
+      'ws.total.kw': 'أبرز كلمة مفتاحية: {kw}.',
+      'ws.total.coverage': 'تم تحليل {art} مصدرًا من {src} جهة إعلامية.',
+      'ws.total.crisis': 'تنبيه: تم رصد {e} إشارة طارئة.',
+
+      /* التذكير (إنشاء تنبيه) */
+      'ws.reminder.t': 'تعيين تذكير',
+      'ws.reminder.s': 'بناءً على هذا التحليل، ننصح بالعودة للفحص مجددًا لاحقًا.',
+      'ws.reminder.email': 'بريد التذكير',
+      'ws.reminder.12h': 'الفحص مجددًا خلال 12 ساعة',
+      'ws.reminder.24h': 'الفحص مجددًا خلال 24 ساعة',
+      'ws.reminder.2d': 'الفحص مجددًا بعد يومين',
+      'ws.reminder.3d': 'الفحص مجددًا بعد 3 أيام',
+      'ws.reminder.1w': 'الفحص مجددًا بعد أسبوع',
+      'ws.reminder.2w': 'الفحص مجددًا بعد أسبوعين',
+      'ws.reminder.1mo': 'الفحص مجددًا بعد شهر',
+      'ws.reminder.alert.t': 'إنشاء تنبيه',
+      'ws.reminder.alert.s': 'يحفظ NABD هذا التقرير ويرسل إليك بريدًا عند موعد الفحص.',
+      'ws.reminder.reco': 'موصى به',
+      'ws.reminder.set': 'تعيين التذكير',
+      'ws.reminder.will': 'سيرسل إليك تذكيرًا على البريد عند الاستحقاق.',
+      'app.toast.reminder': 'تم تعيين التذكير — سنرسل إليك بريدًا عند الاستحقاق.',
+      'app.toast.reminderErr': 'تعذر تعيين التذكير. حاول مجددًا.',
+
+      /* جهات إرسال التقرير */
+      'ws.facility.elec': 'شركات الكهرباء',
+      'ws.facility.water': 'شركات المياه',
+      'ws.facility.gas': 'شركات الغاز',
+      'ws.facility.complaints': 'الشكاوى العامة',
+      'ws.facility.hospitals': 'المستشفيات',
+      'ws.facility.emergencies': 'الطوارئ',
+      'ws.facility.police': 'أقسام الشرطة',
+      'ws.facility.emergencynumbers': 'أرقام الطوارئ',
 
       /* dashboard */
       'dash.qa': 'إجراءات سريعة',
       'dash.qa.new': 'تحليل جديد', 'dash.qa.saved': 'تشغيل بحث محفوظ',
       'dash.qa.export': 'تصدير تقرير', 'dash.qa.alert': 'إنشاء تنبيه',
+      'dash.qa.nav': 'تابع من حيث توقفت',
+      'dash.qa.nav.connections': 'اربط مصدرًا',
+      'dash.qa.nav.connections.d': 'أضف فيسبوك أو واجهة n8n',
+      'dash.qa.nav.settings': 'فتح الإعدادات',
+      'dash.qa.nav.settings.d': 'المظهر واللغة والمزيد',
+      'dash.qa.nav.profile': 'عرض الملف الشخصي',
+      'dash.qa.nav.profile.d': 'بياناتك ونشاطك',
+      'dash.qa.nav.history': 'تصفح السجل',
+      'dash.qa.nav.history.d': 'أعد تشغيل التحليلات السابقة',
+      'dash.suggest.t': 'مقترح لك',
       'dash.brief': 'الموجز اليومي بالذكاء الاصطناعي', 'dash.brief.sub': 'مصر · أُعدّ خصيصاً لك',
       'dash.brief.b1': 'صباح الخير. <strong>الاقتصاد</strong> يتصدر اليوم: قوة الجنيه تجذب التدفقات، وتوقعات التضخم تتراجع في القاهرة، وأرقام قناة السويس عند مستويات قياسية.',
       'dash.brief.b2': 'في <strong>المجتمع</strong>، افتتاحيات العاصمة الجديدة تسيطر على الحديث الإيجابي، بينما تحتاج مناقشات أسعار السلع في الدلتا للمراقبة. تم تحديد مجموعتي شائعات عن العملة.',
@@ -913,6 +1113,9 @@
       'rep.e1': 'مجموعة بيانات السويس', 'rep.e2': 'تصدير المشاعر — القاهرة', 'rep.e3': 'سجل أحداث الأزمات',
       'rep.preview': 'معاينة', 'rep.download': 'تنزيل', 'rep.duplicate': 'تكرار',
       'rep.share': 'مشاركة', 'rep.delete': 'حذف',
+      'rep.saved.empty': 'لا توجد تقارير محفوظة بعد — احفظ تقريرًا من لوحة التحكم.',
+      'rep.open': 'فتح',
+      'rep.downloaded': 'تم تسجيل التنزيل.',
 
       /* profile */
       'prof.about': 'نبذة',
@@ -927,6 +1130,21 @@
       'prof.favorites.empty': 'لا توجد فئات مفضلة بعد.',
       'prof.activity.empty': 'لا يوجد نشاط حديث بعد.',
       'prof.u3': 'صادرات', 'prof.u4': 'بحوث',
+      'prof.photo': 'الصورة الشخصية',
+      'prof.photo.add': 'إضافة صورة',
+      'prof.photo.remove': 'إزالة الصورة',
+      'prof.crop.t': 'قص الصورة',
+      'prof.crop.s': 'اسحب لتغيير الموضع. استخدم مقبض الزاوية لتغيير حجم المربع.',
+      'prof.crop.save': 'قص وحفظ',
+      'act.analysis': 'اكتمل التحليل — {q}',
+      'act.export': 'تم تصدير التقرير — {q}',
+      'act.save': 'تم حفظ التقرير — {q}',
+      'act.fav': 'أُضيف التقرير إلى المفضلة — {q}',
+      'act.alert': 'تم إنشاء تنبيه — {q}',
+      'act.reminder': 'تم تعيين تذكير — {q}',
+      'act.profile': 'تم تحديث الملف الشخصي',
+      'act.avatar': 'تم تحديث الصورة الشخصية',
+      'act.conn': 'تم ربط {n}',
       'prof.cats': 'الفئات المفضلة',
       'prof.activity': 'النشاط الأخير',
       'prof.edit': 'تعديل الملف',
@@ -976,6 +1194,14 @@
       'conn.rss.d': 'تغذيات RSS مخصصة', 'conn.gn.d': 'عناوين عالمية',
       'conn.gt.d': 'منحنيات الاهتمام', 'conn.na.d': 'تجميع واجهة الأخبار',
       'conn.sp.d': 'نتائج محركات البحث', 'conn.gq.d': 'استدلال فائق السرعة للذكاء الاصطناعي',
+      'conn.n8n': 'موارد n8n',
+      'conn.n8n.s': 'وسّع NABD بموارد الأتمتة. أضف مفتاح API لتفعيل كل مورد.',
+      'conn.add': 'إضافة API',
+      'conn.remove': 'إزالة API',
+      'conn.api.ph': 'الصق مفتاح API…',
+      'conn.api.saved': 'تمت إضافة مفتاح API.',
+      'conn.api.removed': 'تمت إزالة مفتاح API.',
+      'conn.soon.more': 'المزيد من المصادر قادم.',
 
       /* api */
       'api.keys': 'مفاتيح الواجهة', 'api.keys.create': 'إنشاء مفتاح', 'api.keys.revoke': 'إلغاء',
@@ -1011,6 +1237,12 @@
       'notif.empty.new': 'لا توجد إشعارات بعد — ستظهر هنا التحليلات المكتملة وأحداث الحساب.',
       'notif.fb.t': 'تم ربط فيسبوك', 'notif.fb.s': 'الصفحة: {p}',
       'notif.run.t': 'اكتمل التحليل', 'notif.run.s': 'الاستعلام: {q}',
+      'notif.alert.t': 'حان موعد الفحص',
+      'notif.alert.s': 'أعد تشغيل تحليل "{q}" للحصول على أحدث الإشارات.',
+      'notif.saved.t': 'تقرير محفوظ — {q}',
+      'notif.saved.s': 'هذا التقرير مسودة محفوظة. أعد تشغيل التحليل من لوحة التحكم لعرض النتائج الكاملة.',
+      'notif.email.reminder': 'تم إرسال بريد التذكير.',
+      'notif.email.reminderErr': 'تعذر إرسال بريد التذكير.',
       'notif.auth.in.t': 'تم تسجيل الدخول', 'notif.auth.in.s': 'مرحبًا بعودتك إلى نبض.',
       'notif.auth.up.t': 'تم إنشاء الحساب', 'notif.auth.up.s': 'أهلًا بك في نبض — مساحة العمل جاهزة.',
 
@@ -1021,6 +1253,10 @@
       'fav.s1': 'الجنيه المصري', 'fav.s2': 'قناة السويس', 'fav.s3': 'العاصمة الجديدة',
       'fav.d1': 'نظرة المحافظات', 'fav.d2': 'لوحة قيادة الأزمات', 'fav.d3': 'نبض التواصل',
       'fav.t1': 'الاقتصاد', 'fav.t2': 'قناة السويس', 'fav.t3': 'التعليم',
+      'fav.empty.reports': 'لا توجد تقارير مفضلة بعد — فعّل النجمة على تقرير من لوحة التحكم.',
+      'fav.empty.searches': 'لا توجد عمليات بحث مفضلة بعد — ثبّت بحثًا من السجل.',
+      'fav.empty.dashboards': 'ستظهر لوحات التحكم المحفوظة هنا.',
+      'fav.empty.topics': 'ستظهر الموضوعات المتابَعَة هنا.',
 
       /* saved searches */
       'srch.new': 'مجلد جديد', 'srch.rename': 'إعادة تسمية', 'srch.dup': 'تكرار',
@@ -1209,6 +1445,147 @@
     list.unshift(item);
     writeStore(NOTIF_KEY, list.slice(0, NOTIF_MAX));
     return item;
+  }
+
+  function fmt(key, params) {
+    let s = t(key);
+    if (params && typeof params === 'object') {
+      Object.keys(params).forEach((k) => { s = s.split('{' + k + '}').join(String(params[k])); });
+    }
+    return s;
+  }
+
+  /* ----------------------------------------------------------
+     LOCAL ACTIVITY FEED — actions the user takes in this browser
+     (analyses, exports, saved reports, favorites, alerts, profile
+     and connection events). Caps at 30 entries.
+     ---------------------------------------------------------- */
+  const ACTIVITY_KEY = 'nabd-activity';
+  const ACTIVITY_TYPES = ['analysis', 'export', 'save', 'fav', 'alert', 'reminder', 'profile', 'avatar', 'conn'];
+  function activityGet() {
+    return readStore(ACTIVITY_KEY).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  }
+  function activityAdd(type, meta) {
+    if (ACTIVITY_TYPES.indexOf(type) === -1) return null;
+    const item = {
+      id: 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      type: type,
+      q: meta && meta.q != null ? String(meta.q) : '',
+      n: meta && meta.n != null ? String(meta.n) : '',
+      ts: Number((meta && meta.ts) || Date.now())
+    };
+    const list = readStore(ACTIVITY_KEY);
+    list.unshift(item);
+    writeStore(ACTIVITY_KEY, list.slice(0, 30));
+    return item;
+  }
+
+  /* ----------------------------------------------------------
+     ALERTS — reminders stored locally with a due date.
+     checkAlerts() moves due alerts into the notification store
+     and asks the server to email a reminder.
+     ---------------------------------------------------------- */
+  const ALERT_KEY = 'nabd-alerts';
+  function alertsGet() {
+    return readStore(ALERT_KEY).slice().sort((a, b) => (a.dueAt || 0) - (b.dueAt || 0));
+  }
+  function alertsAdd(entry) {
+    const item = {
+      id: 'al' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      q: String((entry && entry.q) || '').trim(),
+      dueAt: Number((entry && entry.dueAt) || 0),
+      ts: Number((entry && entry.ts) || Date.now()),
+      done: false
+    };
+    if (!item.q || !item.dueAt) return null;
+    const list = readStore(ALERT_KEY);
+    list.unshift(item);
+    writeStore(ALERT_KEY, list.slice(0, 50));
+    return item;
+  }
+  function alertsRemove(id) {
+    writeStore(ALERT_KEY, readStore(ALERT_KEY).filter((a) => a.id !== id));
+  }
+  function alertsDue() {
+    const now = Date.now();
+    return readStore(ALERT_KEY).filter((a) => !a.done && a.dueAt <= now);
+  }
+  function checkAlerts() {
+    const due = alertsDue();
+    if (!due.length) return;
+    const now = Date.now();
+    const list = readStore(ALERT_KEY);
+    due.forEach((a) => {
+      notifAdd({ title: 'notif.alert.t', sub: 'notif.alert.s', params: { q: a.q }, cat: 'reports', ts: now });
+      a.done = true;
+      const user = getUser();
+      api('/api/notifications?action=send-reminder', {
+        method: 'POST',
+        body: { query: a.q, email: user && user.email }
+      }).catch(() => {});
+    });
+    writeStore(ALERT_KEY, list);
+  }
+
+  /* ----------------------------------------------------------
+     FAVORITES — reports the user starred from the dashboard.
+     ---------------------------------------------------------- */
+  const FAV_KEY = 'nabd-favs';
+  function favGet() {
+    return readStore(FAV_KEY);
+  }
+  function favHas(q) {
+    const key = String(q == null ? '' : q).trim().toLowerCase();
+    if (!key) return false;
+    return favGet().some((f) => String(f.q || '').toLowerCase() === key);
+  }
+  function favAdd(entry) {
+    const item = {
+      id: 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      q: String((entry && entry.q) || '').trim(),
+      t: Number((entry && entry.t) || Date.now()),
+      r: null
+    };
+    const r = (entry && entry.r) || null;
+    if (r && typeof r === 'object') {
+      item.r = {
+        query: String(r.query || item.q || ''),
+        src: r.src != null ? r.src : null,
+        tone: r.tone != null ? r.tone : null
+      };
+    }
+    if (!item.q || favHas(item.q)) return null;
+    const list = favGet();
+    list.unshift(item);
+    writeStore(FAV_KEY, list.slice(0, 50));
+    return item;
+  }
+  function favRemove(q) {
+    const key = String(q == null ? '' : q).trim().toLowerCase();
+    writeStore(FAV_KEY, favGet().filter((f) => String(f.q || '').toLowerCase() !== key));
+  }
+
+  /* ----------------------------------------------------------
+     AVATAR + local download counter (usage stats on profile).
+     ---------------------------------------------------------- */
+  const AVATAR_KEY = 'nabd-avatar';
+  const DL_KEY = 'nabd-dlcount';
+  function avatarGet() {
+    try { return localStorage.getItem(AVATAR_KEY); } catch (e) { return null; }
+  }
+  function avatarSet(dataUrl) {
+    try {
+      if (dataUrl) localStorage.setItem(AVATAR_KEY, dataUrl);
+      else localStorage.removeItem(AVATAR_KEY);
+    } catch (e) {}
+  }
+  function dlCount() {
+    try { return parseInt(localStorage.getItem(DL_KEY) || '0', 10) || 0; } catch (e) { return 0; }
+  }
+  function recordDownload(fileType, searchId) {
+    try { localStorage.setItem(DL_KEY, String(dlCount() + 1)); } catch (e) {}
+    api('/api/downloads', { method: 'POST', body: { fileType: fileType || 'report', searchId: searchId || null } })
+      .catch(() => {});
   }
 
   /* ----------------------------------------------------------
@@ -2555,16 +2932,16 @@
   /* Egyptian governorates (EN + AR + conservative aliases). Used ONLY to
      label locations that are explicitly present in returned API data. */
   const EGYPT_GOVERNORATES = [
-    { en: 'Cairo', ar: 'القاهرة', aliases: ['القاهره', 'caire'] },
-    { en: 'Giza', ar: 'الجيزة', aliases: ['الجيزه'] },
-    { en: 'Alexandria', ar: 'الإسكندرية', aliases: ['الاسكندرية', 'alexandria'] },
+    { en: 'Cairo', ar: 'القاهرة', aliases: ['القاهره', 'caire', 'القاهرة الجديدة', 'new cairo', 'مدينة نصر', 'nasr city', 'شبرا'] },
+    { en: 'Giza', ar: 'الجيزة', aliases: ['الجيزه', '6 أكتوبر', '6 october', 'sixth of october', 'الشيخ زايد', 'sheikh zayed'] },
+    { en: 'Alexandria', ar: 'الإسكندرية', aliases: ['الاسكندرية', 'alexandria', 'الإسكندرية'] },
     { en: 'Tanta', ar: 'طنطا', aliases: ['tanta'] },
-    { en: 'Gharbia', ar: 'الغربية', aliases: ['الغربيه', 'gharbeya'] },
-    { en: 'Dakahlia', ar: 'الدقهلية', aliases: ['الدقهليه', 'dakahlia'] },
+    { en: 'Gharbia', ar: 'الغربية', aliases: ['الغربيه', 'gharbeya', 'المحلة الكبرى', 'el mahalla', 'almahalla'] },
+    { en: 'Dakahlia', ar: 'الدقهلية', aliases: ['الدقهليه', 'dakahlia', 'المنصورة', 'mansoura', 'mansura'] },
     { en: 'Menoufia', ar: 'المنوفية', aliases: ['المنوفيه', 'menoufia'] },
-    { en: 'Qalyubia', ar: 'القليوبية', aliases: ['القليوبيه', 'qalyubia', 'kalubia'] },
-    { en: 'Sharqia', ar: 'الشرقية', aliases: ['الشرقيه', 'sharqia'] },
-    { en: 'Beheira', ar: 'البحيرة', aliases: ['البحيره', 'beheira'] },
+    { en: 'Qalyubia', ar: 'القليوبية', aliases: ['القليوبيه', 'qalyubia', 'kalubia', 'بنها', 'benha', 'شبرا الخيمة', 'shubra el kheima'] },
+    { en: 'Sharqia', ar: 'الشرقية', aliases: ['الشرقيه', 'sharqia', 'الزقازيق', 'zagazig'] },
+    { en: 'Beheira', ar: 'البحيرة', aliases: ['البحيره', 'beheira', 'دمنهور', 'damanhur', 'damanhour'] },
     { en: 'Kafr El Sheikh', ar: 'كفر الشيخ', aliases: ['kafr el sheikh'] },
     { en: 'Damietta', ar: 'دمياط', aliases: ['damietta'] },
     { en: 'Port Said', ar: 'بورسعيد', aliases: ['port said'] },
@@ -2578,11 +2955,24 @@
     { en: 'Qena', ar: 'قنا', aliases: ['qena'] },
     { en: 'Luxor', ar: 'الأقصر', aliases: ['الاقصر', 'luxor'] },
     { en: 'Aswan', ar: 'أسوان', aliases: ['اسوان', 'aswan'] },
-    { en: 'Matrouh', ar: 'مطروح', aliases: ['matrouh'] },
-    { en: 'Red Sea', ar: 'البحر الأحمر', aliases: ['البحر الاحمر', 'red sea'] },
+    { en: 'Matrouh', ar: 'مطروح', aliases: ['matrouh', 'مرسى مطروح', 'marsa matrouh'] },
+    { en: 'Red Sea', ar: 'البحر الأحمر', aliases: ['البحر الاحمر', 'red sea', 'الغردقة', 'hurghada', 'العين السخنة', 'ain sokhna', 'سفاجا', 'safaga'] },
     { en: 'New Valley', ar: 'الوادي الجديد', aliases: ['الوادي الجديد'] },
-    { en: 'North Sinai', ar: 'شمال سيناء', aliases: ['north sinai'] },
-    { en: 'South Sinai', ar: 'جنوب سيناء', aliases: ['جنوب سيناء'] }
+    { en: 'North Sinai', ar: 'شمال سيناء', aliases: ['north sinai', 'العريش', 'arish'] },
+    { en: 'South Sinai', ar: 'جنوب سيناء', aliases: ['جنوب سيناء', 'شرم الشيخ', 'sharm el sheikh', 'sharm'] }
+  ];
+
+  /* Report delivery facilities (placeholders for the "send report" action).
+     Labels come from i18n via L(key); emails are placeholder destinations. */
+  const REPORT_FACILITIES = [
+    { key: 'ws.facility.elec', email: 'electricity@facility.eg' },
+    { key: 'ws.facility.water', email: 'water@facility.eg' },
+    { key: 'ws.facility.gas', email: 'gas@facility.eg' },
+    { key: 'ws.facility.complaints', email: 'complaints@facility.eg' },
+    { key: 'ws.facility.hospitals', email: 'hospitals@facility.eg' },
+    { key: 'ws.facility.emergencies', email: 'emergencies@facility.eg' },
+    { key: 'ws.facility.police', email: 'police@facility.eg' },
+    { key: 'ws.facility.emergencynumbers', email: 'emergency@facility.eg' }
   ];
 
   /* normalizeLocation: canonicalize a returned location name to an
@@ -2956,6 +3346,8 @@
     getSourceLabel,
     normalizeLocation,
     detectGovernorates,
+    governorates: EGYPT_GOVERNORATES,
+    facilities: REPORT_FACILITIES,
     toast,
     applyTheme,
     getUser,
@@ -2969,6 +3361,22 @@
     historyRemove,
     notifGet,
     notifAdd,
+    fmt,
+    activityGet,
+    activityAdd,
+    alertsGet,
+    alertsAdd,
+    alertsRemove,
+    alertsDue,
+    checkAlerts,
+    favGet,
+    favHas,
+    favAdd,
+    favRemove,
+    avatarGet,
+    avatarSet,
+    dlCount,
+    recordDownload,
     buildDonut,
     analyze,
     fb,

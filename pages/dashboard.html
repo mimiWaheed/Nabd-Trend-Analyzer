@@ -44,14 +44,34 @@
         <span class="qa-ic"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></svg></span>
         <span class="qa-label" data-i18n="dash.qa.saved">Run saved search</span>
       </div>
-      <div class="qa-card" data-qa="export">
-        <span class="qa-ic"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg></span>
-        <span class="qa-label" data-i18n="dash.qa.export">Export report</span>
+      <div class="qa-card" data-qa="connections">
+        <span class="qa-ic"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span>
+        <span class="qa-label" data-i18n="dash.qa.nav.connections">Connect a source</span>
       </div>
-      <div class="qa-card" data-qa="alert">
-        <span class="qa-ic"><svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6M10 19a2 2 0 0 0 4 0"/></svg></span>
-        <span class="qa-label" data-i18n="dash.qa.alert">Create alert</span>
+      <div class="qa-card" data-qa="settings">
+        <span class="qa-ic"><svg viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h10M18 18h2"/><circle cx="15" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="18" r="2"/></svg></span>
+        <span class="qa-label" data-i18n="dash.qa.nav.settings">Open settings</span>
       </div>
+      <div class="qa-card" data-qa="profile">
+        <span class="qa-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
+        <span class="qa-label" data-i18n="dash.qa.nav.profile">View profile</span>
+      </div>
+      <div class="qa-card" data-qa="history">
+        <span class="qa-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+        <span class="qa-label" data-i18n="dash.qa.nav.history">Browse history</span>
+      </div>
+    </div>
+
+    <div class="suggest-row" id="dbSuggestRow" style="margin-bottom:22px">
+      <span class="suggest-row-label" data-i18n="dash.suggest.t">Suggested for you</span>
+      <button type="button" class="btn btn-ghost btn-sm" data-qa-suggest="export">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg>
+        <span data-i18n="dash.qa.export">Export report</span>
+      </button>
+      <button type="button" class="btn btn-ghost btn-sm" data-qa-suggest="alert">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6M10 19a2 2 0 0 0 4 0"/></svg>
+        <span data-i18n="dash.qa.alert">Create alert</span>
+      </button>
     </div>
 
     <!-- ============================================================
@@ -147,6 +167,10 @@
               <button type="button" class="seg-btn" data-priv="private" data-i18n="db.priv.priv">Private</button>
             </div>
             <div class="ws-actions">
+              <button class="btn btn-ghost btn-sm" id="dbFavBtn" data-i18n-title="ws.actions.fav">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+                <span data-i18n="ws.actions.fav">Add to favorites</span>
+              </button>
               <button class="btn btn-ghost btn-sm" id="dbExportBtn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg>
                 <span data-i18n="dash.qa.export">Export report</span>
@@ -164,16 +188,6 @@
           </div>
         </div>
 
-        <div class="filter-bar" id="dbFilterBar">
-          <span class="filter-label mono" data-i18n="filters.label">FILTER</span>
-          <button class="filter-chip active" data-filter="all" data-i18n="filters.all">All</button>
-          <button class="filter-chip" data-filter="news" data-i18n="filters.news">News</button>
-          <button class="filter-chip" data-filter="social" data-i18n="filters.social">Social</button>
-          <button class="filter-chip" data-filter="gov" data-i18n="filters.gov">Government</button>
-          <button class="filter-chip" data-filter="sport" data-i18n="filters.sport">Sports</button>
-          <button class="filter-chip" data-filter="business" data-i18n="filters.business">Business</button>
-        </div>
-
         <div class="ws-grid">
 
           <!-- AI summary -->
@@ -187,15 +201,41 @@
                 <h2 class="card-title" id="dbBriefTitle">Egypt — live brief</h2>
                 <div class="summary-meta mono">
                   <span class="live-badge"><span class="live-dot"></span> <span data-i18n="ws.brief">AI BRIEF</span></span>
-                  <span id="dbMeta1" hidden></span>
-                  <span id="dbMeta2" hidden></span>
-                  <span id="dbMeta3" hidden></span>
+                  <span class="gen-note" id="dbGenNote" hidden></span>
                 </div>
               </div>
               <div class="summary-text" id="dbSummaryText"></div>
               <p class="summary-scope-note mono" id="dbScopeNote" hidden></p>
               <div class="empty-state" id="dbEmptySummary" hidden><p data-i18n="ws.sum.na">No AI brief returned for this query — signals are still displayed below.</p></div>
               <div class="summary-chips" id="dbChips" hidden></div>
+            </div>
+          </div>
+
+          <!-- Suggested actions (kept at the top so they catch attention) -->
+          <div class="ws-card card actions-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.actions.t">Suggested actions</h3>
+                <p class="card-sub" data-i18n="ws.actions.s">QUICK ACTIONS FOR THIS ANALYSIS</p>
+              </div>
+            </div>
+            <div class="act-list" id="dbActList">
+              <button type="button" class="act-btn act-primary" data-act="send">
+                <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg></span>
+                <span data-i18n="ws.actions.send">Send report to facility</span>
+              </button>
+              <button type="button" class="act-btn" data-act="save">
+                <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg></span>
+                <span data-i18n="ws.actions.save">Save report for later</span>
+              </button>
+              <button type="button" class="act-btn" data-act="share">
+                <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></span>
+                <span data-i18n="ws.actions.share">Export / share report</span>
+              </button>
+              <button type="button" class="act-btn" data-act="remind">
+                <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+                <span data-i18n="ws.reminder.set">Set reminder</span>
+              </button>
             </div>
           </div>
 
@@ -237,9 +277,7 @@
                 <p class="card-sub mono" data-i18n="ws.regional.s">DETECTED LOCATIONS FROM THIS ANALYSIS</p>
               </div>
             </div>
-            <div class="region-grid" id="regionGrid"></div>
-            <div class="empty-state" id="dbNational" hidden><p data-i18n="ws.loc.egypt">Egypt</p><p class="mono" data-i18n="ws.national.s">Egypt-wide signal</p></div>
-            <div class="empty-state" id="dbEmptyLocations" hidden><p data-i18n="ws.loc.na">No city-level geographic data available for this query.</p></div>
+            <div class="region-heat-wrap" id="regionGrid"></div>
           </div>
 
           <!-- Trending topics -->
@@ -262,7 +300,7 @@
                 <p class="card-sub" data-i18n="ws.kw.s">DETERMINISTIC · COMPUTED FROM AGGREGATION</p>
               </div>
             </div>
-            <div class="src-list" id="dbKwList"></div>
+            <div class="vbar-chart" id="dbKwList"></div>
             <div class="empty-state" id="dbEmptyKeywords" hidden><p data-i18n="ws.nodata">No data available</p></div>
           </div>
 
@@ -274,7 +312,7 @@
                 <p class="card-sub" data-i18n="ws.ph.s">EMERGING 2–3 WORD PHRASES</p>
               </div>
             </div>
-            <div class="src-list" id="dbPhList"></div>
+            <div class="heat-grid" id="dbPhList"></div>
             <div class="empty-state" id="dbEmptyPhrases" hidden><p data-i18n="ws.nodata">No data available</p></div>
           </div>
 
@@ -348,6 +386,7 @@
                 <p class="card-sub" data-i18n="ws.hl.s">GENERATED THIS CYCLE</p>
               </div>
             </div>
+            <div class="total-summary" id="dbTotalSummary" hidden></div>
             <div class="hl-list" id="dbHlList"></div>
             <div class="empty-state" id="dbEmptyHighlights" hidden><p data-i18n="ws.hl.na">No AI highlights generated for this query.</p></div>
           </div>
@@ -372,8 +411,9 @@
                 <p class="card-sub" data-i18n="ws.src.s2">PUBLISHERS FROM THIS ANALYSIS</p>
               </div>
             </div>
-            <div class="src-list" id="dbSrcList"></div>
+            <div class="vbar-chart" id="dbSrcList"></div>
             <div class="empty-state" id="dbEmptySources" hidden><p data-i18n="ws.src.na">No source data available for this analysis.</p></div>
+            <div id="dbSrcFoot"></div>
           </div>
 
           <!-- Signal health (deterministic strength / momentum / diversity) -->
@@ -384,6 +424,7 @@
                 <p class="card-sub" data-i18n="ws.health.s">MOMENTUM · STRENGTH · DIVERSITY · FRESHNESS · RELEVANCE · COVERAGE</p>
               </div>
             </div>
+            <div class="health-chart" id="dbHealthChart" hidden></div>
             <div class="health-grid" id="dbHealthGrid"></div>
             <div class="empty-state" id="dbEmptyHealth" hidden><p data-i18n="ws.nodata">No data available</p></div>
           </div>

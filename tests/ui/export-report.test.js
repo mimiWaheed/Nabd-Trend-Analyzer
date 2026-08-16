@@ -85,7 +85,7 @@ function report(section, errs) {
   if (!doc.getElementById('repTrendChart')) errs.push('timeline card must contain #repTrendChart');
   if (!doc.getElementById('repDonut')) errs.push('sentiment card must contain #repDonut');
   ['repSummary', 'repHtList', 'repHealthGrid', 'repFeedList', 'repSrcList', 'repTrendList',
-    'repHlList', 'repRankList', 'repRegions', 'repKwList', 'repPhList'].forEach((id) => {
+    'repHlList', 'repRankList', 'repRegions', 'repKwList', 'repPhList', 'repHealthChart', 'repActList'].forEach((id) => {
     if (!doc.getElementById(id)) errs.push('missing report section #' + id);
   });
 
@@ -166,9 +166,15 @@ function report(section, errs) {
 
   if (!el('repTrendList') || el('repTrendList').children.length !== 1) errs.push('trending topics must render 1 row');
   if (txt('repTrendList').indexOf('أسعار الذهب') === -1) errs.push('topic label missing from trend list');
+  const trendPie = el('repTrendList').querySelector('.topic-pie');
+  if (!trendPie) errs.push('trending topics must render a topic pie');
+  if (!trendPie.querySelector('.donut')) errs.push('topic pie must include the share donut');
+  if (trendPie.querySelectorAll('.topic-pie-row').length !== 1) errs.push('topic pie must render 1 legend row');
   if (!el('repKwList') || el('repKwList').children.length !== 2) errs.push('keywords must render 2 rows');
+  if (el('repKwList').querySelectorAll('.vbar').length !== 2) errs.push('keywords must render as vertical bars');
   if (txt('repKwList').indexOf('الذهب') === -1) errs.push('keyword الذهب missing');
   if (!el('repPhList') || el('repPhList').children.length !== 2) errs.push('phrases must render 2 rows');
+  if (el('repPhList').querySelectorAll('.heat-tile').length !== 2) errs.push('phrases must render as a heatmap grid');
   if (txt('repPhList').indexOf('أسعار الذهب') === -1) errs.push('phrase أسعار الذهب missing');
   if (txt('repHtList').indexOf('#الذهب') === -1) errs.push('hashtag #الذهب missing');
 
@@ -177,15 +183,20 @@ function report(section, errs) {
   const legend = donut && donut.parentElement.querySelectorAll('.donut-legend b');
   if (legend && (!legend[0] || legend[0].textContent !== '80%')) errs.push('donut legend positive must be 80%');
 
-  const nat = el('repNational');
-  if (!nat || nat.hasAttribute('hidden')) errs.push('national Egypt coverage card must show for location مصر');
+  const regions = el('repRegions');
+  if (!regions.querySelector('.region-tile.national')) errs.push('national heatmap tile must render for Egypt');
+  if (regions.querySelectorAll('.region-tile').length < 20) errs.push('city heatmap must render the full Egyptian city grid');
+  if (txt('repRegions').indexOf('القاهرة') === -1 && txt('repRegions').indexOf('Cairo') === -1) errs.push('Cairo tile must be part of the city grid');
 
+  const healthChart = el('repHealthChart');
+  if (!healthChart || !healthChart.querySelector('.radar-chart')) errs.push('signal health must render as a radar chart');
   const health = el('repHealthGrid');
   if (!health || health.children.length !== 6) errs.push('signal health grid must render 6 items, got ' + (health ? health.children.length : 'none'));
   if (txt('repHealthGrid').indexOf('Very Strong') === -1) errs.push('signal strength label missing');
 
   const srcs = el('repSrcList');
   if (!srcs || srcs.children.length !== 1 || txt('repSrcList').indexOf('اليوم السابع') === -1) errs.push('sources must render 1 row for اليوم السابع');
+  if (!srcs || srcs.querySelectorAll('.vbar').length !== 1) errs.push('sources must render as vertical bars');
 
   const feed = el('repFeedList');
   if (!feed || feed.querySelectorAll('.feed-item').length !== 1) errs.push('feed must render 1 signal');
@@ -195,8 +206,8 @@ function report(section, errs) {
   if (!trendSvg || !trendSvg.querySelector('.tr-line')) errs.push('trend chart must render an SVG line');
   if (!trendSvg || trendSvg.querySelectorAll('.tr-dot').length !== 2) errs.push('trend chart must plot 2 points');
 
-  const meta1 = txt('repMeta1');
-  if (meta1.indexOf('sources') === -1) errs.push('summary meta must include source count');
+  const metaNote = txt('repGenNote');
+  if (metaNote.indexOf('resources') === -1) errs.push('summary gen-note must include resource count');
 
   report('full render', errs);
 })();

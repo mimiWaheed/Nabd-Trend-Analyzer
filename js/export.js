@@ -52,6 +52,7 @@
   }
 
   const SEV = ['sev-danger', 'sev-warn', 'sev-blue', 'sev-pos', 'sev-purple'];
+  const SEV_HEX = { 'sev-danger': '#F45D5D', 'sev-warn': '#F5B84A', 'sev-blue': '#5EA2FF', 'sev-pos': '#35D07F', 'sev-purple': '#7A5CFF' };
   const TAGS = ['tag-danger', 'tag-blue', 'tag-warn', 'tag-pos', 'tag-purple'];
   const SEV_MAP = { critical: 'sev-danger', high: 'sev-danger', emergency: 'sev-danger', breaking: 'sev-danger', medium: 'sev-warn', moderate: 'sev-warn', low: 'sev-blue', calm: 'sev-pos', positive: 'sev-pos', rising: 'sev-purple' };
   const TAG_TYPE = { 'breaking': 'tag-danger', 'breaking event': 'tag-danger', 'misinformation': 'tag-danger', 'misinformation risk': 'tag-danger', 'crisis': 'tag-danger', 'emergency': 'tag-danger', 'opportunity': 'tag-pos', 'emerging pattern': 'tag-blue', 'emerging': 'tag-blue', 'public reaction': 'tag-purple', 'reaction': 'tag-purple', 'watch': 'tag-warn' };
@@ -73,37 +74,102 @@
   /* ----------------------------------------------------------
      row / card builders — same classes as the dashboard widgets
      ---------------------------------------------------------- */
-  function topicRow(t, i, maxVol) {
-    const label = esc(pick(t, ['label', 'name', 'topic', 'title'], '—'));
-    const vol = esc(pick(t, ['vol', 'volume', 'count', 'value'], '—'));
-    const dRaw = pick(t, ['delta', 'change', 'vsBaseline'], '');
-    const flat = /^(stable|flat|same|even|no change)/i.test(String(dRaw)) || String(pick(t, ['dir', 'up', 'trend'], '')).toLowerCase() === 'flat';
-    const down = !flat && (/^-/.test(String(dRaw)) || String(pick(t, ['dir', 'up', 'trend'], '')).toLowerCase() === 'down');
-    const countN = num(pick(t, ['count', 'vol', 'volume', 'value'], null));
-    const wRaw = num(pick(t, ['w', 'weight', 'intensity'], null));
-    const hasBar = wRaw != null || countN != null;
-    const w = wRaw != null
-      ? Math.max(0, Math.min(100, wRaw))
-      : (countN != null && maxVol > 0 ? Math.max(2, Math.min(100, Math.round((countN / maxVol) * 100))) : 0);
-    const sev = sevCls(pick(t, ['sev', 'severity', 'level'], 'sev-blue'));
-    return '<div class="trend-item">'
-      + '<span class="trend-rank">' + String(i + 1).padStart(2, '0') + '</span>'
-      + '<span class="trend-name">' + label + '</span>'
-      + (hasBar ? '<span class="trend-bar"><i class="' + sev + '" style="--w:' + w + '%"></i></span>' : '')
-      + '<span class="trend-vol mono">' + vol + '</span>'
-      + (dRaw ? '<span class="trend-delta ' + (flat ? 'flat' : down ? 'down' : 'up') + '">' + esc(fmtDelta(dRaw)) + '</span>' : '') + '</div>';
+  function vbarRow(label, count, max) {
+    const n = num(count);
+    const h = max > 0 && n != null ? Math.max(2, Math.min(100, Math.round((n / max) * 100))) : 0;
+    return '<div class="vbar">'
+      + '<b class="vbar-count">' + (n != null ? esc(N.formatNumber(n) + '×') : '—') + '</b>'
+      + '<span class="vbar-track"><i class="vbar-fill" style="--h:' + h + '%"></i></span>'
+      + '<span class="vbar-label" title="' + esc(label) + '">' + esc(label) + '</span></div>';
   }
-  function locationCard(l) {
-    const norm = N.normalizeLocation(l && l.name);
-    const canonical = norm && norm.name;
-    const name = esc(canonical ? (N.lang === 'ar' && norm.ar ? norm.ar : canonical) : pick(l, ['name', 'label', 'city', 'region'], '—'));
-    const count = num(l && l.count);
-    const detected = !!(norm && !norm.national);
-    const sub = detected ? L('ws.gov.detected') : (count != null ? N.formatNumber(count) : '');
-    return '<div class="region-card">'
-      + '<div class="region-top"><span class="region-name">' + name + '</span></div>'
-      + (sub ? '<div class="region-meta mono">' + sub + '</div>' : '')
-      + (count != null ? '<div class="region-bar"><i style="--w:' + Math.min(100, count) + '%"></i></div>' : '') + '</div>';
+  function heatTile(label, count, max) {
+    const n = num(count);
+    const int = max > 0 && n != null ? Math.max(0, Math.min(1, n / max)) : 0;
+    const alpha = (0.06 + 0.52 * int).toFixed(3);
+    return '<span class="heat-tile" style="background:rgba(246,173,60,' + alpha + ')">'
+      + '<span class="heat-tile-txt">' + esc(label) + '</span>'
+      + '<span class="heat-tile-count">' + (n != null ? esc(N.formatNumber(n) + '×') : L('ws.gov.detected')) + '</span></span>';
+  }
+  function topicPie(items) {
+    if (!items || !items.length) return '';
+    const palette = ['#5EA2FF', '#F5B84A', '#35D07F', '#7A5CFF', '#F45D5D'];
+    const vals = items.map((t) => {
+      const v = Math.max(0, num(pick(t, ['count', 'vol', 'volume', 'value'], null)) || 0);
+      const sev = sevCls(pick(t, ['sev', 'severity', 'level'], ''));
+      const color = SEV_HEX[sev] || palette[0];
+      const label = String(pick(t, ['label', 'name', 'topic', 'title'], '—'));
+      return { v: v, color: color, label: label };
+    });
+    const total = vals.reduce((a, x) => a + x.v, 0);
+    const legend = vals.map((x) => {
+      const pct = total > 0 && x.v > 0 ? Math.round((x.v / total) * 100) + '%' : '';
+      return '<div class="topic-pie-row"><span class="topic-pie-dot" style="background:' + x.color + '"></span>'
+        + '<span class="topic-pie-name" title="' + esc(x.label) + '">' + esc(x.label) + '</span>'
+        + '<span class="topic-pie-meta">' + (x.v > 0 ? esc(N.formatNumber(x.v)) : '—') + (pct ? ' · ' + pct : '') + '</span></div>';
+    }).join('');
+    if (!total) {
+      return '<div class="topic-pie"><div class="topic-pie-legend">' + legend + '</div></div>';
+    }
+    const holder = document.createElement('div');
+    holder.className = 'donut';
+    N.buildDonut(holder, vals, N.formatNumber(total, true), L('ws.pie.c'));
+    return '<div class="topic-pie">' + holder.outerHTML + '<div class="topic-pie-legend">' + legend + '</div></div>';
+  }
+  function renderTopicPie(listEl, emptyEl, items) {
+    const html = topicPie(items);
+    if (listEl) { listEl.style.display = html ? '' : 'none'; listEl.innerHTML = html; }
+    if (emptyEl) { emptyEl.hidden = html.length > 0; emptyEl.style.display = ''; }
+  }
+  function regionHeat(locs, r) {
+    const list = Array.isArray(locs) ? locs : [];
+    const govs = Array.isArray(N.governorates) ? N.governorates : [];
+    const counts = {};
+    const meta = {};
+    let national = !!(r && r.national);
+    list.forEach((l) => {
+      const norm = N.normalizeLocation(l && l.name);
+      const n = num(l && l.count);
+      if (norm) {
+        if (norm.national) { national = true; return; }
+        if (!meta[norm.name]) meta[norm.name] = norm;
+        if (n != null) counts[norm.name] = (counts[norm.name] || 0) + n;
+      }
+    });
+    if (!national && list.length && !Object.keys(counts).length) national = true;
+    const max = Object.keys(counts).reduce((m, k) => Math.max(m, counts[k] || 0), 0);
+    const tileName = (g) => (N.lang === 'ar' && g.ar ? g.ar : g.en);
+    const tiles = govs.map((g) => {
+      const n = counts[g.en] || 0;
+      const int = max > 0 && n > 0 ? Math.max(0.15, Math.min(1, n / max)) : 0;
+      const alpha = (0.04 + 0.5 * int).toFixed(3);
+      return '<span class="region-tile' + (n > 0 ? '' : ' zero') + '" style="background:rgba(246,173,60,' + alpha + ')">'
+        + '<b>' + esc(tileName(g)) + '</b><span>' + (n > 0 ? esc(N.formatNumber(n) + '×') : '0') + '</span></span>';
+    }).join('');
+    const nationalTile = national
+      ? '<span class="region-tile national" style="background:rgba(246,173,60,.45)">'
+        + '<b>' + esc(N.lang === 'ar' ? 'مصر' : 'Egypt') + '</b>'
+        + '<span>' + esc(L('ws.national.s')) + '</span></span>'
+      : '';
+    const ranked = Object.keys(counts).filter((k) => (counts[k] || 0) > 0)
+      .sort((a, b) => (counts[b] || 0) - (counts[a] || 0))
+      .slice(0, 8);
+    const rank = ranked.map((k, i) => {
+      const g = meta[k] || {};
+      const label = tileName(g);
+      const n = counts[k] || 0;
+      const w = max > 0 ? Math.max(4, Math.round((n / max) * 100)) : 4;
+      return '<li><span class="rr-n">' + String(i + 1).padStart(2, '0') + '</span>'
+        + '<span class="rr-name" title="' + esc(label) + '">' + esc(label) + '</span>'
+        + '<span class="rr-bar"><i style="--w:' + w + '%"></i></span>'
+        + '<span class="rr-count">' + esc(N.formatNumber(n) + '×') + '</span></li>';
+    }).join('');
+    return '<div class="region-heat"><div class="region-heat-grid">' + nationalTile + tiles + '</div>'
+      + (rank ? '<ol class="region-rank">' + rank + '</ol>' : '') + '</div>';
+  }
+  function renderRegionHeat(container, locs, r) {
+    if (!container) return;
+    container.style.display = '';
+    container.innerHTML = regionHeat(locs, r);
   }
   function influencerRow(f) {
     const name = esc(pick(f, ['name', 'label', 'title'], '—'));
@@ -157,24 +223,63 @@
       + (t ? '<span class="feed-time mono">' + t + '</span>' : '') + '</div>';
     return safeUrl ? '<a class="feed-link" href="' + esc(safeUrl) + '" target="_blank" rel="noopener noreferrer">' + inner + '</a>' : inner;
   }
-  function sourceRow(s) {
-    const n = num(s.count);
-    return '<div class="src-row"><span>' + esc(s.label) + '</span>'
-      + '<span class="src-bar"><i style="--w:' + Math.max(0, Math.min(100, n || 0)) + '%"></i></span>'
-      + '<b class="mono">' + (n != null ? N.formatNumber(n) + '×' : '—') + '</b></div>';
-  }
-  function barRow(label, count, max) {
-    const n = num(count);
-    const w = max > 0 && n != null ? Math.max(2, Math.min(100, Math.round((n / max) * 100))) : 0;
-    return '<div class="src-row"><span>' + esc(label) + '</span>'
-      + '<span class="src-bar"><i style="--w:' + w + '%"></i></span>'
-      + '<b class="mono">' + (n != null ? N.formatNumber(n) + '×' : '—') + '</b></div>';
-  }
   function healthCard(label, value, sub, tone) {
     return '<div class="health-item' + (tone ? ' health-' + tone : '') + '">'
       + '<span class="health-label mono">' + esc(label) + '</span>'
       + '<b class="health-value">' + esc(String(value == null ? '—' : value)) + '</b>'
       + (sub ? '<span class="health-sub mono">' + esc(sub) + '</span>' : '') + '</div>';
+  }
+  function healthRadar(D) {
+    const H = D && typeof D === 'object' ? D : null;
+    if (!H) return '';
+    const v = (x) => { const n = num(x); if (n == null) return 0; return Math.max(0, Math.min(100, n > 0 && n <= 1 ? n * 100 : n)); };
+    const mom = H.momentum || {}, ss = H.signalStrength || {}, sd = H.sourceDiversity || {}, fs = H.freshness || {}, rl = H.relevance || {}, cv = H.coverage || {};
+    const covMap = { high: 90, medium: 60, moderate: 60, low: 30, weak: 30, strong: 90 };
+    const covRaw = (String(cv.corroborationLevel || '').toLowerCase() in covMap)
+      ? covMap[String(cv.corroborationLevel || '').toLowerCase()]
+      : (cv.independentSourceRatio != null ? v(cv.independentSourceRatio * 100) : 0);
+    const vals = [
+      [L('export.h.momentum'), v(mom.score)],
+      [L('export.h.signal'), v(ss.score)],
+      [L('export.h.diversity'), v(sd.score)],
+      [L('export.h.freshness'), fs.recentPercentage != null ? v(fs.recentPercentage) : (fs.averageDaysOld != null ? v(Math.max(0, 100 - fs.averageDaysOld * 20)) : 0)],
+      [L('export.h.relevance'), v(rl.average)],
+      [L('export.h.coverage'), covRaw]
+    ];
+    if (!vals.some((x) => x[1] > 0)) return '';
+    const W = 220, C = 110, R = 76;
+    const pt = (angleDeg, radius) => {
+      const a = ((angleDeg - 90) * Math.PI) / 180;
+      return [Number((C + radius * Math.cos(a)).toFixed(1)), Number((C + radius * Math.sin(a)).toFixed(1))];
+    };
+    const poly = (scale) => vals.map((x, i) => pt(i * 60, R * scale).join(',')).join(' ');
+    const rings = [0.25, 0.5, 0.75, 1].map((s) => '<polygon class="radar-ring" points="' + poly(s) + '"/>').join('');
+    const axes = vals.map((x, i) => {
+      const p = pt(i * 60, R);
+      return '<line class="radar-axis" x1="' + C + '" y1="' + C + '" x2="' + p[0] + '" y2="' + p[1] + '"/>';
+    }).join('');
+    const gridPts = vals.map((x, i) => pt(i * 60, Math.max(2, (x[1] / 100) * R)).join(',')).join(' ');
+    const dots = vals.map((x, i) => {
+      const p = pt(i * 60, Math.max(2, (x[1] / 100) * R));
+      return '<circle class="radar-dot" cx="' + p[0] + '" cy="' + p[1] + '" r="2.6"/>';
+    }).join('');
+    const labels = vals.map((x, i) => {
+      const p = pt(i * 60, R + 15);
+      const pd = pt(i * 60, Math.max(4, (x[1] / 100) * R));
+      const cx = p[0];
+      const anchor = cx < C - 12 ? 'end' : cx > C + 12 ? 'start' : 'middle';
+      const top = pd[1] < C - 6;
+      return '<text class="radar-label" x="' + p[0] + '" y="' + p[1] + '" text-anchor="' + anchor + '" dominant-baseline="' + (top ? 'auto' : 'hanging') + '">' + esc(x[0]) + '</text>'
+        + '<text class="radar-val" x="' + pd[0] + '" y="' + pd[1] + '" dy="' + (top ? '-4' : '9') + '" text-anchor="' + anchor + '">' + Math.round(x[1]) + '</text>';
+    }).join('');
+    return '<svg class="radar-chart" viewBox="0 0 ' + W + ' ' + W + '" role="img" aria-label="Signal health radar">'
+      + rings + axes + '<polygon class="radar-grid" points="' + gridPts + '"/>' + dots + labels + '</svg>';
+  }
+  function renderHealthChart(D) {
+    const chart = $('repHealthChart');
+    const html = healthRadar(D);
+    if (chart) { chart.hidden = !html; chart.innerHTML = html; }
+    return html;
   }
 
   /* ----------------------------------------------------------
@@ -182,11 +287,18 @@
      ---------------------------------------------------------- */
   function renderDashboardMetrics(r) {
     const D = r.dashboard && typeof r.dashboard === 'object' ? r.dashboard : null;
+    const setCardHidden = (anchorId, on) => {
+      const el = $(anchorId);
+      const card = el ? el.closest('.ws-card') : null;
+      if (card) card.hidden = on;
+    };
     if (!D) {
       listWidget($('repKwList'), $('repEmptyKw'), []);
       listWidget($('repPhList'), $('repEmptyPh'), []);
       listWidget($('repHtList'), $('repEmptyHt'), []);
       listWidget($('repHealthGrid'), $('repEmptyHealth'), []);
+      setCardHidden('repHtList', true);
+      renderHealthChart(null);
       return;
     }
     const kws = Array.isArray(D.keywords) ? D.keywords : [];
@@ -194,8 +306,8 @@
     const hts = Array.isArray(D.hashtags) ? D.hashtags : [];
     const kwMax = kws.reduce((m, k) => Math.max(m, num(k.count) || 0), 0);
     const phMax = phs.reduce((m, p) => Math.max(m, num(p.count) || 0), 0);
-    listWidget($('repKwList'), $('repEmptyKw'), kws.slice(0, 10).map((k) => barRow(k.keyword, k.count, kwMax)));
-    listWidget($('repPhList'), $('repEmptyPh'), phs.slice(0, 8).map((p) => barRow(p.phrase, p.count, phMax)));
+    listWidget($('repKwList'), $('repEmptyKw'), kws.slice(0, 10).map((k) => vbarRow(k.keyword, k.count, kwMax, k.percentage)));
+    listWidget($('repPhList'), $('repEmptyPh'), phs.slice(0, 8).map((p) => heatTile(p.phrase, p.count, phMax)));
     const htHtml = hts.slice(0, 16).map((h) => {
       const n = num(h.count);
       return '<span class="chip ht-chip"><span class="chip-pulse" aria-hidden="true"></span> <span>' + esc(h.tag || h.hashtag || '') + (n != null ? ' · ' + N.formatNumber(n, true) : '') + '</span></span>';
@@ -204,6 +316,7 @@
     if (htWrap) { htWrap.style.display = htHtml.length ? '' : 'none'; htWrap.innerHTML = htHtml.join(''); }
     const htEmpty = $('repEmptyHt');
     if (htEmpty) { htEmpty.hidden = htHtml.length > 0; htEmpty.style.display = ''; }
+    setCardHidden('repHtList', htHtml.length === 0);
 
     const items = [];
     const mom = D.momentum && typeof D.momentum === 'object' ? D.momentum : null;
@@ -218,6 +331,7 @@
     if (rl) items.push(healthCard(L('export.h.relevance'), rl.average != null ? Math.round(rl.average) : '—', 'H ' + rl.high + ' · M ' + rl.medium + ' · L ' + rl.low));
     const cv = D.coverage && typeof D.coverage === 'object' ? D.coverage : null;
     if (cv) items.push(healthCard(L('export.h.coverage'), cv.corroborationLevel || '—', cv.sourceCount + ' ' + L('ws.src.count') + ' / ' + cv.articleCount + ' ' + L('export.articles')));
+    renderHealthChart(D);
     listWidget($('repHealthGrid'), $('repEmptyHealth'), items);
   }
 
@@ -331,8 +445,15 @@
     set('repKpiPostsDelta', dPosts != null && String(dPosts).trim() ? String(dPosts) : '—');
     set('repKpiActiveDelta', dActive != null && String(dActive).trim() ? String(dActive) : '—');
     if (r.sentiment && r.sentiment.label) {
-      const lbl = String(r.sentiment.label);
-      set('repKpiSentDelta', lbl.charAt(0).toUpperCase() + lbl.slice(1));
+      const lbl = String(r.sentiment.label).toUpperCase();
+      const el = $('repKpiSentDelta');
+      if (el) {
+        el.textContent = lbl.charAt(0) + lbl.slice(1).toLowerCase();
+        el.classList.remove('pos', 'neg', 'neu');
+        if (lbl.indexOf('POS') !== -1) el.classList.add('pos');
+        else if (lbl.indexOf('NEG') !== -1) el.classList.add('neg');
+        else el.classList.add('neu');
+      }
     } else set('repKpiSentDelta', '—');
     set('repKpiCrisesDelta', '—');
   }
@@ -379,12 +500,16 @@
       if (es) es.hidden = false;
     }
 
-    const meta1 = $('repMeta1');
-    if (meta1) meta1.textContent = r.articles && r.articles.length ? r.articles.length + ' ' + L('ws.src.count') : '';
-    const meta2 = $('repMeta2');
-    if (meta2) meta2.textContent = r.analyzedAt ? L('ws.updated') + ' ' + timeAgo(r.analyzedAt) : '';
-    const meta3 = $('repMeta3');
-    if (meta3) meta3.textContent = r.confidence != null ? L('ws.conf') + ' ' + Math.round(r.confidence) + '%' : '';
+    const genNote = $('repGenNote');
+    if (genNote) {
+      const ts = r.analyzedAt || r.generatedAt || (r.raw && r.raw.generatedAt);
+      const rel = N.formatRelativeTime(ts);
+      const arts = Array.isArray(r.articles) ? r.articles.length : 0;
+      const n = arts || ((r.stats && r.stats.totalPosts) || 0);
+      const note = rel ? L('ws.gen.note').split('{t}').join(rel).split('{n}').join(String(n)) : '';
+      genNote.hidden = !note;
+      if (note) genNote.innerHTML = note.replace(/\b\d+(?:[mhdw])?\b/g, (m) => '<b>' + m + '</b>');
+    }
 
     const chips = $('repChips');
     if (chips) {
@@ -404,21 +529,7 @@
   function renderRegions(r) {
     const has = (v) => Array.isArray(v) && v.length > 0;
     const locs = has(r.locations) ? r.locations : (Array.isArray(r.topLocations) ? r.topLocations : []);
-    const regional = locs.filter((l) => {
-      const n = N.normalizeLocation(l && l.name);
-      return n ? !n.national : true;
-    });
-    const showNational = (!locs.length && r.national) || (locs.length && !regional.length);
-    const el = $('repEmptyLocations');
-    const nl = $('repNational');
-    if (showNational) {
-      listWidget($('repRegions'), el, []);
-      if (el) el.hidden = true;
-      if (nl) nl.hidden = false;
-    } else {
-      listWidget($('repRegions'), el, regional.map(locationCard));
-      if (nl) nl.hidden = true;
-    }
+    renderRegionHeat($('repRegions'), locs, r);
   }
 
   function renderDonut(r, query) {
@@ -433,34 +544,47 @@
     if (subEl) subEl.textContent = L('ws.sent.sub').split('{q}').join(query || '—').split('{s}').join(scopeLbl);
 
     const s = r.sentiment;
-    if (s && Array.isArray(s) && s.length) {
+    const paintSegs = (segs) => {
+      const tot = segs.reduce((a, x) => a + x.v, 0) || 1;
+      segs.forEach((x) => { x.p = Math.round((x.v / tot) * 100); });
+      if (tot <= 0) {
+        if (emptyS) {
+          emptyS.hidden = false;
+          const p = emptyS.querySelector('p') || emptyS;
+          p.textContent = L('ws.sent.na') + (s && s.label ? ' (' + s.label + ')' : '');
+        }
+        if (donutEl) donutEl.innerHTML = '';
+        legendB.forEach((b) => { b.textContent = '—'; });
+        return;
+      }
       if (emptyS) emptyS.hidden = true;
-      N.buildDonut(donutEl, s, (s[0].v || 0) + '%', L('ws.donut.pos').toUpperCase());
-      legendB.forEach((b, i) => { if (s[i]) b.textContent = (s[i].v || 0) + '%'; });
+      let dom = 0;
+      for (let i = 1; i < segs.length; i++) if (segs[i].p > segs[dom].p) dom = i;
+      N.buildDonut(donutEl, segs.map((x) => ({ v: x.p, color: x.color })), segs[dom].p + '%', String(segs[dom].label).toUpperCase());
+      legendB.forEach((b, i) => { if (segs[i]) b.textContent = segs[i].p + '%'; });
+    };
+    const SEG_DEF = [
+      { key: 'positive', label: L('ws.donut.pos'), color: '#35D07F' },
+      { key: 'neutral', label: L('ws.donut.neu'), color: '#7A8BB5' },
+      { key: 'negative', label: L('ws.donut.neg'), color: '#F45D5D' }
+    ];
+    if (s && Array.isArray(s) && s.length) {
+      paintSegs(SEG_DEF.map((def, i) => {
+        const item = s[i] || {};
+        const raw = item.v != null ? item.v : item.value;
+        return { v: Math.max(0, num(raw) || 0), label: def.label, color: def.color };
+      }));
       return;
     }
     if (s && typeof s === 'object') {
-      const pos = num(s.positive), neu = num(s.neutral), neg = num(s.negative);
-      const anyVal = (pos || 0) + (neu || 0) + (neg || 0) > 0;
-      if (anyVal) {
-        if (emptyS) emptyS.hidden = true;
-        const segs = [
-          { v: Math.max(0, pos || 0), color: '#35D07F' },
-          { v: Math.max(0, neu || 0), color: '#7A8BB5' },
-          { v: Math.max(0, neg || 0), color: '#F45D5D' }
-        ];
-        const tot = segs.reduce((a, x) => a + x.v, 0) || 1;
-        segs.forEach((x) => { x.v = Math.round((x.v / tot) * 100); });
-        N.buildDonut(donutEl, segs, (segs[0].v || 0) + '%', L('ws.donut.pos').toUpperCase());
-        legendB.forEach((b, i) => { if (segs[i]) b.textContent = segs[i].v + '%'; });
-        return;
-      }
-      if (emptyS) {
-        emptyS.hidden = false;
-        const p = emptyS.querySelector('p') || emptyS;
-        p.textContent = L('ws.sent.na') + (s.label ? ' (' + s.label + ')' : '');
-      }
-    } else if (emptyS) {
+      paintSegs(SEG_DEF.map((def) => ({
+        v: Math.max(0, num(s[def.key]) || 0),
+        label: def.label,
+        color: def.color
+      })));
+      return;
+    }
+    if (emptyS) {
       emptyS.hidden = false;
       const p = emptyS.querySelector('p') || emptyS;
       p.textContent = L('ws.sent.na');
@@ -483,20 +607,28 @@
     const hls = has(r.highlights) ? r.highlights : (Array.isArray(r.aiHighlights) ? r.aiHighlights : []);
     const feed = has(r.articles) ? r.articles : (Array.isArray(r.sampleSources) ? r.sampleSources : []);
 
-    const maxCount = topics.reduce((m, t) => {
-      const n = num(pick(t, ['count', 'vol', 'volume', 'value'], null));
-      return n != null && n > m ? n : m;
-    }, 0);
-    listWidget($('repTrendList'), $('repEmptyTopics'), topics.map((t, i) => topicRow(t, i, maxCount)));
+    renderTopicPie($('repTrendList'), $('repEmptyTopics'), topics);
     listWidget($('repHlList'), $('repEmptyHl'), hls.map(highlightCard));
     listWidget($('repFeedList'), $('repEmptyFeed'), feed.slice(0, 30).map(feedItem));
     listWidget($('repRankList'), $('repEmptyInf'), infs.map(influencerRow));
+    const infCard = $('repRankList') ? $('repRankList').closest('.ws-card') : null;
+    if (infCard) infCard.hidden = infs.length === 0;
 
     renderRegions(r);
 
+    /* overall analysis summary (numbers only, real contract values) */
+    const tsEl = $('repTotalSummary');
+    if (tsEl) {
+      const rows = totalSummaryRows(r);
+      tsEl.hidden = rows.length === 0;
+      tsEl.innerHTML = rows.length
+        ? '<span class="ts-label">' + esc(L('ws.hl.total')) + '</span>' + rows.map((x) => '<p class="ts-text">' + x + '</p>').join('')
+        : '';
+    }
+
     let srcs;
     if (has(r.sources)) {
-      srcs = r.sources.slice(0, 8);
+      srcs = r.sources.slice(0, 12);
     } else {
       const countBy = {};
       feed.forEach((f) => {
@@ -506,12 +638,83 @@
       srcs = Object.keys(countBy)
         .map((label) => ({ label: label, count: countBy[label] }))
         .sort((a, b) => b.count - a.count)
-        .slice(0, 8);
+        .slice(0, 12);
     }
-    listWidget($('repSrcList'), $('repEmptySrc'), srcs.map(sourceRow));
+    const srcMax = srcs.reduce((m, s) => Math.max(m, num(s.count) || 0), 0);
+    const srcList = $('repSrcList');
+    const srcEmpty = $('repEmptySrc');
+    const srcFoot = $('repSrcFoot');
+    const paintSrcs = (count) => {
+      if (srcList) {
+        srcList.style.display = srcs.length ? '' : 'none';
+        srcList.innerHTML = srcs.slice(0, count).map((s) => vbarRow(s.label, s.count, srcMax, s.percentage)).join('');
+      }
+      if (srcEmpty) srcEmpty.hidden = srcs.length > 0;
+    };
+    if (srcList) { srcList.dataset.realCount = String(srcs.length); }
+    paintSrcs(5);
+    if (srcFoot) {
+      srcFoot.innerHTML = '';
+      if (srcs.length > 5) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'src-toggle';
+        btn.dataset.expanded = 'false';
+        btn.textContent = L('ws.src.more').split('{n}').join(String(srcs.length));
+        btn.addEventListener('click', () => {
+          const exp = btn.dataset.expanded === 'true';
+          btn.dataset.expanded = String(!exp);
+          btn.textContent = exp
+            ? L('ws.src.more').split('{n}').join(String(srcs.length))
+            : L('ws.src.fewer');
+          paintSrcs(exp ? 5 : srcs.length);
+        });
+        srcFoot.appendChild(btn);
+      }
+    }
 
     renderDonut(r, query);
     renderTrend(r);
+  }
+
+  function totalSummaryRows(r) {
+    const D = r.dashboard && typeof r.dashboard === 'object' ? r.dashboard : null;
+    const stats = r.stats || (r.raw && r.raw.stats) || {};
+    const rows = [];
+    const mom = D && D.momentum ? D.momentum : null;
+    if (mom) {
+      const sc = num(mom.score);
+      rows.push(L('ws.total.momentum')
+        .split('{dir}').join(esc(String(mom.label || mom.direction || '—')))
+        .split('{score}').join(sc != null ? '<b>' + Math.round(sc) + '</b>' : '<b>—</b>'));
+    }
+    const sent = r.sentiment && typeof r.sentiment === 'object' ? r.sentiment : null;
+    if (sent && (num(sent.positive) != null || num(sent.neutral) != null || num(sent.negative) != null)) {
+      const pos = num(sent.positive) != null ? Math.round(num(sent.positive)) : 0;
+      const neu = num(sent.neutral) != null ? Math.round(num(sent.neutral)) : 0;
+      const neg = num(sent.negative) != null ? Math.round(num(sent.negative)) : 0;
+      rows.push(L('ws.total.sentiment')
+        .split('{label}').join(esc(String(sent.label || '—')))
+        .split('{pos}').join('<b>' + pos + '</b>')
+        .split('{neu}').join('<b>' + neu + '</b>')
+        .split('{neg}').join('<b>' + neg + '</b>'));
+    }
+    if (D && Array.isArray(D.keywords) && D.keywords.length) {
+      const kw = D.keywords[0].keyword || D.keywords[0].label || '';
+      if (kw) rows.push(L('ws.total.kw').split('{kw}').join('<b>' + esc(kw) + '</b>'));
+    }
+    const art = num(stats.totalPosts);
+    const srcN = D && D.sourceDiversity && num(D.sourceDiversity.uniqueSources) != null
+      ? num(D.sourceDiversity.uniqueSources)
+      : (Array.isArray(r.sources) ? r.sources.length : null);
+    if (art != null && srcN != null) {
+      rows.push(L('ws.total.coverage')
+        .split('{art}').join('<b>' + N.formatNumber(art) + '</b>')
+        .split('{src}').join('<b>' + srcN + '</b>'));
+    }
+    const e = num(stats.emergencyAlerts);
+    if (e != null && e > 0) rows.push(L('ws.total.crisis').split('{e}').join('<b>' + e + '</b>'));
+    return rows;
   }
 
   function render() {
@@ -551,7 +754,13 @@
   /* ----------------------------------------------------------
      wiring
      ---------------------------------------------------------- */
-  if (printBtn) printBtn.addEventListener('click', () => { try { window.print(); } catch (e) {} });
+  if (printBtn) printBtn.addEventListener('click', () => {
+    if (draft) {
+      if (N.recordDownload) N.recordDownload('pdf', null);
+      if (N.activityAdd) N.activityAdd('export', { q: String(draft.q || (draft.r && draft.r.query) || '') });
+    }
+    try { window.print(); } catch (e) {}
+  });
   document.addEventListener('nabd-lang', render);
   window.addEventListener('resize', (() => {
     let t = null;
@@ -560,6 +769,176 @@
       t = setTimeout(() => { if (report && !report.hidden) renderTrend(draft && draft.r ? draft.r : {}); }, 200);
     };
   })());
+
+  /* ---------- suggested actions on the report page ---------- */
+  function currentDraft() {
+    if (!draft || !draft.r || typeof draft.r !== 'object') return null;
+    return draft;
+  }
+  function buildComplaintTemplate(d) {
+    const r = (d && d.r) || {};
+    const brief = (r.briefMeta && r.briefMeta.headline) || (r.aiBrief && r.aiBrief.headline)
+      || (Array.isArray(r.highlights) && r.highlights[0] && (r.highlights[0].title || r.highlights[0].detail)) || '';
+    const q = (d && d.q) || r.query || '';
+    return [
+      N.fmt('ws.fac.email.line1', { q: q }),
+      N.fmt('ws.fac.email.line2', { t: new Date((d && d.t) || Date.now()).toLocaleString() }),
+      brief ? N.fmt('ws.fac.email.line3', { b: brief }) : '',
+      N.fmt('ws.fac.email.line4', { u: window.location.href }),
+      '',
+      N.fmt('ws.fac.email.line5', { q: q }),
+      '',
+      N.fmt('ws.fac.email.sign')
+    ].filter(Boolean).join('\n');
+  }
+  function facilityEmailModal(d) {
+    return new Promise((resolve) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'c-modal';
+      const facs = Array.isArray(N.facilities) ? N.facilities : [];
+      const items = facs.map((f, i) =>
+        '<button type="button" class="fac-btn" data-f="' + i + '">'
+        + '<span class="fac-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg></span>'
+        + '<span><b>' + esc(L(f.key)) + '</b><span class="fac-mail">' + esc(f.email || '') + '</span></span>'
+        + '</button>').join('');
+      const body = buildComplaintTemplate(d);
+      wrap.innerHTML =
+        '<div class="c-modal-mask"></div>'
+        + '<div class="c-modal-card c-modal-card-scroll" role="dialog" aria-modal="true">'
+        + '<div class="c-modal-t">' + esc(L('ws.actions.pick')) + '</div>'
+        + '<div class="c-modal-s selectable">'
+        + '<p class="fac-desc">' + esc(L('ws.actions.pick.s')) + '</p>'
+        + '<div class="fac-grid">' + items + '</div>'
+        + '<label class="fac-field"><span>' + esc(L('ws.actions.pick.to')) + '</span>'
+        + '<input type="email" class="inp" id="facTo" data-i18n-ph="ws.actions.pick.to.ph" placeholder="' + esc(L('ws.actions.pick.to.ph')) + '"></label>'
+        + '<label class="fac-field"><span>' + esc(L('ws.actions.pick.body')) + '</span>'
+        + '<textarea class="inp" id="facBody" rows="9">' + esc(body) + '</textarea></label>'
+        + '</div>'
+        + '<div class="c-modal-actions">'
+        + '<button type="button" class="btn btn-ghost btn-sm" data-c="cancel">' + esc(L('db.fb.conf.cancel')) + '</button>'
+        + '<button type="button" class="btn btn-primary btn-sm" data-c="send">' + esc(L('ws.actions.pick.send')) + '</button>'
+        + '</div>'
+        + '</div>';
+      const done = (val) => {
+        try { document.removeEventListener('keydown', onKey); } catch (err) {}
+        if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+        resolve(val);
+      };
+      const onKey = (e) => { if (e.key === 'Escape') done(null); };
+      const toEl = wrap.querySelector('#facTo');
+      const bodyEl = wrap.querySelector('#facBody');
+      wrap.querySelector('.c-modal-mask').addEventListener('click', () => done(null));
+      wrap.querySelector('[data-c="cancel"]').addEventListener('click', () => done(null));
+      wrap.querySelector('[data-c="send"]').addEventListener('click', () => {
+        const to = (toEl.value || '').trim();
+        if (!to) { N.toast(document.body, L('ws.actions.pick.err')); toEl.focus(); return; }
+        done({ to: to, body: bodyEl.value });
+      });
+      wrap.querySelectorAll('.fac-btn').forEach((b) => b.addEventListener('click', () => {
+        const f = facs[Number(b.dataset.f)];
+        if (f && f.email) toEl.value = f.email;
+        toEl.focus();
+      }));
+      document.addEventListener('keydown', onKey);
+      document.body.appendChild(wrap);
+    });
+  }
+  const REMINDER_MS = {
+    '12h': 12 * 3600000, '24h': 24 * 3600000, '2d': 2 * 24 * 3600000,
+    '3d': 3 * 24 * 3600000, '1w': 7 * 24 * 3600000, '2w': 14 * 24 * 3600000,
+    '1mo': 30 * 24 * 3600000
+  };
+  function reminderModal() {
+    return new Promise((resolve) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'c-modal';
+      const opts = [
+        { value: '12h', label: L('ws.reminder.12h'), reco: true },
+        { value: '24h', label: L('ws.reminder.24h'), reco: false },
+        { value: '2d', label: L('ws.reminder.2d'), reco: false },
+        { value: '3d', label: L('ws.reminder.3d'), reco: false },
+        { value: '1w', label: L('ws.reminder.1w'), reco: false },
+        { value: '2w', label: L('ws.reminder.2w'), reco: false },
+        { value: '1mo', label: L('ws.reminder.1mo'), reco: false }
+      ];
+      const optHtml = opts.map((o) =>
+        '<button type="button" class="rem-opt' + (o.reco ? ' reco' : '') + '" data-v="' + o.value + '">'
+        + '<span>' + esc(o.label) + '</span>'
+        + (o.reco ? '<span class="rem-meta">' + esc(L('ws.reminder.reco')) + '</span>' : '')
+        + '</button>').join('');
+      wrap.innerHTML =
+        '<div class="c-modal-mask"></div>'
+        + '<div class="c-modal-card c-modal-card-scroll" role="dialog" aria-modal="true">'
+        + '<div class="c-modal-t">' + esc(L('ws.reminder.t')) + '</div>'
+        + '<div class="c-modal-s selectable">' + esc(L('ws.reminder.s')) + optHtml
+        + '<p class="rem-hint">' + esc(L('ws.reminder.will')) + '</p></div>'
+        + '<div class="c-modal-actions"><button type="button" class="btn btn-ghost btn-sm" data-c="cancel">' + esc(L('db.fb.conf.cancel')) + '</button></div>'
+        + '</div>';
+      const done = (val) => {
+        try { document.removeEventListener('keydown', onKey); } catch (err) {}
+        if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+        resolve(val);
+      };
+      const onKey = (e) => { if (e.key === 'Escape') done(null); };
+      wrap.querySelector('.c-modal-mask').addEventListener('click', () => done(null));
+      wrap.querySelector('[data-c="cancel"]').addEventListener('click', () => done(null));
+      wrap.querySelectorAll('.rem-opt').forEach((b) => b.addEventListener('click', () => done(b.dataset.v)));
+      document.addEventListener('keydown', onKey);
+      document.body.appendChild(wrap);
+    });
+  }
+  async function setReminder() {
+    const d = currentDraft();
+    if (!d) return;
+    const choice = await reminderModal();
+    if (!choice) return;
+    const q = String(d.q || (d.r && d.r.query) || '');
+    const ms = REMINDER_MS[choice] || REMINDER_MS['12h'];
+    if (N.alertsAdd) N.alertsAdd({ q: q, dueAt: Date.now() + ms });
+    if (N.activityAdd) N.activityAdd('alert', { q: q });
+    N.toast(document.body, L('app.toast.reminder'));
+  }
+  const repActList = $('repActList');
+  if (repActList) repActList.addEventListener('click', (e) => {
+    const b = e.target.closest('.act-btn');
+    if (!b) return;
+    const d = currentDraft();
+    if (!d) return;
+    const act = b.dataset.act;
+    if (act === 'send') {
+      facilityEmailModal(d).then((res) => {
+        if (!res) return;
+        N.toast(document.body, L('app.toast.email'));
+        const q = String(d.q || (d.r && d.r.query) || '');
+        const subject = N.fmt('ws.fac.email.line1', { q: q });
+        try {
+          window.location.href = 'mailto:' + res.to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(res.body);
+        } catch (err) {}
+        N.toast(document.body, L('app.toast.facility'));
+      });
+    } else if (act === 'save') {
+      try {
+        let saved = [];
+        try { saved = JSON.parse(localStorage.getItem('nabd-saved-reports') || '[]'); if (!Array.isArray(saved)) saved = []; } catch (err) { saved = []; }
+        saved.unshift(d);
+        saved = saved.slice(0, 20);
+        localStorage.setItem('nabd-saved-reports', JSON.stringify(saved));
+        if (N.activityAdd) N.activityAdd('save', { q: String(d.q || (d.r && d.r.query) || '') });
+        N.toast(document.body, L('app.toast.savedReport'));
+      } catch (err) {
+        N.toast(document.body, L('app.toast.exported'));
+      }
+    } else if (act === 'share') {
+      const url = window.location.href;
+      if (window.navigator && navigator.share) {
+        navigator.share({ title: L('export.title'), text: String(d.q || (d.r && d.r.query) || ''), url: url }).catch(() => {});
+      } else {
+        try { window.navigator.clipboard.writeText(url); N.toast(document.body, L('app.toast.shared')); } catch (err) { N.toast(document.body, L('app.toast.exported')); }
+      }
+    } else if (act === 'remind') {
+      setReminder();
+    }
+  });
 
   render();
 })();

@@ -180,10 +180,27 @@ html[dir="rtl"] .rep-query-line { justify-content: flex-start; }
 
   .exp-feed { gap: 6px; }
   .feed-track, .feed-item, .exp-feed { animation: none !important; }
-  .region-bar i, .trend-bar i, .src-bar i { animation: none !important; }
+  .hbar-fill, .vbar-fill, .region-rank .rr-bar i, .heat-tile { animation: none !important; }
   .live-badge .live-dot, .chip-pulse { animation: none !important; }
 
   .exp-trend svg { position: static; width: 100%; height: 240px; }
+
+  .topic-pie .donut { width: 132px; height: 132px; }
+
+  .health-chart { gap: 10px; }
+  .radar-chart { width: 190px; height: 190px; }
+  .radar-grid { fill: rgba(94, 162, 255, .1); stroke: rgba(11, 18, 32, .55); }
+  .radar-ring, .radar-axis { stroke: rgba(11, 18, 32, .14); }
+  .radar-dot { fill: #2B7DE0; }
+
+  .vbar-chart { overflow: hidden; }
+  .gen-note:hover { box-shadow: none; }
+
+  /* new components: full-width lists print, interactive bits stay hidden */
+  .src-toggle, .c-modal, .c-modal-mask, .c-modal-card { display: none !important; }
+  .src-card .vbar-chart { min-height: 0; }
+  .total-summary { border-color: rgba(11, 18, 32, .12); background: #FFFFFF; }
+  .total-summary::before { background: rgba(11, 18, 32, .12); box-shadow: none; }
 
   .ws-foot { padding: 20px 0 0; }
 }

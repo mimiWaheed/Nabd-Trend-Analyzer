@@ -160,6 +160,24 @@
         <div class="conn-tools"><span class="status-chip neu"><span class="d"></span><span data-i18n="app.soon">Coming soon</span></span></div>
       </div>
     </div>
+
+    <div class="ws-card conn-n8n">
+      <div class="card-head">
+        <span class="card-title" data-i18n="conn.n8n">n8n resources</span>
+        <button class="btn btn-primary btn-sm" id="n8nAdd" data-i18n="conn.add">Add API</button>
+      </div>
+      <p class="conn-n8n-sub" data-i18n="conn.n8n.s">Extend NABD with automation resources. Add an API key to enable each one.</p>
+      <div id="n8nList"></div>
+      <div id="n8nForm" hidden>
+        <div class="conn-n8n-row">
+          <input type="text" class="inp" id="n8nName" maxlength="60" placeholder="Resource name">
+          <input type="password" class="inp" id="n8nKey" data-i18n-ph="conn.api.ph" placeholder="Paste your API key…">
+          <button class="btn btn-primary btn-sm" id="n8nSave" data-i18n="conn.add">Add API</button>
+          <button class="btn btn-ghost btn-sm" id="n8nCancel" data-i18n="prof.cancel">Cancel</button>
+        </div>
+      </div>
+      <p class="conn-n8n-more" data-i18n="conn.soon.more">More sources are on the way.</p>
+    </div>
   </main>
 
   <script src="../js/script.js"></script>

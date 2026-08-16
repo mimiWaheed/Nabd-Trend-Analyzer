@@ -41,84 +41,11 @@
     <div class="app-head-row">
       <span class="card-title" style="font-size:1rem" data-i18n="rep.generated">Generated reports</span>
     </div>
-    <div class="doc-grid" style="margin-bottom:28px">
-      <div class="doc-card">
-        <div class="doc-type" style="background:linear-gradient(135deg,#5EA2FF,#7A5CFF)">PDF</div>
-        <div class="doc-title" data-i18n="rep.r1">Weekly Egypt Brief</div>
-        <div class="doc-meta">Today · 07:00 · 14 sources</div>
-        <div class="doc-tags"><span class="status-chip neu" data-i18n="rep.type.weekly">WEEKLY</span></div>
-        <div class="doc-actions">
-          <button class="btn btn-ghost btn-sm" data-rep="preview" data-i18n="rep.preview">Preview</button>
-          <button class="btn btn-ghost btn-sm" data-rep="download" data-i18n="rep.download">Download</button>
-          <button class="btn btn-ghost btn-sm" data-rep="share" data-i18n="rep.share">Share</button>
-          <button class="btn btn-ghost btn-sm" data-rep="delete">✕</button>
-        </div>
-      </div>
-      <div class="doc-card">
-        <div class="doc-type" style="background:linear-gradient(135deg,#FF9A5C,#FF5C7A)">RISK</div>
-        <div class="doc-title" data-i18n="rep.r2">Inflation Risk Watch</div>
-        <div class="doc-meta">Yesterday · 18:22 · 9 sources</div>
-        <div class="doc-tags"><span class="status-chip bad"><span class="d"></span>ELEVATED</span></div>
-        <div class="doc-actions">
-          <button class="btn btn-ghost btn-sm" data-rep="preview" data-i18n="rep.preview">Preview</button>
-          <button class="btn btn-ghost btn-sm" data-rep="download" data-i18n="rep.download">Download</button>
-          <button class="btn btn-ghost btn-sm" data-rep="share" data-i18n="rep.share">Share</button>
-          <button class="btn btn-ghost btn-sm" data-rep="delete">✕</button>
-        </div>
-      </div>
-      <div class="doc-card">
-        <div class="doc-type" style="background:linear-gradient(135deg,#5CFFB1,#5EA2FF)">SOC</div>
-        <div class="doc-title" data-i18n="rep.r3">Social Pulse Report</div>
-        <div class="doc-meta">Mon · 09:30 · 12 sources</div>
-        <div class="doc-tags"><span class="status-chip ok"><span class="d"></span>POSITIVE</span></div>
-        <div class="doc-actions">
-          <button class="btn btn-ghost btn-sm" data-rep="preview" data-i18n="rep.preview">Preview</button>
-          <button class="btn btn-ghost btn-sm" data-rep="download" data-i18n="rep.download">Download</button>
-          <button class="btn btn-ghost btn-sm" data-rep="share" data-i18n="rep.share">Share</button>
-          <button class="btn btn-ghost btn-sm" data-rep="delete">✕</button>
-        </div>
-      </div>
-      <div class="doc-card">
-        <div class="doc-type" style="background:linear-gradient(135deg,#7A5CFF,#5CFFB1)">PDF</div>
-        <div class="doc-title" data-i18n="rep.r4">Monthly Intelligence Summary</div>
-        <div class="doc-meta">Aug 01 · 20 sources</div>
-        <div class="doc-tags"><span class="status-chip neu" data-i18n="rep.type.monthly">MONTHLY</span></div>
-        <div class="doc-actions">
-          <button class="btn btn-ghost btn-sm" data-rep="preview" data-i18n="rep.preview">Preview</button>
-          <button class="btn btn-ghost btn-sm" data-rep="download" data-i18n="rep.download">Download</button>
-          <button class="btn btn-ghost btn-sm" data-rep="share" data-i18n="rep.share">Share</button>
-          <button class="btn btn-ghost btn-sm" data-rep="delete">✕</button>
-        </div>
-      </div>
-      <div class="doc-card">
-        <div class="doc-type" style="background:linear-gradient(135deg,#FFC75C,#FF9A5C)">TREND</div>
-        <div class="doc-title" data-i18n="rep.r5">Suez Canal Trend Report</div>
-        <div class="doc-meta">Jul 28 · 11 sources</div>
-        <div class="doc-tags"><span class="status-chip neu" data-i18n="rep.type.trend">TREND</span></div>
-        <div class="doc-actions">
-          <button class="btn btn-ghost btn-sm" data-rep="preview" data-i18n="rep.preview">Preview</button>
-          <button class="btn btn-ghost btn-sm" data-rep="download" data-i18n="rep.download">Download</button>
-          <button class="btn btn-ghost btn-sm" data-rep="share" data-i18n="rep.share">Share</button>
-          <button class="btn btn-ghost btn-sm" data-rep="delete">✕</button>
-        </div>
-      </div>
-      <div class="doc-card">
-        <div class="doc-type" style="background:linear-gradient(135deg,#FF5C7A,#7A5CFF)">RISK</div>
-        <div class="doc-title" data-i18n="rep.r6">Egypt Market Risk Review</div>
-        <div class="doc-meta">Jul 25 · 15 sources</div>
-        <div class="doc-tags"><span class="status-chip warn"><span class="d"></span>MODERATE</span></div>
-        <div class="doc-actions">
-          <button class="btn btn-ghost btn-sm" data-rep="preview" data-i18n="rep.preview">Preview</button>
-          <button class="btn btn-ghost btn-sm" data-rep="download" data-i18n="rep.download">Download</button>
-          <button class="btn btn-ghost btn-sm" data-rep="share" data-i18n="rep.share">Share</button>
-          <button class="btn btn-ghost btn-sm" data-rep="delete">✕</button>
-        </div>
-</div>
-    </div>
+    <div class="doc-grid" id="repGrid" style="margin-bottom:28px"></div>
 
-    <div class="empty-state" id="repEmpty" style="display:none">
+    <div class="empty-state" id="repEmpty" hidden>
       <span class="e-ic">🗂</span>
-      <p data-i18n="rep.empty">No reports yet — run an analysis and export one here.</p>
+      <p data-i18n="rep.saved.empty">No saved reports yet — save one from the dashboard.</p>
     </div>
 
     <div class="app-head-row">

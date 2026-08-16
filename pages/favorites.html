@@ -45,80 +45,32 @@
     </div>
 
     <div class="fav-sec on" data-fs="reports">
-      <div class="doc-grid">
-        <div class="doc-card">
-          <div class="doc-type" style="background:linear-gradient(135deg,#5EA2FF,#7A5CFF)">PDF</div>
-          <div class="doc-title" data-i18n="fav.r1">Weekly Egypt Brief</div>
-          <div class="doc-meta">Today · 07:00</div>
-          <div class="doc-actions">
-            <button class="btn btn-ghost btn-sm" data-rep="preview" data-i18n="rep.preview">Preview</button>
-            <button class="icon-btn sm star-btn on"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6L3.3 9.4l6-.9z"/></svg></button>
-          </div>
-        </div>
-        <div class="doc-card">
-          <div class="doc-type" style="background:linear-gradient(135deg,#FF9A5C,#FF5C7A)">RISK</div>
-          <div class="doc-title" data-i18n="fav.r2">Inflation Risk Watch</div>
-          <div class="doc-meta">Yesterday · 18:22</div>
-          <div class="doc-actions">
-            <button class="btn btn-ghost btn-sm" data-rep="preview" data-i18n="rep.preview">Preview</button>
-            <button class="icon-btn sm star-btn on"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6L3.3 9.4l6-.9z"/></svg></button>
-          </div>
-        </div>
-        <div class="doc-card">
-          <div class="doc-type" style="background:linear-gradient(135deg,#5CFFB1,#5EA2FF)">SOC</div>
-          <div class="doc-title" data-i18n="fav.r3">Social Pulse Report</div>
-          <div class="doc-meta">Mon · 09:30</div>
-          <div class="doc-actions">
-            <button class="btn btn-ghost btn-sm" data-rep="preview" data-i18n="rep.preview">Preview</button>
-            <button class="icon-btn sm star-btn on"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6L3.3 9.4l6-.9z"/></svg></button>
-          </div>
-        </div>
+      <div class="doc-grid" id="favReports"></div>
+      <div class="fav-empty" id="favReportsEmpty" hidden>
+        <span class="prof-empty-ic"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6L3.3 9.4l6-.9z"/></svg></span>
+        <p data-i18n="fav.empty.reports">No favorite reports yet.</p>
       </div>
     </div>
 
     <div class="fav-sec" data-fs="searches">
-      <div class="app-row">
-        <span class="row-icon"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></svg></span>
-        <div class="grow"><div class="row-title" data-i18n="fav.s1">Egyptian Pound</div><div class="row-sub">4 runs this week</div></div>
-        <button class="icon-btn sm star-btn on"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6L3.3 9.4l6-.9z"/></svg></button>
-      </div>
-      <div class="app-row">
-        <span class="row-icon"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></svg></span>
-        <div class="grow"><div class="row-title" data-i18n="fav.s2">Suez Canal</div><div class="row-sub">3 runs this week</div></div>
-        <button class="icon-btn sm star-btn on"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6L3.3 9.4l6-.9z"/></svg></button>
-      </div>
-      <div class="app-row">
-        <span class="row-icon"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></svg></span>
-        <div class="grow"><div class="row-title" data-i18n="fav.s3">New Capital</div><div class="row-sub">2 runs this week</div></div>
-        <button class="icon-btn sm star-btn on"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6L3.3 9.4l6-.9z"/></svg></button>
+      <div id="favSearches"></div>
+      <div class="fav-empty" id="favSearchesEmpty" hidden>
+        <span class="prof-empty-ic"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></svg></span>
+        <p data-i18n="fav.empty.searches">No favorite searches yet.</p>
       </div>
     </div>
 
     <div class="fav-sec" data-fs="dashboards">
-      <div class="app-row">
-        <span class="row-icon"><svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/></svg></span>
-        <div class="grow"><div class="row-title" data-i18n="fav.d1">Governorate overview</div><div class="row-sub">27 regions · updated 2m ago</div></div>
-        <button class="icon-btn sm star-btn on"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6L3.3 9.4l6-.9z"/></svg></button>
-      </div>
-      <div class="app-row">
-        <span class="row-icon"><svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/></svg></span>
-        <div class="grow"><div class="row-title" data-i18n="fav.d2">Crisis command board</div><div class="row-sub">Live escalation map</div></div>
-        <button class="icon-btn sm star-btn on"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6L3.3 9.4l6-.9z"/></svg></button>
-      </div>
-      <div class="app-row">
-        <span class="row-icon"><svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/></svg></span>
-        <div class="grow"><div class="row-title" data-i18n="fav.d3">Social pulse</div><div class="row-sub">Facebook + RSS sentiment</div></div>
-        <button class="icon-btn sm star-btn on"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6L3.3 9.4l6-.9z"/></svg></button>
+      <div class="fav-empty">
+        <span class="prof-empty-ic"><svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/></svg></span>
+        <p data-i18n="fav.empty.dashboards">Saved dashboards will appear here.</p>
       </div>
     </div>
 
     <div class="fav-sec" data-fs="topics">
-      <div class="app-toolbar">
-        <div class="toolbar-group">
-          <span class="query-chip"><span data-i18n="fav.t1">Economy</span></span>
-          <span class="query-chip"><span data-i18n="fav.t2">Suez Canal</span></span>
-          <span class="query-chip"><span data-i18n="fav.t3">Education</span></span>
-        </div>
+      <div class="fav-empty">
+        <span class="prof-empty-ic"><svg viewBox="0 0 24 24"><path d="M7 7h10M7 12h10M7 17h6"/></svg></span>
+        <p data-i18n="fav.empty.topics">Followed topics will appear here.</p>
       </div>
     </div>
   </main>

@@ -45,7 +45,13 @@
         </div>
         <div class="prof-about-body">
           <div class="prof-hero">
-            <span class="avatar" id="profAvatar" style="width:64px;height:64px;border-radius:20px;font-size:1.3rem"><svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></span>
+            <div class="prof-avatar-wrap">
+              <span class="avatar" id="profAvatar" style="width:64px;height:64px;border-radius:20px;font-size:1.3rem"><svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></span>
+              <button type="button" class="icon-btn sm prof-photo-btn" id="profPhotoBtn" data-i18n-title="prof.photo.add" title="Add photo">
+                <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </button>
+              <input type="file" id="profPhotoInput" accept="image/*" hidden>
+            </div>
             <div>
               <div class="prof-hero-name" id="profName">—</div>
               <span class="status-chip ok" id="profVerified"><span class="d"></span></span>
@@ -178,6 +184,23 @@
           <button type="submit" class="btn btn-primary btn-sm" id="profEditSave" data-i18n="prof.save">Save changes</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Crop photo modal -->
+  <div class="c-modal" id="cropModal" hidden>
+    <div class="c-modal-mask" id="cropModalMask"></div>
+    <div class="c-modal-card crop-modal" role="dialog" aria-modal="true" aria-labelledby="cropTitle">
+      <div class="c-modal-t" id="cropTitle" data-i18n="prof.crop.t">Crop photo</div>
+      <p class="crop-hint" data-i18n="prof.crop.s">Drag to reposition. Use the corner handle to resize the square.</p>
+      <div class="crop-stage" id="cropStage">
+        <img id="cropImg" alt="">
+        <div class="crop-frame" id="cropFrame"><span class="crop-handle"></span></div>
+      </div>
+      <div class="c-modal-actions">
+        <button type="button" class="btn btn-ghost btn-sm" id="cropCancel" data-i18n="prof.cancel">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" id="cropSave" data-i18n="prof.crop.save">Crop &amp; save</button>
+      </div>
     </div>
   </div>
 
