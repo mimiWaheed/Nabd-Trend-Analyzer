@@ -72,7 +72,8 @@
     { id: 'favorites', href: 'favorites.html', key: 'app.nav.favorites', ic: IC.star },
     { id: 'notifications', href: 'notifications.html', key: 'app.nav.notifications', ic: IC.bell, badge: true },
     { id: 'settings', href: 'settings.html', key: 'app.nav.settings', ic: IC.sliders },
-    { id: 'profile', href: 'profile.html', key: 'app.nav.profile', ic: IC.user }
+    { id: 'profile', href: 'profile.html', key: 'app.nav.profile', ic: IC.user },
+    { id: 'admin', href: 'admin.html', key: 'app.nav.admin', ic: IC.sliders, adminOnly: true }
   ];
 
   const MENU = [
@@ -110,7 +111,11 @@
   function injectShell() {
     const holder = $('appShell');
     if (!holder) return false;
-    const navHtml = NAV.map((it) => {
+    const u = N.getUser();
+    const userRole = (u && u.role) || 'analyst';
+    const isAdminUser = userRole === 'nabd_admin' || userRole === 'superadmin';
+    const visibleNav = NAV.filter((it) => !it.adminOnly || isAdminUser);
+    const navHtml = visibleNav.map((it) => {
       let h = '';
       if (it.sep) h += '<div class="app-nav-sep" data-i18n="' + it.sep + '"></div>';
       h += '<a class="app-nav-item' + (page === it.id ? ' active' : '') + '" href="' + it.href + '" data-page="' + it.href + '" data-nav="' + it.id + '" data-i18n-title="' + it.key + '" title="' + L(it.key) + '">'
@@ -808,6 +813,7 @@
         else if (act === 'profile') N.navigate('profile.html');
         else if (act === 'history') N.navigate('history.html');
         else if (act === 'citizen-portal') N.navigate('citizen-portal.html');
+        else if (act === 'admin') N.navigate('admin.html');
       });
     });
     document.querySelectorAll('[data-qa-suggest]').forEach((b) => {
@@ -1673,6 +1679,28 @@
         input.focus();
       }
     }
+
+    /* ---------- admin stats (visible only to nabd_admin / superadmin) ---------- */
+    const u = N.getUser();
+    const userRole = (u && u.role) || 'analyst';
+    if (userRole === 'nabd_admin' || userRole === 'superadmin') {
+      const adminStatsEl = $('dbAdminStats');
+      if (adminStatsEl) adminStatsEl.hidden = false;
+      const adminQa = $('dbQaAdmin');
+      if (adminQa) adminQa.hidden = false;
+      fetch('/api/users?action=admin-stats', { headers: { Accept: 'application/json' }, credentials: 'include' })
+        .then((r) => r.json())
+        .then((d) => {
+          if (!d.ok || !d.stats) return;
+          const s = d.stats;
+          const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+          set('dbAdminUsers', s.totalUsers.toLocaleString());
+          set('dbAdminReports', s.totalSearches.toLocaleString());
+          set('dbAdminExports', s.totalDownloads.toLocaleString());
+          set('dbAdminRPM', s.estimatedRPM.toLocaleString());
+        })
+        .catch(() => {});
+    }
   }
 
   /* ---------------- history ---------------- */
@@ -2303,6 +2331,21 @@
   /* ---------------- connections ---------------- */
   function initConnections() {
     const cards = document.querySelectorAll('.conn-card');
+    const u = N.getUser();
+    const userRole = (u && u.role) || 'analyst';
+    const isAdminUser = userRole === 'nabd_admin' || userRole === 'superadmin';
+    const socialOnly = !isAdminUser;
+
+    /* Analysts: hide non-social cards + n8n section. Admins: see everything. */
+    if (socialOnly) {
+      cards.forEach((c) => {
+        const id = c.dataset.conn;
+        if (id !== 'fb' && id !== 'ig') { c.style.display = 'none'; }
+      });
+      const n8nSection = document.querySelector('.conn-n8n');
+      if (n8nSection) n8nSection.style.display = 'none';
+    }
+
     const fbSt = () => (N.fb ? N.fb.read() : { connected: false }).connected;
     const fbData = () => (N.fb ? N.fb.read() : {});
     const state = { fb: fbSt() ? 'on' : 'off', rss: 'on', gnews: 'off', gtrends: 'off', newsapi: 'off', ig: 'soon', sp: 'soon', gq: 'soon' };
@@ -2756,6 +2799,9 @@
     render();
   }
 
+  /* admin page self-initializes via admin.js */
+  function initAdmin() {}
+
   /* ---------------- boot ---------------- */
   function boot() {
     if (!injectShell()) return;
@@ -2771,6 +2817,7 @@
     else if (page === 'notifications') initNotifications();
     else if (page === 'favorites') initFavorites();
     else if (page === 'searches') initSearches();
+    else if (page === 'admin') initAdmin();
     if (N.checkAlerts) N.checkAlerts();
     window.addEventListener('app-unread', updateBadge);
   }

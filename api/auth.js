@@ -304,6 +304,7 @@ async function actionVerifyEmail(req, res) {
         organization: pending.organization || null,
         country: pending.country || null,
         lang: pending.lang || 'en',
+        role: 'analyst',
         createdAt: nowIso(),
         updatedAt: nowIso(),
         lastLoginAt: null

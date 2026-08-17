@@ -35,6 +35,26 @@
       </div>
     </div>
 
+    <!-- Admin Stats (hidden by default, shown for nabd_admin/superadmin) -->
+    <div class="stats-grid" id="dbAdminStats" style="margin-bottom:22px" hidden>
+      <div class="stat">
+        <div class="stat-val" id="dbAdminUsers">—</div>
+        <div class="stat-label" data-i18n="admin.stat.users">Total Users</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="dbAdminReports">—</div>
+        <div class="stat-label" data-i18n="admin.stat.reports">Total Reports</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="dbAdminExports">—</div>
+        <div class="stat-label" data-i18n="admin.stat.exports">Total Exports</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="dbAdminRPM">—</div>
+        <div class="stat-label" data-i18n="admin.stat.rpm">Est. Reports/Min</div>
+      </div>
+    </div>
+
     <div class="qa-grid" style="margin-bottom:22px" id="dbQuick">
       <div class="qa-card" data-qa="new">
         <span class="qa-ic"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
@@ -63,6 +83,10 @@
       <div class="qa-card" data-qa="citizen-portal">
         <span class="qa-ic"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg></span>
         <span class="qa-label" data-i18n="dash.qa.nav.citizen-portal">Citizen Portal</span>
+      </div>
+      <div class="qa-card" data-qa="admin" id="dbQaAdmin" hidden>
+        <span class="qa-ic"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+        <span class="qa-label" data-i18n="dash.qa.nav.admin">Admin Panel</span>
       </div>
     </div>
 

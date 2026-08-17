@@ -2,9 +2,15 @@
    /api/users                  GET → profile (default action "me")
    /api/users?action=me        GET / PATCH → read / update the profile
    /api/users?action=settings  GET / PATCH → persistent user settings (JSONB)
-   /api/users?action=recent-researches  GET → the user's actual recent searches */
+   /api/users?action=recent-researches  GET → the user's actual recent searches
+   Admin actions (require nabd_admin or superadmin):
+   /api/users?action=admin-stats     GET → platform-wide statistics
+   /api/users?action=admin-list      GET → all users (paginated)
+   /api/users?action=admin-view      GET → view a specific user
+   /api/users?action=admin-role      POST → change a user's role
+   /api/users?action=admin-delete    DELETE → delete a user */
 
-const { requireAuth } = require('../lib/auth');
+const { requireAuth, requireAdmin, ROLES, isSuperAdmin } = require('../lib/auth');
 const storeApi = require('../lib/store');
 const { asyncBody, fail, ok, failCode, publicUser, queryOf } = require('../lib/respond');
 const { isName, isPhone, cleanPhone } = require('../lib/validate');
@@ -57,6 +63,10 @@ async function actionMe(req, res) {
     patch.organization = String(body.organization).trim() || null;
   }
   if (body.role !== undefined) {
+    /* Only superadmin can change their own role via profile PATCH */
+    if (!isSuperAdmin(auth.user)) {
+      return fail(res, 403, 'FORBIDDEN', 'Only superadmin can change roles via profile');
+    }
     const v = String(body.role).trim();
     if (v.length > 80) return fail(res, 422, 'VALIDATION_ERROR', 'Role is too long');
     patch.role = v || null;
@@ -130,6 +140,145 @@ async function actionRecentResearches(req, res) {
   return ok(res, { researches: items });
 }
 
+/* ---- Admin actions ---- */
+
+const VALID_ADMIN_ROLES = [ROLES.ANALYST, ROLES.ADMIN];
+
+async function actionAdminStats(req, res) {
+  if (req.method !== 'GET') return fail(res, 405, 'METHOD_NOT_ALLOWED');
+  const auth = await requireAdmin(req, res);
+  if (!auth) return;
+  const store = storeApi.makeStore();
+
+  const [totalUsers, totalSearches, totalAnalyses, totalDownloads] = await Promise.all([
+    store.countAllUsers(),
+    store.countAllSearches(),
+    store.countAllAnalyses(),
+    store.countAllDownloads()
+  ]);
+
+  const estimatedRPM = totalAnalyses > 0
+    ? Math.round((totalAnalyses / Math.max(1, Math.floor((Date.now() - new Date(auth.user.createdAt).getTime()) / 60000))) * 100) / 100
+    : 0;
+
+  return ok(res, {
+    stats: {
+      totalUsers,
+      totalSearches,
+      totalAnalyses,
+      totalDownloads,
+      estimatedRPM
+    }
+  });
+}
+
+async function actionAdminList(req, res) {
+  if (req.method !== 'GET') return fail(res, 405, 'METHOD_NOT_ALLOWED');
+  const auth = await requireAdmin(req, res);
+  if (!auth) return;
+  const store = storeApi.makeStore();
+
+  const q = queryOf(req);
+  const limit = Math.min(Math.max(parseInt(q.limit, 10) || 25, 1), 100);
+  const offset = Math.max(parseInt(q.offset, 10) || 0, 0);
+
+  const users = await store.listAllUsers({ limit, offset });
+  const total = await store.countAllUsers();
+
+  return ok(res, { users, total, limit, offset });
+}
+
+async function actionAdminView(req, res) {
+  if (req.method !== 'GET') return fail(res, 405, 'METHOD_NOT_ALLOWED');
+  const auth = await requireAdmin(req, res);
+  if (!auth) return;
+  const store = storeApi.makeStore();
+
+  const q = queryOf(req);
+  const targetId = String(q.id || '');
+  if (!targetId) return fail(res, 422, 'VALIDATION_ERROR', 'User ID is required');
+
+  const target = await store.findUserById(targetId);
+  if (!target) return fail(res, 404, 'NOT_FOUND', 'User not found');
+
+  const [analyses, searches, downloads] = await Promise.all([
+    store.countAnalyses(targetId),
+    store.countSearches(targetId),
+    store.countDownloads(targetId)
+  ]);
+
+  return ok(res, {
+    user: publicUser(target),
+    usage: { analyses, searches, downloads }
+  });
+}
+
+async function actionAdminRole(req, res) {
+  if (req.method !== 'POST') return fail(res, 405, 'METHOD_NOT_ALLOWED');
+  const auth = await requireAdmin(req, res);
+  if (!auth) return;
+  const store = storeApi.makeStore();
+
+  let body;
+  try { body = await asyncBody(req); } catch (e) { return fail(res, 400, e.code || 'BAD_REQUEST'); }
+
+  const targetId = String((body && body.userId) || '');
+  const newRole = String((body && body.role) || '').trim();
+
+  if (!targetId) return fail(res, 422, 'VALIDATION_ERROR', 'userId is required');
+  if (VALID_ADMIN_ROLES.indexOf(newRole) === -1) return fail(res, 422, 'VALIDATION_ERROR', 'Role must be analyst or nabd_admin');
+
+  /* Cannot change your own role */
+  if (targetId === auth.user.id) return fail(res, 422, 'VALIDATION_ERROR', 'Cannot change your own role');
+
+  /* Only superadmin can promote to nabd_admin */
+  if (newRole === ROLES.ADMIN && !isSuperAdmin(auth.user)) {
+    return fail(res, 403, 'FORBIDDEN', 'Only superadmin can promote to admin');
+  }
+
+  const target = await store.findUserById(targetId);
+  if (!target) return fail(res, 404, 'NOT_FOUND', 'User not found');
+
+  /* Cannot change superadmin's role */
+  if (target.role === ROLES.SUPERADMIN) return fail(res, 403, 'FORBIDDEN', 'Cannot change superadmin role');
+
+  const updated = await store.updateUser(targetId, { role: newRole });
+  await events.logActivity(auth.user.id, 'ROLE_CHANGED', { targetId, newRole, previousRole: target.role || null });
+  await events.createNotification(targetId, 'system', 'Role updated', 'Your role has been updated to ' + newRole);
+
+  return ok(res, { user: publicUser(updated) });
+}
+
+async function actionAdminDelete(req, res) {
+  if (req.method !== 'DELETE') return fail(res, 405, 'METHOD_NOT_ALLOWED');
+  const auth = await requireAdmin(req, res);
+  if (!auth) return;
+  const store = storeApi.makeStore();
+
+  const q = queryOf(req);
+  const targetId = String(q.id || '');
+  if (!targetId) return fail(res, 422, 'VALIDATION_ERROR', 'User ID is required');
+
+  /* Cannot delete yourself */
+  if (targetId === auth.user.id) return fail(res, 422, 'VALIDATION_ERROR', 'Cannot delete your own account');
+
+  const target = await store.findUserById(targetId);
+  if (!target) return fail(res, 404, 'NOT_FOUND', 'User not found');
+
+  /* Cannot delete superadmin */
+  if (target.role === ROLES.SUPERADMIN) return fail(res, 403, 'FORBIDDEN', 'Cannot delete superadmin');
+
+  /* Only superadmin can delete nabd_admin */
+  if (target.role === ROLES.ADMIN && !isSuperAdmin(auth.user)) {
+    return fail(res, 403, 'FORBIDDEN', 'Only superadmin can delete an admin');
+  }
+
+  await store.deleteUser(targetId);
+  await events.logActivity(auth.user.id, 'USER_DELETED', { targetId, email: target.email });
+
+  return ok(res, { deleted: true });
+}
+
 module.exports = async function handler(req, res) {
   const q = queryOf(req);
   const action = String(q.action || 'me');
@@ -137,6 +286,11 @@ module.exports = async function handler(req, res) {
     case 'me': return actionMe(req, res);
     case 'settings': return actionSettings(req, res);
     case 'recent-researches': return actionRecentResearches(req, res);
+    case 'admin-stats': return actionAdminStats(req, res);
+    case 'admin-list': return actionAdminList(req, res);
+    case 'admin-view': return actionAdminView(req, res);
+    case 'admin-role': return actionAdminRole(req, res);
+    case 'admin-delete': return actionAdminDelete(req, res);
     default: return fail(res, 404, 'NOT_FOUND', 'Unknown users action: ' + action);
   }
 };
