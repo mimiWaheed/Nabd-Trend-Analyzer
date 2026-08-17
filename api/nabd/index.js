@@ -43,6 +43,7 @@ module.exports = async function handler(req, res) {
   const context = body.context || {};
 
   const config = getProviderConfig();
+  console.error('[NABD AI] Config:', { baseUrl: config.baseUrl, model: config.model, hasKey: !!config.apiKey, keyPrefix: config.apiKey ? config.apiKey.slice(0, 4) : 'none' });
   if (!config.apiKey) return fail(res, 503, 'AI_NOT_CONFIGURED', 'AI assistant is not configured');
 
   const contextParts = [];
@@ -78,6 +79,7 @@ module.exports = async function handler(req, res) {
 
     if (!response.ok) {
       const errBody = await response.text().catch(() => '');
+      console.error('[NABD AI] Provider error', response.status, errBody.slice(0, 500));
       if (response.status === 429) return fail(res, 429, 'RATE_LIMITED', 'Too many requests. Please try again later.');
       if (response.status === 401) return fail(res, 503, 'AI_AUTH_FAILED', 'AI service authentication failed');
       return fail(res, 502, 'AI_PROVIDER_ERROR', 'The AI service returned an error');
@@ -90,6 +92,7 @@ module.exports = async function handler(req, res) {
 
     return ok(res, { reply: reply.trim() });
   } catch (e) {
+    console.error('[NABD AI] Catch error:', e.message, e.stack);
     return fail(res, 502, 'AI_PROVIDER_ERROR', 'Could not reach the AI service');
   }
 };
