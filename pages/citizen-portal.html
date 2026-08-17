@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NABD (نبض) - citizen portal: submit complaints and view recent incident analysis.">
+  <title>Citizen Portal - NABD (نبض)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%235EA2FF'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%23070B14'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('nabd-theme') || 'dark';
+        if (t === 'system') t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+        var l = localStorage.getItem('nabd-lang') || 'en';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('lang', l);
+        document.documentElement.setAttribute('dir', l === 'ar' ? 'rtl' : 'ltr');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="app-page" data-page="citizen-portal">
+
+  <div id="appShell"></div>
+
+  <main class="app-main">
+    <div class="app-head">
+      <div>
+        <h1 data-i18n="app.title.citizen-portal">Citizen Portal</h1>
+        <p data-i18n="app.sub.citizen-portal">Submit a complaint or report an incident — your report is sent directly to the relevant facility.</p>
+      </div>
+    </div>
+
+    <!-- Complaint Form -->
+    <div class="cp-form-card" id="cpFormCard">
+      <div class="cp-form-head">
+        <h2 class="card-title" data-i18n="cp.form.title">New Complaint</h2>
+        <p class="card-sub" data-i18n="cp.form.sub">SELECT A CATEGORY AND DESCRIBE YOUR ISSUE</p>
+      </div>
+
+      <form id="cpForm" autocomplete="off">
+        <div class="cp-categories" id="cpCategories">
+          <button type="button" class="cp-cat-btn" data-cat="power-outage">
+            <span class="cp-cat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>
+            <span class="cp-cat-label" data-i18n="cp.cat.power">Power Outage</span>
+          </button>
+          <button type="button" class="cp-cat-btn" data-cat="water-flooding">
+            <span class="cp-cat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></span>
+            <span class="cp-cat-label" data-i18n="cp.cat.water">Water Flooding</span>
+          </button>
+          <button type="button" class="cp-cat-btn" data-cat="fire">
+            <span class="cp-cat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></span>
+            <span class="cp-cat-label" data-i18n="cp.cat.fire">Fire</span>
+          </button>
+          <button type="button" class="cp-cat-btn" data-cat="incident">
+            <span class="cp-cat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+            <span class="cp-cat-label" data-i18n="cp.cat.incident">Incident</span>
+          </button>
+          <button type="button" class="cp-cat-btn" data-cat="complaint">
+            <span class="cp-cat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+            <span class="cp-cat-label" data-i18n="cp.cat.complaint">Complaint</span>
+          </button>
+          <button type="button" class="cp-cat-btn" data-cat="infrastructure">
+            <span class="cp-cat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M5 20V8l7-5 7 5v12"/><path d="M9 20v-6h6v6"/></svg></span>
+            <span class="cp-cat-label" data-i18n="cp.cat.infrastructure">Infrastructure</span>
+          </button>
+          <button type="button" class="cp-cat-btn" data-cat="waste">
+            <span class="cp-cat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></span>
+            <span class="cp-cat-label" data-i18n="cp.cat.waste">Waste Management</span>
+          </button>
+          <button type="button" class="cp-cat-btn" data-cat="other">
+            <span class="cp-cat-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></span>
+            <span class="cp-cat-label" data-i18n="cp.cat.other">Other</span>
+          </button>
+        </div>
+
+        <input type="hidden" id="cpCategory" name="category" value="">
+
+        <div class="fac-field">
+          <span data-i18n="cp.form.facility">Send report to facility</span>
+          <div class="cp-facility-chips" id="cpFacilityChips"></div>
+        </div>
+
+        <div class="fac-field">
+          <span data-i18n="cp.form.from">From (sender email)</span>
+          <input type="email" class="inp" id="cpFrom" value="nabdanalyzerinfo@gmail.com" readonly>
+        </div>
+
+        <div class="fac-field">
+          <span data-i18n="cp.form.to">To (facility email)</span>
+          <input type="email" class="inp" id="cpTo" data-i18n-ph="cp.form.to.ph" placeholder="facility@example.com">
+        </div>
+
+        <div class="fac-field">
+          <span data-i18n="cp.form.subject">Subject</span>
+          <input type="text" class="inp" id="cpSubject" data-i18n-ph="cp.form.subject.ph" placeholder="Brief description of the issue">
+        </div>
+
+        <div class="fac-field">
+          <span data-i18n="cp.form.body">Complaint details</span>
+          <textarea class="inp" id="cpBody" rows="7" data-i18n-ph="cp.form.body.ph" placeholder="Describe your complaint or incident in detail..."></textarea>
+        </div>
+
+        <div class="cp-form-actions">
+          <button type="button" class="btn btn-ghost btn-sm" id="cpResetBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+            <span data-i18n="cp.form.reset">Reset</span>
+          </button>
+          <button type="submit" class="btn btn-primary btn-sm" id="cpSendBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
+            <span data-i18n="cp.form.send">Send Report</span>
+          </button>
+        </div>
+      </form>
+
+      <div class="cp-status" id="cpStatus" hidden>
+        <div class="cp-status-inner" id="cpStatusInner"></div>
+      </div>
+    </div>
+
+    <!-- Recent Incidents Summary -->
+    <div class="cp-incidents-card" id="cpIncidentsCard">
+      <div class="cp-incidents-head">
+        <div>
+          <h2 class="card-title" data-i18n="cp.incidents.title">Recent Analyzed Incidents</h2>
+          <p class="card-sub" data-i18n="cp.incidents.sub">SUMMARY OF YOUR LATEST ANALYSIS RESULTS</p>
+        </div>
+      </div>
+      <div class="cp-incidents-list" id="cpIncidentsList"></div>
+      <div class="empty-state" id="cpIncidentsEmpty">
+        <span class="e-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;color:var(--text-muted)"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>
+        <p data-i18n="cp.incidents.empty">No incident analyses yet. Run an analysis from the dashboard to see results here.</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/script.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/citizen-portal.js"></script>
+</body>
+</html>
