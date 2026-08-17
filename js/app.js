@@ -807,6 +807,7 @@
         else if (act === 'settings') N.navigate('settings.html');
         else if (act === 'profile') N.navigate('profile.html');
         else if (act === 'history') N.navigate('history.html');
+        else if (act === 'citizen-portal') N.navigate('citizen-portal.html');
       });
     });
     document.querySelectorAll('[data-qa-suggest]').forEach((b) => {
