@@ -62,7 +62,6 @@
     <!-- ============ HERO ============ -->
     <section class="hero" id="top">
       <div class="hero-bg" aria-hidden="true">
-        <canvas id="shaderCanvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:0"></canvas>
         <div class="grid-overlay"></div>
         <div class="pattern-mesh"></div>
         <div class="pattern-shine"></div>
@@ -561,101 +560,5 @@
   </main>
 
   <script src="js/script.js"></script>
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js"
-    }
-  }
-  </script>
-  <script type="module">
-  import * as THREE from 'three';
-
-  const canvas = document.getElementById('shaderCanvas');
-  if (canvas) {
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-    const r = 3.9;
-    const az = 180 * Math.PI / 180;
-    const pol = 115 * Math.PI / 180;
-    camera.position.set(
-      r * Math.sin(pol) * Math.cos(az) - 0.5,
-      r * Math.cos(pol) + 0.1,
-      r * Math.sin(pol) * Math.sin(az)
-    );
-    camera.lookAt(0, 0, 0);
-
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-    const geo = new THREE.PlaneGeometry(12, 12, 128, 128);
-    const mat = new THREE.ShaderMaterial({
-      uniforms: {
-        uTime: { value: 0.2 },
-        uSpeed: { value: 0.1 },
-        uDensity: { value: 1.1 },
-        uFrequency: { value: 5.5 },
-        uStrength: { value: 2.4 },
-        uAmplitude: { value: 0 },
-        uColor1: { value: new THREE.Color(0x000082) },
-        uColor2: { value: new THREE.Color(0xa954fe) },
-        uColor3: { value: new THREE.Color(0x000000) },
-        uBrightness: { value: 1.1 }
-      },
-      vertexShader: `
-        uniform float uTime, uSpeed, uDensity, uFrequency, uStrength, uAmplitude;
-        varying vec2 vUv;
-        varying float vElevation;
-        void main() {
-          vUv = uv;
-          vec3 p = position;
-          float wave = sin(p.x * uFrequency + uTime * uSpeed) * cos(p.y * uFrequency * 0.8 + uTime * uSpeed * 0.6) * uStrength;
-          float ripple = sin((p.x + p.y) * uDensity * 3.0 + uTime * uSpeed * 1.5) * uAmplitude;
-          p.z += wave + ripple;
-          vElevation = p.z;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform vec3 uColor1, uColor2, uColor3;
-        uniform float uBrightness;
-        varying vec2 vUv;
-        varying float vElevation;
-        void main() {
-          float t = smoothstep(-2.5, 2.5, vElevation);
-          vec3 c = mix(uColor1, uColor2, t);
-          c = mix(c, uColor3, smoothstep(0.6, 1.0, t));
-          c *= uBrightness;
-          float edge = smoothstep(0.0, 0.15, vUv.x) * smoothstep(1.0, 0.85, vUv.x)
-                     * smoothstep(0.0, 0.15, vUv.y) * smoothstep(1.0, 0.85, vUv.y);
-          gl_FragColor = vec4(c, edge * 0.95);
-        }
-      `,
-      transparent: true,
-      side: THREE.DoubleSide
-    });
-
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.rotation.x = -Math.PI / 2;
-    mesh.rotation.z = 235 * Math.PI / 180;
-    scene.add(mesh);
-
-    const clock = new THREE.Clock();
-    function animate() {
-      requestAnimationFrame(animate);
-      mat.uniforms.uTime.value = clock.getElapsedTime();
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-  }
-  </script>
 </body>
 </html>
