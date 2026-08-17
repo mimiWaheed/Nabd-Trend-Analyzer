@@ -60,12 +60,16 @@ async function actionIndex(req, res, q) {
       sourceCount = Math.min(n, 1000000);
     }
 
+    const VALID_STATUSES = ['pending', 'processing', 'completed', 'error'];
+    const rawStatus = body && body.status ? String(body.status).toLowerCase() : 'pending';
+    const status = VALID_STATUSES.indexOf(rawStatus) !== -1 ? rawStatus : 'pending';
+
     const search = await store.createSearch({
       id: randomToken(16),
       userId: auth.user.id,
       query,
       scope,
-      status: 'pending',
+      status,
       error: null,
       category,
       sourceCount,

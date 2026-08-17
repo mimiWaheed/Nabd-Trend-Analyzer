@@ -2399,6 +2399,7 @@
     }
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 60000);
+    let searchId = null;
     return loadApiConfig()
       .then((cfg) => fetch(apiWebhookUrl(cfg), {
         method: 'POST',
@@ -2416,6 +2417,17 @@
           if (!txt || !txt.trim()) throw new Error('trend-analysis empty response');
           try { return JSON.parse(txt); } catch (e) { throw new Error('trend-analysis invalid json'); }
         });
+      })
+      .then((result) => {
+        return api('/api/searches', { method: 'POST', body: { query: q, scope: scope, status: 'completed' } })
+          .then((res) => {
+            if (res && res.search) searchId = res.search.id;
+          })
+          .catch(() => {})
+          .then(() => {
+            result._searchId = searchId;
+            return result;
+          });
       })
       .catch((err) => {
         clearTimeout(timer);

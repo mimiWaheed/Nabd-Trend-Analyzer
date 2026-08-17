@@ -338,6 +338,7 @@
     let running = false;
     let query = '';
     let lastResult = null;
+    let lastSearchId = null;
     let analysisState = 'idle';           /* idle | loading | success | error */
     const ERR = $('dbError');
     const retryBtn = $('dbRetryBtn');
@@ -433,7 +434,8 @@
     function beginRun(q) {
       query = (q || '').trim() || '';
       /* stale-state guard: clear the previous normalized result immediately */
-      lastResult = null;
+          lastResult = null;
+          lastSearchId = null;
       resetTrend();
       if (loadQuery) loadQuery.textContent = query;
       if (queryEl) queryEl.textContent = query;
@@ -449,6 +451,7 @@
           ]);
           if (token !== runToken) return;
           lastResult = N.normalizeAnalysisResponse ? N.normalizeAnalysisResponse(res) : res;
+          lastSearchId = (res && res._searchId) || null;
           stopLoading();
           if (scanText) scanText.textContent = L('db.ready');
           setProgress(100);
@@ -1913,7 +1916,7 @@
           const q = String(d.q || (d.r && d.r.query) || '');
           if (N.notifAdd) N.notifAdd({ title: 'notif.saved.t', sub: 'notif.saved.s', params: { q: q }, cat: 'reports', ts: Date.now() });
           if (act === 'download') {
-            if (N.recordDownload) N.recordDownload('report', null);
+            if (N.recordDownload) N.recordDownload('report', lastSearchId);
             if (N.activityAdd) N.activityAdd('export', { q: q });
             T('rep.downloaded');
           } else {
@@ -1929,7 +1932,7 @@
         }
       }
       if (act === 'share') T('app.toast.shared');
-      else if (act === 'download') { if (N.recordDownload) N.recordDownload('report', null); T('rep.downloaded'); }
+      else if (act === 'download') { if (N.recordDownload) N.recordDownload('report', lastSearchId); T('rep.downloaded'); }
       else if (act === 'delete') T('app.toast.del');
       else if (act === 'preview') T('app.toast.created');
     });

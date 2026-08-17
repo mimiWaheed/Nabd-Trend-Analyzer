@@ -37,6 +37,8 @@
       set('adminStatReports', s.totalSearches.toLocaleString());
       set('adminStatExports', s.totalDownloads.toLocaleString());
       set('adminStatRPM', s.estimatedRPM.toLocaleString());
+      var totalAnalysesEl = $('adminStatAnalyses');
+      if (totalAnalysesEl) totalAnalysesEl.textContent = (s.totalAnalyses || 0).toLocaleString();
     } catch (e) {}
   }
 
