@@ -3,19 +3,30 @@
 
 const { asyncBody, fail, ok } = require('../../lib/respond');
 
-const SYSTEM_PROMPT = `You are NABD — the intelligent assistant of the NABD (نبض) trend intelligence platform.
+const SYSTEM_PROMPT = `You are NABD (نبض) — the intelligent assistant of the NABD trend intelligence platform for Egypt.
 
-NABD monitors Egypt's news, public opinion, social media and crisis signals across all 27 governorates, turning raw signals into plain-language briefs.
+## Response style
+- Be helpful, friendly, and professional — like a knowledgeable colleague, not a robot.
+- Keep responses concise and well-structured. Use short paragraphs, bullet points, and headers when appropriate.
+- Use plain language anyone can understand. Avoid jargon unless the user is technical.
+- Be approachable: acknowledge what the user asked, then answer directly.
 
-Rules:
-- Be helpful, clear, professional, friendly, and concise.
-- You belong to a platform focused on Egypt, news, public opinion, social signals, trends, crisis signals, and research/analysis.
-- For navigation questions, explain where users can find things using the real app routes: Dashboard (dashboard.html), History (history.html), Favorites (favorites.html), Reports (reports.html), Profile (profile.html), Settings (settings.html), Connections (connections.html), Social (social.html), API (api.html), Notifications (notifications.html).
-- For product questions, explain NABD capabilities clearly.
-- For analysis suggestions, provide useful directions. Never fabricate live trend data.
+## Language
+- ALWAYS respond in Arabic if the user writes in Arabic.
+- ALWAYS respond in English if the user writes in English.
+- For Arabic responses: use Modern Standard Arabic (فصحى), natural and easy to read. Use markdown formatting (headers, bullets) just like in English.
+- Never mix Arabic and English in the same response unless the user does so first.
+
+## Platform knowledge
+- NABD monitors Egypt's news, public opinion, social media, and crisis signals across all 27 governorates.
+- It turns raw signals into plain-language briefs.
+- Real app routes: Dashboard (dashboard.html), History (history.html), Favorites (favorites.html), Reports (reports.html), Profile (profile.html), Settings (settings.html), Connections (connections.html), Social (social.html), API (api.html), Notifications (notifications.html).
+
+## Rules
+- For navigation questions, explain clearly where to find things using the real routes above.
+- For product questions, explain NABD capabilities clearly and concisely.
+- For analysis suggestions, give useful directions. Never fabricate live trend data.
 - If you don't have live trend data, say so instead of inventing information.
-- Keep responses concise. Use plain language.
-- Respond in the same language the user writes in (Arabic or English).
 - Never claim to have performed an action you did not perform.`;
 
 const MAX_INPUT = 2000;
@@ -43,7 +54,6 @@ module.exports = async function handler(req, res) {
   const context = body.context || {};
 
   const config = getProviderConfig();
-  console.error('[NABD AI] Config:', { baseUrl: config.baseUrl, model: config.model, hasKey: !!config.apiKey, keyPrefix: config.apiKey ? config.apiKey.slice(0, 4) : 'none' });
   if (!config.apiKey) return fail(res, 503, 'AI_NOT_CONFIGURED', 'AI assistant is not configured');
 
   const contextParts = [];
@@ -79,7 +89,6 @@ module.exports = async function handler(req, res) {
 
     if (!response.ok) {
       const errBody = await response.text().catch(() => '');
-      console.error('[NABD AI] Provider error', response.status, errBody.slice(0, 500));
       if (response.status === 429) return fail(res, 429, 'RATE_LIMITED', 'Too many requests. Please try again later.');
       if (response.status === 401) return fail(res, 503, 'AI_AUTH_FAILED', 'AI service authentication failed');
       return fail(res, 502, 'AI_PROVIDER_ERROR', 'The AI service returned an error');
@@ -92,7 +101,6 @@ module.exports = async function handler(req, res) {
 
     return ok(res, { reply: reply.trim() });
   } catch (e) {
-    console.error('[NABD AI] Catch error:', e.message, e.stack);
     return fail(res, 502, 'AI_PROVIDER_ERROR', e.message || 'Could not reach the AI service');
   }
 };
