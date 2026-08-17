@@ -2401,6 +2401,51 @@
     });
   }
 
+  /* ---------------- social ---------------- */
+  function initSocial() {
+    const fbBtn = $('socFbBtn');
+    const fbChip = $('socFbChip');
+    const fbMeta = $('socFbMeta');
+    const fbLast = $('socFbLast');
+    const fbTools = $('socFbTools');
+    const card = document.querySelector('.conn-card[data-conn="fb"]');
+
+    function paint() {
+      const st = N.fb ? N.fb.read() : { connected: false };
+      const chipText = fbChip ? fbChip.querySelector('[data-i18n]') : null;
+
+      if (st.connected) {
+        if (fbChip) {
+          fbChip.className = 'status-chip conn-chip ok';
+          if (chipText) chipText.textContent = L('social.fb.connected.title');
+        }
+        if (fbLast) {
+          fbLast.textContent = st.connectedAt && N.formatRelativeTime ? N.formatRelativeTime(st.connectedAt) : '—';
+        }
+        if (fbTools) {
+          fbTools.innerHTML = '<button class="btn btn-ghost btn-sm" id="socFbDisconnect" data-i18n="social.fb.disconnect">' + L('social.fb.disconnect') + '</button>';
+          const disBtn = $('socFbDisconnect');
+          if (disBtn) disBtn.addEventListener('click', () => { if (N.fb) N.fb.disconnect(); });
+        }
+        if (card) card.classList.remove('off');
+      } else {
+        if (fbChip) {
+          fbChip.className = 'status-chip conn-chip neu';
+          if (chipText) chipText.textContent = L('social.fb.idle.title');
+        }
+        if (fbLast) fbLast.textContent = '—';
+        if (fbTools) {
+          fbTools.innerHTML = '<button class="btn btn-primary btn-sm" id="socFbBtn" data-i18n="social.fb.connect">' + L('social.fb.connect') + '</button>';
+          const conBtn = $('socFbBtn');
+          if (conBtn) conBtn.addEventListener('click', () => { if (N.fb) N.fb.connect(); });
+        }
+      }
+    }
+
+    paint();
+    document.addEventListener('nabd-fb-change', paint);
+  }
+
   /* ---------------- api ---------------- */
   function initApi() {
     const keyWrap = $('apiKeys');
@@ -2708,6 +2753,7 @@
     else if (page === 'profile') initProfile();
     else if (page === 'settings') initSettings();
     else if (page === 'connections') initConnections();
+    else if (page === 'social') initSocial();
     else if (page === 'api') initApi();
     else if (page === 'notifications') initNotifications();
     else if (page === 'favorites') initFavorites();
