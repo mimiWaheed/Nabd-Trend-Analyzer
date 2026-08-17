@@ -93,6 +93,6 @@ module.exports = async function handler(req, res) {
     return ok(res, { reply: reply.trim() });
   } catch (e) {
     console.error('[NABD AI] Catch error:', e.message, e.stack);
-    return fail(res, 502, 'AI_PROVIDER_ERROR', 'Could not reach the AI service');
+    return fail(res, 502, 'AI_PROVIDER_ERROR', e.message || 'Could not reach the AI service');
   }
 };
