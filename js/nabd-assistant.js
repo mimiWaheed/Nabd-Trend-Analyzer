@@ -18,9 +18,10 @@
       placeholder: 'Ask NABD anything...',
       typing: 'NABD is thinking...',
       error: 'I couldn\'t reach NABD right now. Please try again in a moment.',
-      chips: ['What can I do with NABD?', 'Where is my history?', 'What should I analyze today?', 'How does NABD work?'],
+      chips: ['What can I do with NABD?', 'Where is my history?', 'What\'s trending today?', 'How does NABD work?'],
       close: 'Close assistant',
-      open: 'Open assistant'
+      open: 'Open assistant',
+      reset: 'Reset chat'
     },
     ar: {
       trigger: 'اسأل نبض',
@@ -30,9 +31,10 @@
       placeholder: 'اسأل نبض...',
       typing: 'نبض يفكر...',
       error: 'لم أتمكن من الوصول إلى نبض الآن. حاول مرة أخرى.',
-      chips: ['ما الذي يمكنني فعله مع نبض؟', 'أين سجل بحثي؟', 'ماذا أحلل اليوم؟', 'كيف يعمل نبض؟'],
+      chips: ['ما الذي يمكنني فعله مع نبض؟', 'أين سجل بحثي؟', 'ما الترند اليوم؟', 'كيف يعمل نبض؟'],
       close: 'إغلاق المساعد',
-      open: 'فتح المساعد'
+      open: 'فتح المساعد',
+      reset: 'محادثة جديدة'
     }
   };
 
@@ -96,9 +98,14 @@
           <span class="nabd-panel-logo">N</span>
           <span class="nabd-panel-title">NABD</span>
         </div>
-        <button class="nabd-panel-close" aria-label="${esc(str('close'))}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-        </button>
+        <div class="nabd-panel-actions">
+          <button class="nabd-panel-reset" aria-label="${esc(str('reset'))}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          </button>
+          <button class="nabd-panel-close" aria-label="${esc(str('close'))}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
       </div>
       <div class="nabd-panel-messages" id="nabdMessages"></div>
       <div class="nabd-panel-input">
@@ -222,10 +229,17 @@
     }
   }
 
+  function resetChat() {
+    state.messages = [];
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    showWelcome();
+  }
+
   function bind() {
     els.fab.addEventListener('click', toggle);
     els.fab.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
     els.close.addEventListener('click', toggle);
+    if (els.reset) els.reset.addEventListener('click', resetChat);
 
     if (els.bubble) {
       els.bubbleDismiss.addEventListener('click', () => {
@@ -265,6 +279,7 @@
       bubble: container.querySelector('.nabd-bubble'),
       bubbleDismiss: container.querySelector('.nabd-bubble-dismiss'),
       panel: container.querySelector('.nabd-panel'),
+      reset: container.querySelector('.nabd-panel-reset'),
       messages: container.querySelector('.nabd-panel-messages'),
       input: container.querySelector('.nabd-input'),
       send: container.querySelector('.nabd-send'),

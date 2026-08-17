@@ -4659,6 +4659,15 @@ html[dir="rtl"] .app-window { text-align: right; }
   background: var(--surface-1); flex: none;
 }
 .nabd-panel-brand { display: flex; align-items: center; gap: 10px; }
+.nabd-panel-actions { display: flex; align-items: center; gap: 4px; }
+.nabd-panel-reset {
+  background: none; border: none; cursor: pointer;
+  width: 28px; height: 28px; border-radius: 8px;
+  display: grid; place-items: center;
+  color: var(--text-muted); transition: background .2s, color .2s;
+}
+.nabd-panel-reset:hover { background: var(--surface-1); color: var(--text); }
+.nabd-panel-reset svg { width: 16px; height: 16px; }
 .nabd-panel-logo {
   width: 32px; height: 32px; border-radius: 10px;
   background: linear-gradient(135deg, #5EA2FF, #7A5CFF);
