@@ -285,6 +285,121 @@
 
     const deleteBtn = $('admDeleteBtn');
     if (deleteBtn) deleteBtn.addEventListener('click', deleteUser);
+
+    initConnectionsInline();
+  }
+
+  /* ── Embedded connections logic (moved from app.js) ── */
+  function initConnectionsInline() {
+    const cards = document.querySelectorAll('.conn-card');
+    if (!cards.length) return;
+
+    const state = { fb: 'off', rss: 'on', gnews: 'off', gtrends: 'off', newsapi: 'off', ig: 'soon', sp: 'soon', gq: 'soon' };
+
+    function paint() {
+      cards.forEach((c) => {
+        const id = c.dataset.conn;
+        const s = state[id];
+        if (!s) return;
+        c.classList.toggle('off', s === 'off');
+        const chip = c.querySelector('.conn-chip');
+        if (chip) {
+          if (s === 'on') chip.innerHTML = '<span class="d"></span>' + L('conn.status.ok');
+          else if (s === 'soon') chip.innerHTML = '<span class="d"></span>' + L('conn.status.soon');
+          else chip.innerHTML = '<span class="d"></span>' + L('conn.status.off');
+        }
+        const ls = c.querySelector('.cm-last');
+        if (ls) ls.textContent = s === 'on' ? 'now' : '—';
+        const tools = c.querySelector('.conn-tools');
+        if (tools) {
+          tools.innerHTML = s === 'soon'
+            ? '<span class="status-chip neu"><span class="d"></span>' + L('app.soon') + '</span>'
+            : s === 'on'
+              ? '<button class="btn btn-ghost btn-sm" data-ca="dis">' + L('conn.disconnect') + '</button><button class="btn btn-ghost btn-sm" data-ca="rec">' + L('conn.reconnect') + '</button>'
+              : '<button class="btn btn-primary btn-sm" data-ca="con">' + L('conn.connect') + '</button>';
+        }
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-ca]');
+      if (!b) return;
+      const card = b.closest('.conn-card');
+      const id = card && card.dataset.conn;
+      if (!id || !(id in state)) return;
+      if (b.dataset.ca === 'dis') state[id] = 'off';
+      else if (b.dataset.ca === 'rec') state[id] = 'on';
+      else state[id] = 'on';
+      paint();
+      toast('Connection updated');
+    });
+
+    paint();
+
+    /* n8n resources */
+    const N8N_KEY = 'nabd-n8n';
+    const n8nList = $('n8nList');
+    const n8nForm = $('n8nForm');
+    const n8nName = $('n8nName');
+    const n8nKey = $('n8nKey');
+    const n8nRead = () => { try { return JSON.parse(localStorage.getItem(N8N_KEY) || '[]'); } catch (e) { return []; } };
+    const n8nWrite = (list) => { try { localStorage.setItem(N8N_KEY, JSON.stringify(list)); } catch (e) {} };
+    function renderN8n() {
+      if (!n8nList) return;
+      const list = n8nRead();
+      if (!list.length) { n8nList.innerHTML = ''; return; }
+      n8nList.innerHTML = list.map((it, i) =>
+        '<div class="app-row key-row">'
+        + '<span class="key-prefix" style="background:linear-gradient(135deg,#EA4B71,#7A5CFF)">n8n</span>'
+        + '<div class="grow"><div class="row-title">' + esc(it.name || 'n8n') + '</div>'
+        + '<div class="row-sub mono">••••••••' + esc(String(it.key || '').slice(-4)) + '</div></div>'
+        + '<div class="key-actions"><button class="btn btn-ghost btn-sm" data-n8n="del" data-idx="' + i + '">Remove</button></div>'
+        + '</div>'
+      ).join('');
+    }
+    renderN8n();
+    const n8nAdd = $('n8nAdd');
+    if (n8nAdd) n8nAdd.addEventListener('click', () => { if (n8nForm) n8nForm.hidden = false; if (n8nName) n8nName.focus(); });
+    const n8nCancel = $('n8nCancel');
+    if (n8nCancel) n8nCancel.addEventListener('click', () => { if (n8nForm) n8nForm.hidden = true; });
+    const n8nSave = $('n8nSave');
+    if (n8nSave) n8nSave.addEventListener('click', () => {
+      const name = n8nName ? n8nName.value.trim() : '';
+      const key = n8nKey ? n8nKey.value.trim() : '';
+      if (!key) { if (n8nKey) n8nKey.focus(); return; }
+      const list = n8nRead();
+      list.unshift({ id: 'n' + Date.now().toString(36), name: name || 'n8n', key: key, addedAt: Date.now() });
+      n8nWrite(list);
+      if (n8nForm) n8nForm.hidden = true;
+      if (n8nName) n8nName.value = '';
+      if (n8nKey) n8nKey.value = '';
+      renderN8n();
+      toast('API saved');
+    });
+    document.addEventListener('click', (e) => {
+      const d = e.target.closest('[data-n8n="del"]');
+      if (!d) return;
+      const list = n8nRead();
+      const ix = d.dataset.idx != null ? Number(d.dataset.idx) : -1;
+      if (ix >= 0) list.splice(ix, 1);
+      n8nWrite(list);
+      renderN8n();
+      toast('API removed');
+    });
+  }
+
+  function esc(s) {
+    const el = document.createElement('span');
+    el.textContent = s;
+    return el.innerHTML;
+  }
+
+  function L(key) {
+    const l = localStorage.getItem('nabd-lang') || 'en';
+    try {
+      const m = (typeof I18N !== 'undefined' && I18N[l]) || {};
+      return m[key] || key;
+    } catch (e) { return key; }
   }
 
   if (document.readyState === 'loading') {

@@ -68,7 +68,6 @@
     { id: 'reports', href: 'reports.html', key: 'app.nav.reports', ic: IC.file },
     { id: 'citizen-portal', href: 'citizen-portal.html', key: 'app.nav.citizen-portal', ic: 'M22 2 11 13M22 2 15 22l-4-9-9-4z', sep: 'app.sep3' },
     { id: 'private', href: 'social.html', key: 'app.nav.social', ic: IC.shield },
-    { id: 'connections', href: 'connections.html', key: 'app.nav.connections', ic: IC.link, sep: 'app.sep2' },
     { id: 'favorites', href: 'favorites.html', key: 'app.nav.favorites', ic: IC.star },
     { id: 'notifications', href: 'notifications.html', key: 'app.nav.notifications', ic: IC.bell, badge: true },
     { id: 'settings', href: 'settings.html', key: 'app.nav.settings', ic: IC.sliders },
@@ -2814,7 +2813,6 @@
     else if (page === 'reports') initReports();
     else if (page === 'profile') initProfile();
     else if (page === 'settings') initSettings();
-    else if (page === 'connections') initConnections();
     else if (page === 'social') initSocial();
     else if (page === 'api') initApi();
     else if (page === 'notifications') initNotifications();

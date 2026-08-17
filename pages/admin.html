@@ -33,6 +33,12 @@
         <h1 data-i18n="admin.title">Admin Panel</h1>
         <p data-i18n="admin.sub">Manage users, roles and platform health.</p>
       </div>
+      <div class="app-head-actions">
+        <a href="#admin-connections" class="btn btn-ghost btn-sm" id="adminConnBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+          <span data-i18n="admin.conn.btn">Check Connections</span>
+        </a>
+      </div>
     </div>
 
     <!-- Stats Overview -->
@@ -73,6 +79,152 @@
           <div class="admin-stat-label" data-i18n="admin.stat.rpm">Est. Reports/Min</div>
         </div>
       </div>
+    </div>
+
+    <!-- Connection Cards -->
+    <div class="conn-grid" id="admin-connections">
+      <div class="conn-card" data-conn="fb">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:#1877F2">f</span>
+          <div><div class="conn-name">Facebook</div><div class="conn-desc" data-i18n="conn.fb.d">Page audience analysis</div></div>
+        </div>
+        <span class="status-chip conn-chip ok"><span class="d"></span><span data-i18n="conn.status.ok">Connected</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">2m ago</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>98%</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:98%"></div></div>
+        </div>
+        <div class="conn-tools">
+          <button class="btn btn-ghost btn-sm" data-ca="dis" data-i18n="conn.disconnect">Disconnect</button>
+          <button class="btn btn-ghost btn-sm" data-ca="rec" data-i18n="conn.reconnect">Reconnect</button>
+        </div>
+      </div>
+
+      <div class="conn-card" data-conn="rss">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:linear-gradient(135deg,#FF9A5C,#FF5C7A)">RSS</span>
+          <div><div class="conn-name">RSS Sources</div><div class="conn-desc" data-i18n="conn.rss.d">Custom RSS feeds</div></div>
+        </div>
+        <span class="status-chip conn-chip ok"><span class="d"></span><span data-i18n="conn.status.ok">Connected</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">5m ago</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>100%</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+        </div>
+        <div class="conn-tools">
+          <button class="btn btn-ghost btn-sm" data-ca="dis" data-i18n="conn.disconnect">Disconnect</button>
+          <button class="btn btn-ghost btn-sm" data-ca="rec" data-i18n="conn.reconnect">Reconnect</button>
+        </div>
+      </div>
+
+      <div class="conn-card" data-conn="gnews">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:#4285F4">G</span>
+          <div><div class="conn-name">Google News</div><div class="conn-desc" data-i18n="conn.gn.d">Global headlines</div></div>
+        </div>
+        <span class="status-chip conn-chip neu"><span class="d"></span><span data-i18n="conn.status.off">Disconnected</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">—</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>—</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:0"></div></div>
+        </div>
+        <div class="conn-tools">
+          <button class="btn btn-primary btn-sm" data-ca="con" data-i18n="conn.connect">Connect</button>
+        </div>
+      </div>
+
+      <div class="conn-card" data-conn="gtrends">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:#EA4335">G</span>
+          <div><div class="conn-name">Google Trends</div><div class="conn-desc" data-i18n="conn.gt.d">Search interest curves</div></div>
+        </div>
+        <span class="status-chip conn-chip neu"><span class="d"></span><span data-i18n="conn.status.off">Disconnected</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">—</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>—</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:0"></div></div>
+        </div>
+        <div class="conn-tools">
+          <button class="btn btn-primary btn-sm" data-ca="con" data-i18n="conn.connect">Connect</button>
+        </div>
+      </div>
+
+      <div class="conn-card" data-conn="newsapi">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:linear-gradient(135deg,#5CFFB1,#5EA2FF)">N</span>
+          <div><div class="conn-name">NewsAPI</div><div class="conn-desc" data-i18n="conn.na.d">News API aggregation</div></div>
+        </div>
+        <span class="status-chip conn-chip neu"><span class="d"></span><span data-i18n="conn.status.off">Disconnected</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">—</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>—</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:0"></div></div>
+        </div>
+        <div class="conn-tools">
+          <button class="btn btn-primary btn-sm" data-ca="con" data-i18n="conn.connect">Connect</button>
+        </div>
+      </div>
+
+      <div class="conn-card" data-conn="ig">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:linear-gradient(135deg,#FFC75C,#FF5C7A)">IG</span>
+          <div><div class="conn-name">Instagram</div><div class="conn-desc" data-i18n="conn.ig.d">Instagram insights</div></div>
+        </div>
+        <span class="status-chip conn-chip neu"><span class="d"></span><span data-i18n="conn.status.soon">Coming soon</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">—</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>—</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:0"></div></div>
+        </div>
+        <div class="conn-tools"><span class="status-chip neu"><span class="d"></span><span data-i18n="app.soon">Coming soon</span></span></div>
+      </div>
+
+      <div class="conn-card" data-conn="sp">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:#34A853">S</span>
+          <div><div class="conn-name">SerpAPI</div><div class="conn-desc" data-i18n="conn.sp.d">Search engine results</div></div>
+        </div>
+        <span class="status-chip conn-chip neu"><span class="d"></span><span data-i18n="conn.status.soon">Coming soon</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">—</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>—</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:0"></div></div>
+        </div>
+        <div class="conn-tools"><span class="status-chip neu"><span class="d"></span><span data-i18n="app.soon">Coming soon</span></span></div>
+      </div>
+
+      <div class="conn-card" data-conn="gq">
+        <div class="conn-top">
+          <span class="conn-logo" style="background:linear-gradient(135deg,#7A5CFF,#5EA2FF)">GQ</span>
+          <div><div class="conn-name">Groq</div><div class="conn-desc" data-i18n="conn.gq.d">Ultra-fast inference for AI</div></div>
+        </div>
+        <span class="status-chip conn-chip neu"><span class="d"></span><span data-i18n="conn.status.soon">Coming soon</span></span>
+        <div class="conn-meta">
+          <div class="cm-row"><span data-i18n="conn.last">Last sync</span><b class="cm-last">—</b></div>
+          <div class="cm-row"><span data-i18n="conn.health">API health</span><b>—</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:0"></div></div>
+        </div>
+        <div class="conn-tools"><span class="status-chip neu"><span class="d"></span><span data-i18n="app.soon">Coming soon</span></span></div>
+      </div>
+    </div>
+
+    <!-- n8n Resources -->
+    <div class="ws-card conn-n8n">
+      <div class="card-head">
+        <span class="card-title" data-i18n="conn.n8n">n8n resources</span>
+        <button class="btn btn-primary btn-sm" id="n8nAdd" data-i18n="conn.add">Add API</button>
+      </div>
+      <p class="conn-n8n-sub" data-i18n="conn.n8n.s">Extend NABD with automation resources. Add an API key to enable each one.</p>
+      <div id="n8nList"></div>
+      <div id="n8nForm" hidden>
+        <div class="conn-n8n-row">
+          <input type="text" class="inp" id="n8nName" maxlength="60" placeholder="Resource name">
+          <input type="password" class="inp" id="n8nKey" data-i18n-ph="conn.api.ph" placeholder="Paste your API key…">
+          <button class="btn btn-primary btn-sm" id="n8nSave" data-i18n="conn.add">Add API</button>
+          <button class="btn btn-ghost btn-sm" id="n8nCancel" data-i18n="prof.cancel">Cancel</button>
+        </div>
+      </div>
+      <p class="conn-n8n-more" data-i18n="conn.soon.more">More sources are on the way.</p>
     </div>
 
     <!-- Search & Filters -->
@@ -218,6 +370,16 @@
   </main>
 
   <style>
+    /* ── Header Actions ── */
+    .app-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .app-head-actions { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+
     /* ── Stats Cards ── */
     .admin-stats {
       display: grid;
