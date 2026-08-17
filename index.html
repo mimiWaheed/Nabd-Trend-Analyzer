@@ -42,10 +42,6 @@
           <a href="#why" data-spy="why" data-i18n="nav.about">About</a>
         </nav>
         <div class="nav-actions">
-          <button class="icon-btn" data-action="theme" aria-label="Toggle theme">
-            <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-            <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-          </button>
           <button class="lang-toggle mono" data-action="lang">العربية</button>
           <a class="nav-signin" href="pages/signin.html" data-page="pages/signin.html" data-i18n="nav.signin">Sign In</a>
           <a class="btn btn-primary btn-sm" href="pages/signup.html" data-page="pages/signup.html" data-i18n="nav.getstarted">Get Started</a>
@@ -96,59 +92,6 @@
               <p class="mono" data-i18n="hero.trust">Egypt live · all 27 governorates · answers in seconds</p>
             </div>
           </div>
-
-        <!-- Product window — the live NABD workspace, built from real widgets -->
-        <div class="app-window reveal" id="heroVisual" style="--d:.2s">
-          <div class="app-chrome mono">
-            <span class="win-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-            <span class="win-addr">nabd.eg/workspace?q=cairo</span>
-            <span class="live-badge"><span class="live-dot"></span> LIVE</span>
-          </div>
-          <div class="brief-panel">
-            <div class="brief-head">
-              <span class="mono pv-label" data-i18n="pv.skyline">CAIRO · LIVE MONITORING</span>
-              <span class="mono pv-label" data-i18n="pv.timeline">EGYPT · 24H VOLUME</span>
-            </div>
-
-            <div class="ws-query">
-              <span class="ws-query-label mono" data-i18n="ws.querylabel">TRACKING</span>
-              <span class="ws-query-text">What's happening in Cairo today?</span>
-            </div>
-
-            <div class="brief-body">
-              <div class="brief-donut">
-                <div class="pv-donut-vis" id="previewDonut"></div>
-                <div>
-                  <p class="pv-title" data-i18n="pv.sentiment">Egypt sentiment</p>
-                  <p class="mono pv-sub"><span class="pos">62%</span> <span data-i18n="pv.positive">positive</span></p>
-                </div>
-              </div>
-              <div class="brief-chart">
-                <div class="pv-chart"><canvas id="previewChart" height="90"></canvas></div>
-              </div>
-            </div>
-
-            <div class="brief-regions">
-              <p class="mono pv-label" data-i18n="pv.regions">REGION COVERAGE</p>
-              <div class="region-heat-grid">
-                <span class="region-tile national" style="background:rgba(246,173,60,.45)"><b data-i18n="gv.egypt">Egypt</b><span data-i18n="ws.national.s">Egypt-wide signal</span></span>
-                <span class="region-tile" style="background:rgba(246,173,60,.42)"><b data-i18n="gv.cairo">Cairo</b><span>124×</span></span>
-                <span class="region-tile" style="background:rgba(246,173,60,.3)"><b data-i18n="gv.alex">Alexandria</b><span>96×</span></span>
-                <span class="region-tile" style="background:rgba(246,173,60,.24)"><b data-i18n="gv.giza">Giza</b><span>71×</span></span>
-                <span class="region-tile" style="background:rgba(246,173,60,.16)"><b data-i18n="gv.sharqia">Sharqia</b><span>48×</span></span>
-                <span class="region-tile zero" style="background:rgba(246,173,60,.06)"><b data-i18n="gv.aswan">Aswan</b><span>0</span></span>
-              </div>
-            </div>
-
-            <div class="brief-foot mono">
-              <span data-i18n="ws.meta1">14 sources</span>
-              <span class="dot-sep" aria-hidden="true"></span>
-              <span data-i18n="ws.meta2">updated 2m ago</span>
-              <span class="dot-sep" aria-hidden="true"></span>
-              <span data-i18n="ws.meta3">confidence 94%</span>
-            </div>
-          </div>
-        </div>
 
         <p class="hero-note mono" aria-hidden="true">
           <span class="note-line"></span>
