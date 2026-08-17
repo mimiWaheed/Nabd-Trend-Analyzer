@@ -63,8 +63,10 @@
 
   function applyFilters() {
     const q = (($('adminSearch') || {}).value || '').toLowerCase().trim();
-    const roleFilter = (($('adminRoleFilter') || {}).value || 'all');
-    const dateFilter = (($('adminDateFilter') || {}).value || 'all');
+    const roleFilterEl = $('adminRoleFilter');
+    const dateFilterEl = $('adminDateFilter');
+    const roleFilter = roleFilterEl ? roleFilterEl.dataset.value : 'all';
+    const dateFilter = dateFilterEl ? dateFilterEl.dataset.value : 'all';
     const now = Date.now();
 
     filteredUsers = allUsers.filter((u) => {
@@ -160,7 +162,15 @@
       }
 
       const sel = $('admRoleSelect');
-      if (sel) sel.value = u.role || 'analyst';
+      if (sel) {
+        const r = u.role || 'analyst';
+        sel.dataset.value = r;
+        const label = sel.querySelector('.admin-dropdown-label');
+        if (label) label.textContent = r;
+        sel.querySelectorAll('.admin-dropdown-item').forEach((i) => {
+          i.classList.toggle('active', i.dataset.value === r);
+        });
+      }
 
       const actions = $('admActions');
       if (actions) actions.style.display = (u.role === 'superadmin') ? 'none' : 'flex';
@@ -173,7 +183,7 @@
   async function changeRole() {
     if (!selectedUserId) return;
     const sel = $('admRoleSelect');
-    const newRole = sel ? sel.value : 'analyst';
+    const newRole = sel ? sel.dataset.value : 'analyst';
     try {
       const res = await fetch('/api/users?action=admin-role', {
         method: 'POST',
@@ -215,6 +225,34 @@
     } catch (e) { toast('Network error'); }
   }
 
+  function initDropdown(el) {
+    if (!el) return;
+    const btn = el.querySelector('.admin-dropdown-btn');
+    const panel = el.querySelector('.admin-dropdown-panel');
+    const label = el.querySelector('.admin-dropdown-label');
+    const items = panel ? panel.querySelectorAll('.admin-dropdown-item') : [];
+
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.admin-dropdown.open').forEach((d) => { if (d !== el) d.classList.remove('open'); });
+        el.classList.toggle('open');
+      });
+    }
+
+    items.forEach((item) => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        el.dataset.value = item.dataset.value;
+        if (label) label.textContent = item.textContent;
+        items.forEach((i) => i.classList.remove('active'));
+        item.classList.add('active');
+        el.classList.remove('open');
+        applyFilters();
+      });
+    });
+  }
+
   function init() {
     loadStats();
     loadUsers();
@@ -224,15 +262,13 @@
       search.addEventListener('input', () => { applyFilters(); });
     }
 
-    const roleFilter = $('adminRoleFilter');
-    if (roleFilter) {
-      roleFilter.addEventListener('change', () => { applyFilters(); });
-    }
+    initDropdown($('adminRoleFilter'));
+    initDropdown($('adminDateFilter'));
+    initDropdown($('admRoleSelect'));
 
-    const dateFilter = $('adminDateFilter');
-    if (dateFilter) {
-      dateFilter.addEventListener('change', () => { applyFilters(); });
-    }
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.admin-dropdown.open').forEach((d) => d.classList.remove('open'));
+    });
 
     const prev = $('adminPrev');
     const next = $('adminNext');

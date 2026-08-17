@@ -82,18 +82,30 @@
         <input type="text" class="admin-search-input" id="adminSearch" data-i18n-ph="admin.search.placeholder" placeholder="Search by name or email...">
       </div>
       <div class="admin-filters">
-        <select class="admin-filter-select" id="adminRoleFilter">
-          <option value="all" data-i18n="admin.filter.role.all">All Roles</option>
-          <option value="superadmin" data-i18n="admin.filter.role.superadmin">Super Admin</option>
-          <option value="nabd_admin" data-i18n="admin.filter.role.admin">Admin</option>
-          <option value="analyst" data-i18n="admin.filter.role.analyst">Analyst</option>
-        </select>
-        <select class="admin-filter-select" id="adminDateFilter">
-          <option value="all" data-i18n="admin.filter.date.all">All Time</option>
-          <option value="today" data-i18n="admin.filter.date.today">Joined Today</option>
-          <option value="week" data-i18n="admin.filter.date.week">Joined This Week</option>
-          <option value="month" data-i18n="admin.filter.date.month">Joined This Month</option>
-        </select>
+        <div class="admin-dropdown" id="adminRoleFilter" data-value="all">
+          <button class="admin-dropdown-btn" type="button">
+            <span class="admin-dropdown-label" data-i18n="admin.filter.role.all">All Roles</span>
+            <svg class="admin-dropdown-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="admin-dropdown-panel">
+            <div class="admin-dropdown-item active" data-value="all" data-i18n="admin.filter.role.all">All Roles</div>
+            <div class="admin-dropdown-item" data-value="superadmin" data-i18n="admin.filter.role.superadmin">Super Admin</div>
+            <div class="admin-dropdown-item" data-value="nabd_admin" data-i18n="admin.filter.role.admin">Admin</div>
+            <div class="admin-dropdown-item" data-value="analyst" data-i18n="admin.filter.role.analyst">Analyst</div>
+          </div>
+        </div>
+        <div class="admin-dropdown" id="adminDateFilter" data-value="all">
+          <button class="admin-dropdown-btn" type="button">
+            <span class="admin-dropdown-label" data-i18n="admin.filter.date.all">All Time</span>
+            <svg class="admin-dropdown-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="admin-dropdown-panel">
+            <div class="admin-dropdown-item active" data-value="all" data-i18n="admin.filter.date.all">All Time</div>
+            <div class="admin-dropdown-item" data-value="today" data-i18n="admin.filter.date.today">Joined Today</div>
+            <div class="admin-dropdown-item" data-value="week" data-i18n="admin.filter.date.week">Joined This Week</div>
+            <div class="admin-dropdown-item" data-value="month" data-i18n="admin.filter.date.month">Joined This Month</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -185,10 +197,16 @@
             </div>
           </div>
           <div class="modal-actions" id="admActions">
-            <select class="admin-filter-select" id="admRoleSelect">
-              <option value="analyst">Analyst</option>
-              <option value="nabd_admin">NABD Admin</option>
-            </select>
+            <div class="admin-dropdown admin-dropdown--modal" id="admRoleSelect" data-value="analyst">
+              <button class="admin-dropdown-btn" type="button">
+                <span class="admin-dropdown-label">Analyst</span>
+                <svg class="admin-dropdown-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="admin-dropdown-panel">
+                <div class="admin-dropdown-item" data-value="analyst">Analyst</div>
+                <div class="admin-dropdown-item" data-value="nabd_admin">NABD Admin</div>
+              </div>
+            </div>
             <div class="modal-actions-right">
               <button class="btn btn-primary btn-sm" id="admRoleBtn" data-i18n="admin.action.role">Change Role</button>
               <button class="btn btn-ghost btn-sm admin-delete-btn" id="admDeleteBtn" data-i18n="admin.action.delete">Delete User</button>
@@ -274,24 +292,89 @@
     }
     .admin-search-input::placeholder { color: var(--text-muted); }
     .admin-filters { display: flex; gap: 8px; flex-shrink: 0; }
-    .admin-filter-select {
-      padding: 10px 32px 10px 12px;
-      border-radius: 10px;
+
+    /* ── Custom Dropdown ── */
+    .admin-dropdown { position: relative; }
+    .admin-dropdown-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border-radius: 12px;
       border: 1px solid var(--border);
-      background: var(--surface-1);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px) saturate(1.1);
+      box-shadow: var(--shadow-soft);
       color: var(--text);
-      font-size: .82rem;
+      font-size: .84rem;
+      font-weight: 500;
       font-family: inherit;
-      outline: none;
       cursor: pointer;
-      appearance: none;
-      background-image: linear-gradient(45deg, transparent 50%, var(--text-muted) 50%), linear-gradient(135deg, var(--text-muted) 50%, transparent 50%);
-      background-position: calc(100% - 12px) 50%, calc(100% - 7px) 50%;
-      background-size: 5px 5px;
-      background-repeat: no-repeat;
-      transition: border-color .25s var(--ease);
+      outline: none;
+      transition: border-color .25s var(--ease), box-shadow .25s var(--ease), transform .2s var(--ease);
+      white-space: nowrap;
+      user-select: none;
     }
-    .admin-filter-select:focus { border-color: var(--accent); }
+    .admin-dropdown-btn:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+    .admin-dropdown-btn:focus-visible {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(94,162,255,.15);
+    }
+    .admin-dropdown-chevron {
+      width: 14px; height: 14px;
+      stroke: var(--text-muted);
+      transition: transform .25s var(--ease);
+      flex-shrink: 0;
+    }
+    .admin-dropdown.open .admin-dropdown-chevron { transform: rotate(180deg); }
+    .admin-dropdown-panel {
+      position: absolute;
+      top: calc(100% + 6px);
+      inset-inline-start: 0;
+      min-width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px) saturate(1.15);
+      box-shadow: 0 12px 40px -8px rgba(0,0,0,.45), 0 0 0 1px var(--border);
+      padding: 5px;
+      z-index: 50;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6px) scale(.97);
+      transition: opacity .2s var(--ease), transform .2s var(--ease), visibility .2s;
+    }
+    .admin-dropdown.open .admin-dropdown-panel {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+    .admin-dropdown-item {
+      padding: 9px 14px;
+      border-radius: 9px;
+      font-size: .84rem;
+      font-weight: 500;
+      color: var(--text-soft);
+      cursor: pointer;
+      transition: background .15s var(--ease), color .15s var(--ease);
+      white-space: nowrap;
+    }
+    .admin-dropdown-item:hover {
+      background: var(--hover);
+      color: var(--text);
+    }
+    .admin-dropdown-item.active {
+      background: rgba(94,162,255,.12);
+      color: var(--accent);
+    }
+    .admin-dropdown--modal .admin-dropdown-btn {
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: .82rem;
+    }
 
     /* ── Table Card ── */
     .admin-table-card { padding: 0; }
@@ -432,7 +515,8 @@
       .admin-stats { grid-template-columns: repeat(2, 1fr); }
       .admin-filter-bar { flex-direction: column; align-items: stretch; }
       .admin-filters { width: 100%; }
-      .admin-filter-select { flex: 1; }
+      .admin-dropdown { flex: 1; }
+      .admin-dropdown-btn { width: 100%; justify-content: space-between; }
     }
     @media (max-width: 540px) {
       .admin-stats { grid-template-columns: 1fr; }
