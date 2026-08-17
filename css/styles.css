@@ -4721,6 +4721,18 @@ html[dir="rtl"] .app-window { text-align: right; }
 }
 .nabd-chip:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
 
+/* Action buttons */
+.nabd-msg-actions { padding-left: 38px; padding-top: 4px; }
+[dir="rtl"] .nabd-msg-actions { padding-left: 0; padding-right: 38px; }
+.nabd-action-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 10px; border: 1px solid var(--accent);
+  background: var(--accent-soft); color: var(--accent);
+  font-size: .82rem; font-weight: 600; cursor: pointer;
+  transition: background .2s, color .2s, transform .15s;
+}
+.nabd-action-btn:hover { background: var(--accent); color: #fff; transform: translateY(-1px); }
+
 /* Typing indicator */
 .nabd-typing-dots { display: flex; gap: 4px; padding: 4px 0; }
 .nabd-typing-dots i {

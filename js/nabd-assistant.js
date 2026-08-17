@@ -21,7 +21,8 @@
       chips: ['What can I do with NABD?', 'Where is my history?', 'What\'s trending today?', 'How does NABD work?'],
       close: 'Close assistant',
       open: 'Open assistant',
-      reset: 'Reset chat'
+      reset: 'Reset chat',
+      analyzeBtn: '📊 Open analysis in Dashboard'
     },
     ar: {
       trigger: 'اسأل نبض',
@@ -34,7 +35,8 @@
       chips: ['ما الذي يمكنني فعله مع نبض؟', 'أين سجل بحثي؟', 'ما الترند اليوم؟', 'كيف يعمل نبض؟'],
       close: 'إغلاق المساعد',
       open: 'فتح المساعد',
-      reset: 'محادثة جديدة'
+      reset: 'محادثة جديدة',
+      analyzeBtn: '📊 فتح التحليل في لوحة التحكم'
     }
   };
 
@@ -70,6 +72,17 @@
     return esc(text)
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/\n/g, '<br>');
+  }
+
+  var ACTION_RE = /:::action\s*\n([\s\S]*?)\n:::\s*$/;
+
+  function parseActions(text) {
+    var m = text.match(ACTION_RE);
+    if (!m) return { clean: text, actions: [] };
+    var clean = text.slice(0, m.index).trim();
+    var actions = [];
+    try { actions = [JSON.parse(m[1])]; } catch (e) {}
+    return { clean: clean, actions: actions };
   }
 
   function buildHTML() {
@@ -139,7 +152,23 @@
       const div = document.createElement('div');
       div.className = 'nabd-msg nabd-msg-' + (m.role === 'assistant' ? 'bot' : 'user');
       if (m.role === 'assistant') {
-        div.innerHTML = '<div class="nabd-msg-avatar">N</div><div class="nabd-msg-body">' + renderMarkdown(m.content) + '</div>';
+        var parsed = parseActions(m.content);
+        div.innerHTML = '<div class="nabd-msg-avatar">N</div><div class="nabd-msg-body">' + renderMarkdown(parsed.clean) + '</div>';
+        if (parsed.actions.length) {
+          var actDiv = document.createElement('div');
+          actDiv.className = 'nabd-msg nabd-msg-bot';
+          actDiv.innerHTML = '<div class="nabd-msg-avatar"></div><div class="nabd-msg-actions">';
+          parsed.actions.forEach(function (a) {
+            if (a.type === 'analyze' && a.query) {
+              var btn = document.createElement('button');
+              btn.className = 'nabd-action-btn';
+              btn.textContent = str('analyzeBtn');
+              btn.dataset.query = a.query;
+              actDiv.querySelector('.nabd-msg-actions').appendChild(btn);
+            }
+          });
+          div.appendChild(actDiv);
+        }
       } else {
         div.innerHTML = '<div class="nabd-msg-body nabd-msg-user-body">' + esc(m.content) + '</div>';
       }
@@ -158,7 +187,23 @@
     const div = document.createElement('div');
     div.className = 'nabd-msg nabd-msg-' + (role === 'assistant' ? 'bot' : 'user');
     if (role === 'assistant') {
-      div.innerHTML = '<div class="nabd-msg-avatar">N</div><div class="nabd-msg-body">' + renderMarkdown(content) + '</div>';
+      var parsed = parseActions(content);
+      div.innerHTML = '<div class="nabd-msg-avatar">N</div><div class="nabd-msg-body">' + renderMarkdown(parsed.clean) + '</div>';
+      if (parsed.actions.length) {
+        var actDiv = document.createElement('div');
+        actDiv.className = 'nabd-msg nabd-msg-bot';
+        actDiv.innerHTML = '<div class="nabd-msg-avatar"></div><div class="nabd-msg-actions">';
+        parsed.actions.forEach(function (a) {
+          if (a.type === 'analyze' && a.query) {
+            var btn = document.createElement('button');
+            btn.className = 'nabd-action-btn';
+            btn.textContent = str('analyzeBtn');
+            btn.dataset.query = a.query;
+            actDiv.querySelector('.nabd-msg-actions').appendChild(btn);
+          }
+        });
+        div.appendChild(actDiv);
+      }
     } else {
       div.innerHTML = '<div class="nabd-msg-body nabd-msg-user-body">' + esc(content) + '</div>';
     }
@@ -258,7 +303,11 @@
 
     els.messages.addEventListener('click', (e) => {
       const chip = e.target.closest('.nabd-chip');
-      if (chip) sendMessage(chip.dataset.msg);
+      if (chip) { sendMessage(chip.dataset.msg); return; }
+      const actBtn = e.target.closest('.nabd-action-btn');
+      if (actBtn && actBtn.dataset.query) {
+        window.location.href = '/pages/dashboard.html?view=analysis&q=' + encodeURIComponent(actBtn.dataset.query);
+      }
     });
 
     document.addEventListener('keydown', (e) => {
