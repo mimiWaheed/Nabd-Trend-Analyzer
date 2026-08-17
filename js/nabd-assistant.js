@@ -201,11 +201,11 @@
       if (data.ok && data.reply) {
         addMessage('assistant', data.reply);
       } else {
-        addMessage('assistant', str('error'));
+        addMessage('assistant', data.message || str('error'));
       }
     } catch (e) {
       hideTyping();
-      addMessage('assistant', str('error'));
+      addMessage('assistant', e.message || str('error'));
     }
     state.sending = false;
   }
