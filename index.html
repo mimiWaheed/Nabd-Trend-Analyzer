@@ -61,35 +61,41 @@
 
     <!-- ============ HERO ============ -->
     <section class="hero" id="top">
-      <div class="hero-bg" aria-hidden="true">
-        <div class="grid-overlay"></div>
-        <div class="pattern-mesh"></div>
-        <div class="pattern-shine"></div>
-        <span class="aurora aurora-a"></span>
-        <span class="aurora aurora-b"></span>
-        <span class="aurora aurora-c"></span>
-        <div class="hero-orb"></div>
+      <div class="hero-image-layer" aria-hidden="true">
+        <img src="assets/hero.jpg" alt="" loading="eager">
       </div>
+      <div class="hero-overlay" aria-hidden="true"></div>
 
-      <div class="container hero-inner">
-        <div class="hero-copy reveal">
-          <div class="eyebrow center">
-            <span class="eyebrow-dot"></span> <span data-i18n="hero.eyebrow">SIGNAL INTELLIGENCE · EGYPT</span>
-          </div>
-          <h1 class="reveal" style="--d:.05s" data-i18n-html="hero.h1">Egypt speaks in signals. We turn them into <span class="grad">answers</span>.</h1>
-          <p class="hero-sub reveal" style="--d:.1s" data-i18n="hero.sub">NABD (نبض) monitors Egypt's news, public opinion, social media and crisis signals across all 27 governorates — then turns any question into a plain-language brief you can act on.</p>
-          <div class="hero-cta reveal" style="--d:.15s">
-            <a class="btn btn-primary" href="pages/signin.html" data-page="pages/signin.html">
-              <span data-i18n="hero.cta1">Launch NABD</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-            <a class="btn btn-ghost" href="#product" data-i18n="hero.cta2">See the workspace</a>
-          </div>
-          <div class="hero-trust reveal" style="--d:.2s">
-            <span class="live-dot" aria-hidden="true"></span>
-            <p class="mono" data-i18n="hero.trust">Egypt live · all 27 governorates · answers in seconds</p>
-          </div>
+      <div class="hero-content">
+        <div class="hero-bg" aria-hidden="true">
+          <div class="grid-overlay"></div>
+          <div class="pattern-mesh"></div>
+          <div class="pattern-shine"></div>
+          <span class="aurora aurora-a"></span>
+          <span class="aurora aurora-b"></span>
+          <span class="aurora aurora-c"></span>
+          <div class="hero-orb"></div>
         </div>
+
+        <div class="container hero-inner">
+          <div class="hero-copy reveal">
+            <div class="eyebrow center">
+              <span class="eyebrow-dot"></span> <span data-i18n="hero.eyebrow">SIGNAL INTELLIGENCE · EGYPT</span>
+            </div>
+            <h1 class="reveal" style="--d:.05s" data-i18n-html="hero.h1">Egypt speaks in signals. We turn them into <span class="grad">answers</span>.</h1>
+            <p class="hero-sub reveal" style="--d:.1s" data-i18n="hero.sub">NABD (نبض) monitors Egypt's news, public opinion, social media and crisis signals across all 27 governorates — then turns any question into a plain-language brief you can act on.</p>
+            <div class="hero-cta reveal" style="--d:.15s">
+              <a class="btn btn-primary" href="pages/signin.html" data-page="pages/signin.html">
+                <span data-i18n="hero.cta1">Launch NABD</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+              <a class="btn btn-ghost" href="#product" data-i18n="hero.cta2">See the workspace</a>
+            </div>
+            <div class="hero-trust reveal" style="--d:.2s">
+              <span class="live-dot" aria-hidden="true"></span>
+              <p class="mono" data-i18n="hero.trust">Egypt live · all 27 governorates · answers in seconds</p>
+            </div>
+          </div>
 
         <!-- Product window — the live NABD workspace, built from real widgets -->
         <div class="app-window reveal" id="heroVisual" style="--d:.2s">
@@ -149,6 +155,7 @@
           LIVE FROM THE NABD WORKSPACE
           <span class="note-line"></span>
         </p>
+        </div><!-- /hero-content -->
       </div>
     </section>
 

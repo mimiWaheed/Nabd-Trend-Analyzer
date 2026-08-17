@@ -1799,6 +1799,32 @@
   }
 
   /* ----------------------------------------------------------
+     HERO SCROLL TRANSITION — image zoom + overlay darken + text fade
+     ---------------------------------------------------------- */
+  if (!reduceMotion) {
+    const heroEl = document.querySelector('.hero');
+    const heroImg = document.querySelector('.hero-image-layer img');
+    const heroOv  = document.querySelector('.hero-overlay');
+    const heroCnt = document.querySelector('.hero-content');
+    if (heroEl && heroImg && heroOv && heroCnt) {
+      let heroTicking = false;
+      const updateHero = () => {
+        const rect = heroEl.getBoundingClientRect();
+        const h = heroEl.offsetHeight;
+        const progress = Math.max(0, Math.min(1, -rect.top / (h - window.innerHeight || h)));
+        heroImg.style.transform = 'scale(' + (1 + progress * 0.12) + ')';
+        heroOv.style.background = 'rgba(0,0,0,' + (0.20 + progress * 0.60) + ')';
+        heroCnt.style.opacity = 1 - progress;
+        heroCnt.style.transform = 'translateY(' + (-progress * 20) + 'px)';
+        heroTicking = false;
+      };
+      window.addEventListener('scroll', () => {
+        if (!heroTicking) { requestAnimationFrame(updateHero); heroTicking = true; }
+      }, { passive: true });
+    }
+  }
+
+  /* ----------------------------------------------------------
      REVEAL ON SCROLL
      ---------------------------------------------------------- */
   const revealObserver = new IntersectionObserver((entries) => {
