@@ -65,7 +65,7 @@
     { id: 'dashboard', href: 'dashboard.html', key: 'app.nav.dashboard', ic: IC.grid, sep: 'app.sep1' },
     { id: 'history', href: 'history.html', key: 'app.nav.history', ic: IC.clock },
     { id: 'reports', href: 'reports.html', key: 'app.nav.reports', ic: IC.file },
-    { id: 'private', href: 'dashboard.html?view=analysis&p=1', key: 'app.nav.private', ic: IC.shield },
+    { id: 'private', href: 'social.html', key: 'app.nav.social', ic: IC.shield },
     { id: 'connections', href: 'connections.html', key: 'app.nav.connections', ic: IC.link, sep: 'app.sep2' },
     { id: 'favorites', href: 'favorites.html', key: 'app.nav.favorites', ic: IC.star },
     { id: 'notifications', href: 'notifications.html', key: 'app.nav.notifications', ic: IC.bell, badge: true },
@@ -798,7 +798,7 @@
       c.addEventListener('click', () => {
         const act = c.dataset.qa;
         if (act === 'new') { resetToPreview(); T('ws.toast.new'); }
-        else if (act === 'saved') runAnalysis(L('dash.fav.q1'));
+        else if (act === 'saved') N.navigate('social.html');
         else if (act === 'export') startExport();
         else if (act === 'alert') setReminder();
         else if (act === 'connections') N.navigate('connections.html');
@@ -2582,8 +2582,7 @@
         }
         if (b.dataset.fav === 'open' && f) {
           const q = String(f.q || (f.r && f.r.query) || '');
-          if (N.notifAdd) N.notifAdd({ title: 'notif.saved.t', sub: 'notif.saved.s', params: { q: q }, cat: 'reports', ts: Date.now() });
-          T('app.toast.savedNotif');
+          if (q) N.navigate('dashboard.html?view=analysis&q=' + encodeURIComponent(q));
           return;
         }
         return;

@@ -3031,6 +3031,34 @@ html[lang="ar"] .app-head h1 { letter-spacing: 0; }
 .conn-meta .cm-row b { color: var(--text-soft); font-weight: 600; font-family: var(--mono); }
 .conn-card.off { opacity: .62; }
 .conn-card.off .conn-actions { pointer-events: none; }
+.conn-card.conn-soon { opacity: .72; }
+.conn-card.conn-soon:hover { opacity: .85; }
+.conn-card.conn-soon .conn-tools { pointer-events: none; }
+
+/* ---------- social page ---------- */
+.soc-eyebrow {
+  font-size: 11px;
+  letter-spacing: .18em;
+  color: var(--accent);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.soc-privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 28px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  border: 1px dashed var(--border-strong);
+  background: color-mix(in srgb, var(--accent) 4%, transparent);
+}
+.soc-privacy p {
+  margin: 0;
+  font-size: .82rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
 
 /* ---------- n8n resources ---------- */
 .conn-n8n { margin-top: 20px; }
