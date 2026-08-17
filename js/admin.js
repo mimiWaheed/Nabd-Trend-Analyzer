@@ -54,6 +54,8 @@
       const total = data.total || 0;
       const cnt = $('adminCount');
       if (cnt) cnt.textContent = (currentOffset + 1) + '–' + Math.min(currentOffset + PAGE_SIZE, total) + ' of ' + total;
+      const badge = $('adminUserCount');
+      if (badge) badge.textContent = total + ' users';
       const prev = $('adminPrev');
       const next = $('adminNext');
       if (prev) prev.disabled = currentOffset === 0;
@@ -256,6 +258,32 @@
   function init() {
     loadStats();
     loadUsers();
+
+    document.querySelectorAll('.admin-section').forEach((sec) => {
+      const head = sec.querySelector('.admin-section-head');
+      const body = sec.querySelector('.admin-section-body');
+      if (!head || !body) return;
+      head.addEventListener('click', () => {
+        const open = sec.classList.toggle('open');
+        if (open) {
+          body.style.maxHeight = body.scrollHeight + 'px';
+          body.addEventListener('transitionend', function handler() {
+            if (sec.classList.contains('open')) body.style.maxHeight = 'none';
+            body.removeEventListener('transitionend', handler);
+          });
+        } else {
+          body.style.maxHeight = body.scrollHeight + 'px';
+          requestAnimationFrame(() => { body.style.maxHeight = '0'; });
+        }
+      });
+    });
+
+    const connBtn = $('adminConnBtn');
+    if (connBtn) connBtn.addEventListener('click', () => {
+      const connSec = document.querySelector('.conn-grid') && document.querySelector('.conn-grid').closest('.admin-section');
+      if (connSec && !connSec.classList.contains('open')) connSec.querySelector('.admin-section-head').click();
+      setTimeout(() => { const t = document.getElementById('admin-connections'); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
+    });
 
     const search = $('adminSearch');
     if (search) {

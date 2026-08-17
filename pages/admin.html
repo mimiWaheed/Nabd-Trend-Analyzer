@@ -34,10 +34,10 @@
         <p data-i18n="admin.sub">Manage users, roles and platform health.</p>
       </div>
       <div class="app-head-actions">
-        <a href="#admin-connections" class="btn btn-ghost btn-sm" id="adminConnBtn">
+        <button class="btn btn-ghost btn-sm" id="adminConnBtn" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
           <span data-i18n="admin.conn.btn">Check Connections</span>
-        </a>
+        </button>
       </div>
     </div>
 
@@ -81,8 +81,18 @@
       </div>
     </div>
 
-    <!-- Connection Cards -->
-    <div class="conn-grid" id="admin-connections">
+    <!-- Connections Section -->
+    <div class="admin-section" id="admin-connections">
+      <button class="admin-section-head" type="button">
+        <div class="admin-section-head-left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+          <span data-i18n="admin.section.connections">Connections</span>
+          <span class="admin-section-badge" data-i18n="admin.section.conn.count">8 sources</span>
+        </div>
+        <svg class="admin-section-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="admin-section-body">
+        <div class="conn-grid">
       <div class="conn-card" data-conn="fb">
         <div class="conn-top">
           <span class="conn-logo" style="background:#1877F2">f</span>
@@ -225,73 +235,77 @@
         </div>
       </div>
       <p class="conn-n8n-more" data-i18n="conn.soon.more">More sources are on the way.</p>
-    </div>
-
-    <!-- Search & Filters -->
-    <div class="admin-filter-bar" id="adminFilterBar">
-      <div class="admin-search-wrap">
-        <svg class="admin-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" class="admin-search-input" id="adminSearch" data-i18n-ph="admin.search.placeholder" placeholder="Search by name or email...">
-      </div>
-      <div class="admin-filters">
-        <div class="admin-dropdown" id="adminRoleFilter" data-value="all">
-          <button class="admin-dropdown-btn" type="button">
-            <span class="admin-dropdown-label" data-i18n="admin.filter.role.all">All Roles</span>
-            <svg class="admin-dropdown-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="admin-dropdown-panel">
-            <div class="admin-dropdown-item active" data-value="all" data-i18n="admin.filter.role.all">All Roles</div>
-            <div class="admin-dropdown-item" data-value="superadmin" data-i18n="admin.filter.role.superadmin">Super Admin</div>
-            <div class="admin-dropdown-item" data-value="nabd_admin" data-i18n="admin.filter.role.admin">Admin</div>
-            <div class="admin-dropdown-item" data-value="analyst" data-i18n="admin.filter.role.analyst">Analyst</div>
-          </div>
-        </div>
-        <div class="admin-dropdown" id="adminDateFilter" data-value="all">
-          <button class="admin-dropdown-btn" type="button">
-            <span class="admin-dropdown-label" data-i18n="admin.filter.date.all">All Time</span>
-            <svg class="admin-dropdown-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="admin-dropdown-panel">
-            <div class="admin-dropdown-item active" data-value="all" data-i18n="admin.filter.date.all">All Time</div>
-            <div class="admin-dropdown-item" data-value="today" data-i18n="admin.filter.date.today">Joined Today</div>
-            <div class="admin-dropdown-item" data-value="week" data-i18n="admin.filter.date.week">Joined This Week</div>
-            <div class="admin-dropdown-item" data-value="month" data-i18n="admin.filter.date.month">Joined This Month</div>
-          </div>
-        </div>
       </div>
     </div>
 
-    <!-- User Management -->
-    <div class="ws-card admin-table-card">
-      <div class="card-head">
-        <div>
-          <h3 class="card-title" data-i18n="admin.users.t">User Management</h3>
-          <p class="card-sub" data-i18n="admin.users.s">ALL REGISTERED USERS</p>
+    <!-- Users Section -->
+    <div class="admin-section">
+      <button class="admin-section-head" type="button">
+        <div class="admin-section-head-left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span data-i18n="admin.section.users">User Management</span>
+          <span class="admin-section-badge" id="adminUserCount">—</span>
         </div>
-      </div>
-      <div class="admin-table-wrap">
-        <table class="admin-table" id="adminUserTable">
-          <thead>
-            <tr>
-              <th data-i18n="admin.th.name">Name</th>
-              <th data-i18n="admin.th.email">Email</th>
-              <th data-i18n="admin.th.role">Role</th>
-              <th data-i18n="admin.th.joined">Joined</th>
-              <th data-i18n="admin.th.actions">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="adminUserBody"></tbody>
-        </table>
-        <div class="admin-empty" id="adminEmpty" hidden>
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.35"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="11" x2="23" y2="11"/></svg>
-          <p data-i18n="admin.empty">No users found matching your criteria.</p>
+        <svg class="admin-section-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="admin-section-body">
+        <div class="admin-filter-bar" id="adminFilterBar">
+          <div class="admin-search-wrap">
+            <svg class="admin-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="admin-search-input" id="adminSearch" data-i18n-ph="admin.search.placeholder" placeholder="Search by name or email...">
+          </div>
+          <div class="admin-filters">
+            <div class="admin-dropdown" id="adminRoleFilter" data-value="all">
+              <button class="admin-dropdown-btn" type="button">
+                <span class="admin-dropdown-label" data-i18n="admin.filter.role.all">All Roles</span>
+                <svg class="admin-dropdown-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="admin-dropdown-panel">
+                <div class="admin-dropdown-item active" data-value="all" data-i18n="admin.filter.role.all">All Roles</div>
+                <div class="admin-dropdown-item" data-value="superadmin" data-i18n="admin.filter.role.superadmin">Super Admin</div>
+                <div class="admin-dropdown-item" data-value="nabd_admin" data-i18n="admin.filter.role.admin">Admin</div>
+                <div class="admin-dropdown-item" data-value="analyst" data-i18n="admin.filter.role.analyst">Analyst</div>
+              </div>
+            </div>
+            <div class="admin-dropdown" id="adminDateFilter" data-value="all">
+              <button class="admin-dropdown-btn" type="button">
+                <span class="admin-dropdown-label" data-i18n="admin.filter.date.all">All Time</span>
+                <svg class="admin-dropdown-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="admin-dropdown-panel">
+                <div class="admin-dropdown-item active" data-value="all" data-i18n="admin.filter.date.all">All Time</div>
+                <div class="admin-dropdown-item" data-value="today" data-i18n="admin.filter.date.today">Joined Today</div>
+                <div class="admin-dropdown-item" data-value="week" data-i18n="admin.filter.date.week">Joined This Week</div>
+                <div class="admin-dropdown-item" data-value="month" data-i18n="admin.filter.date.month">Joined This Month</div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="admin-pager" id="adminPager">
-        <span class="admin-pager-count" id="adminCount"></span>
-        <div class="admin-pager-btns">
-          <button class="btn btn-ghost btn-sm" id="adminPrev" disabled data-i18n="admin.prev">Previous</button>
-          <button class="btn btn-ghost btn-sm" id="adminNext" data-i18n="admin.next">Next</button>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="adminUserTable">
+            <thead>
+              <tr>
+                <th data-i18n="admin.th.name">Name</th>
+                <th data-i18n="admin.th.email">Email</th>
+                <th data-i18n="admin.th.role">Role</th>
+                <th data-i18n="admin.th.joined">Joined</th>
+                <th data-i18n="admin.th.actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminUserBody"></tbody>
+          </table>
+          <div class="admin-empty" id="adminEmpty" hidden>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.35"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="11" x2="23" y2="11"/></svg>
+            <p data-i18n="admin.empty">No users found matching your criteria.</p>
+          </div>
+        </div>
+        <div class="admin-pager" id="adminPager">
+          <span class="admin-pager-count" id="adminCount"></span>
+          <div class="admin-pager-btns">
+            <button class="btn btn-ghost btn-sm" id="adminPrev" disabled data-i18n="admin.prev">Previous</button>
+            <button class="btn btn-ghost btn-sm" id="adminNext" data-i18n="admin.next">Next</button>
+          </div>
         </div>
       </div>
     </div>
@@ -379,6 +393,72 @@
       flex-wrap: wrap;
     }
     .app-head-actions { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+
+    /* ── Collapsible Sections ── */
+    .admin-section {
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px) saturate(1.1);
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 20px;
+      overflow: hidden;
+      transition: border-color .3s var(--ease);
+    }
+    .admin-section:hover { border-color: var(--border-strong); }
+    .admin-section-head {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 22px;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: .92rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      transition: background .2s var(--ease);
+      user-select: none;
+    }
+    .admin-section-head:hover { background: var(--hover); }
+    .admin-section-head:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+    .admin-section-head-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .admin-section-head-left svg { color: var(--accent); flex-shrink: 0; }
+    .admin-section-badge {
+      font-size: .7rem;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(94,162,255,.1);
+      color: var(--accent);
+    }
+    .admin-section-chevron {
+      width: 16px; height: 16px;
+      stroke: var(--text-muted);
+      transition: transform .3s var(--ease);
+      flex-shrink: 0;
+    }
+    .admin-section.open .admin-section-chevron { transform: rotate(180deg); }
+    .admin-section-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .35s var(--ease), opacity .25s var(--ease);
+      opacity: 0;
+    }
+    .admin-section.open .admin-section-body {
+      opacity: 1;
+    }
+    .admin-section-body > * { padding-left: 22px; padding-right: 22px; }
+    .admin-section-body > *:first-child { padding-top: 4px; }
+    .admin-section-body > *:last-child { padding-bottom: 20px; }
 
     /* ── Stats Cards ── */
     .admin-stats {
@@ -687,6 +767,8 @@
       .modal-actions { flex-direction: column; align-items: stretch; }
       .modal-actions-right { justify-content: stretch; }
       .modal-actions-right .btn { flex: 1; }
+      .admin-section-head { padding: 14px 16px; font-size: .86rem; }
+      .admin-section-body > * { padding-left: 16px; padding-right: 16px; }
     }
   </style>
 
