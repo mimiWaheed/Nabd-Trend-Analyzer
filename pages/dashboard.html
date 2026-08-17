@@ -269,27 +269,19 @@
             <div class="kpi-value" id="kpiCrises">—</div>
           </div>
 
-          <!-- Regional intelligence -->
-          <div class="ws-card card gov-card">
+          <!-- Live feed (real sampleSources) -->
+          <div class="ws-card card feed-card">
             <div class="card-head">
               <div>
-                <h3 class="card-title" data-i18n="ws.regional.t">Regional intelligence</h3>
-                <p class="card-sub mono" data-i18n="ws.regional.s">DETECTED LOCATIONS FROM THIS ANALYSIS</p>
+                <h3 class="card-title" data-i18n="ws.feed.t">Live feed</h3>
+                <p class="card-sub" data-i18n="ws.feed.s2">REAL SOURCES · CLICK TO OPEN</p>
               </div>
             </div>
-            <div class="region-heat-wrap" id="regionGrid"></div>
-          </div>
-
-          <!-- Trending topics -->
-          <div class="ws-card card topics-card">
-            <div class="card-head">
-              <div>
-                <h3 class="card-title" data-i18n="ws.topics.t">Trending topics</h3>
-                <p class="card-sub" data-i18n="ws.topics.s2">RANKED BY SEVERITY</p>
-              </div>
+            <span class="live-badge mono" style="margin-top:-2px"><span class="live-dot"></span> LIVE</span>
+            <div class="feed">
+              <div class="feed-track" id="dbFeedTrack"></div>
+              <div class="empty-state" id="dbEmptyFeed" hidden><p data-i18n="ws.feed.na">No live signals returned for this query.</p></div>
             </div>
-            <div class="trend-list" id="dbTrendList"></div>
-            <div class="empty-state" id="dbEmptyTopics" hidden><p data-i18n="ws.nodata">No data available</p></div>
           </div>
 
           <!-- Top keywords (deterministic, from aggregation) -->
@@ -302,6 +294,18 @@
             </div>
             <div class="vbar-chart" id="dbKwList"></div>
             <div class="empty-state" id="dbEmptyKeywords" hidden><p data-i18n="ws.nodata">No data available</p></div>
+          </div>
+
+          <!-- Trending topics -->
+          <div class="ws-card card topics-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.topics.t">Trending topics</h3>
+                <p class="card-sub" data-i18n="ws.topics.s2">RANKED BY SEVERITY</p>
+              </div>
+            </div>
+            <div class="trend-list" id="dbTrendList"></div>
+            <div class="empty-state" id="dbEmptyTopics" hidden><p data-i18n="ws.nodata">No data available</p></div>
           </div>
 
           <!-- Top phrases (deterministic n-grams) -->
@@ -363,19 +367,15 @@
             </div>
           </div>
 
-          <!-- Live feed (real sampleSources) -->
-          <div class="ws-card card feed-card">
+          <!-- Regional intelligence -->
+          <div class="ws-card card gov-card">
             <div class="card-head">
               <div>
-                <h3 class="card-title" data-i18n="ws.feed.t">Live feed</h3>
-                <p class="card-sub" data-i18n="ws.feed.s2">REAL SOURCES · CLICK TO OPEN</p>
+                <h3 class="card-title" data-i18n="ws.regional.t">Regional intelligence</h3>
+                <p class="card-sub mono" data-i18n="ws.regional.s">DETECTED LOCATIONS FROM THIS ANALYSIS</p>
               </div>
             </div>
-            <span class="live-badge mono" style="margin-top:-2px"><span class="live-dot"></span> LIVE</span>
-            <div class="feed">
-              <div class="feed-track" id="dbFeedTrack"></div>
-              <div class="empty-state" id="dbEmptyFeed" hidden><p data-i18n="ws.feed.na">No live signals returned for this query.</p></div>
-            </div>
+            <div class="region-heat-wrap" id="regionGrid"></div>
           </div>
 
           <!-- AI highlights -->
