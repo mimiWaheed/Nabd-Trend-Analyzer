@@ -1798,7 +1798,17 @@
       if (btn.dataset.act === 'rerun') N.navigate('dashboard.html?view=analysis&q=' + encodeURIComponent(r.query));
       else if (btn.dataset.act === 'pin') {
         const ix = pins.indexOf(r.id);
-        if (ix === -1) pins.push(r.id); else pins.splice(ix, 1);
+        if (ix === -1) {
+          pins.push(r.id);
+          if (N.favAdd && !N.favHas(r.query)) {
+            N.favAdd({ q: r.query, t: r.ts || Date.now(), r: { query: r.query, src: r.src || null, tone: r.tone || '' } });
+          }
+          T('app.toast.fav');
+        } else {
+          pins.splice(ix, 1);
+          if (N.favRemove) N.favRemove(r.query);
+          T('app.toast.favOff');
+        }
         try { localStorage.setItem('nabd-pins', JSON.stringify(pins)); } catch (err) {}
         render();
       } else if (btn.dataset.act === 'del') {
