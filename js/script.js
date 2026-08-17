@@ -1458,6 +1458,11 @@
   const NOTIF_CATS = ['ai', 'trend', 'system', 'reports', 'conn', 'export'];
   const HISTORY_CATS = ['news', 'social', 'gov', 'sport', 'business'];
 
+  function userStoreKey(base) {
+    const u = getUser();
+    return (u && u.id) ? base + '-' + u.id : base;
+  }
+
   function readStore(key) {
     try {
       const raw = localStorage.getItem(key);
@@ -1469,7 +1474,7 @@
     try { localStorage.setItem(key, JSON.stringify(arr)); } catch (e) {}
   }
   function historyGet() {
-    return readStore(HISTORY_KEY).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    return readStore(userStoreKey(HISTORY_KEY)).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
   }
   function historyAdd(entry) {
     const item = {
@@ -1483,16 +1488,18 @@
       exp: entry && entry.exp ? 1 : 0
     };
     if (!item.query) return item;
-    const list = readStore(HISTORY_KEY);
+    const key = userStoreKey(HISTORY_KEY);
+    const list = readStore(key);
     list.unshift(item);
-    writeStore(HISTORY_KEY, list.slice(0, 60));
+    writeStore(key, list.slice(0, 60));
     return item;
   }
   function historyRemove(id) {
-    writeStore(HISTORY_KEY, readStore(HISTORY_KEY).filter((h) => h.id !== id));
+    const key = userStoreKey(HISTORY_KEY);
+    writeStore(key, readStore(key).filter((h) => h.id !== id));
   }
   function notifGet() {
-    return readStore(NOTIF_KEY).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    return readStore(userStoreKey(NOTIF_KEY)).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
   }
   function notifAdd(entry) {
     const item = {
@@ -1503,9 +1510,10 @@
       ts: Number((entry && entry.ts) || Date.now()),
       params: entry && entry.params && typeof entry.params === 'object' ? entry.params : null
     };
-    const list = readStore(NOTIF_KEY);
+    const key = userStoreKey(NOTIF_KEY);
+    const list = readStore(key);
     list.unshift(item);
-    writeStore(NOTIF_KEY, list.slice(0, NOTIF_MAX));
+    writeStore(key, list.slice(0, NOTIF_MAX));
     return item;
   }
 
@@ -1525,7 +1533,7 @@
   const ACTIVITY_KEY = 'nabd-activity';
   const ACTIVITY_TYPES = ['analysis', 'export', 'save', 'fav', 'alert', 'reminder', 'profile', 'avatar', 'conn'];
   function activityGet() {
-    return readStore(ACTIVITY_KEY).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    return readStore(userStoreKey(ACTIVITY_KEY)).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
   }
   function activityAdd(type, meta) {
     if (ACTIVITY_TYPES.indexOf(type) === -1) return null;
@@ -1536,9 +1544,10 @@
       n: meta && meta.n != null ? String(meta.n) : '',
       ts: Number((meta && meta.ts) || Date.now())
     };
-    const list = readStore(ACTIVITY_KEY);
+    const key = userStoreKey(ACTIVITY_KEY);
+    const list = readStore(key);
     list.unshift(item);
-    writeStore(ACTIVITY_KEY, list.slice(0, 30));
+    writeStore(key, list.slice(0, 30));
     return item;
   }
 
@@ -1549,7 +1558,7 @@
      ---------------------------------------------------------- */
   const ALERT_KEY = 'nabd-alerts';
   function alertsGet() {
-    return readStore(ALERT_KEY).slice().sort((a, b) => (a.dueAt || 0) - (b.dueAt || 0));
+    return readStore(userStoreKey(ALERT_KEY)).slice().sort((a, b) => (a.dueAt || 0) - (b.dueAt || 0));
   }
   function alertsAdd(entry) {
     const item = {
@@ -1560,23 +1569,26 @@
       done: false
     };
     if (!item.q || !item.dueAt) return null;
-    const list = readStore(ALERT_KEY);
+    const key = userStoreKey(ALERT_KEY);
+    const list = readStore(key);
     list.unshift(item);
-    writeStore(ALERT_KEY, list.slice(0, 50));
+    writeStore(key, list.slice(0, 50));
     return item;
   }
   function alertsRemove(id) {
-    writeStore(ALERT_KEY, readStore(ALERT_KEY).filter((a) => a.id !== id));
+    const key = userStoreKey(ALERT_KEY);
+    writeStore(key, readStore(key).filter((a) => a.id !== id));
   }
   function alertsDue() {
     const now = Date.now();
-    return readStore(ALERT_KEY).filter((a) => !a.done && a.dueAt <= now);
+    return readStore(userStoreKey(ALERT_KEY)).filter((a) => !a.done && a.dueAt <= now);
   }
   function checkAlerts() {
-    const due = alertsDue();
-    if (!due.length) return;
+    const key = userStoreKey(ALERT_KEY);
+    const list = readStore(key);
     const now = Date.now();
-    const list = readStore(ALERT_KEY);
+    const due = list.filter((a) => !a.done && a.dueAt <= now);
+    if (!due.length) return;
     due.forEach((a) => {
       notifAdd({ title: 'notif.alert.t', sub: 'notif.alert.s', params: { q: a.q }, cat: 'reports', ts: now });
       a.done = true;
@@ -1586,7 +1598,7 @@
         body: { query: a.q, email: user && user.email }
       }).catch(() => {});
     });
-    writeStore(ALERT_KEY, list);
+    writeStore(key, list);
   }
 
   /* ----------------------------------------------------------
@@ -1594,7 +1606,7 @@
      ---------------------------------------------------------- */
   const FAV_KEY = 'nabd-favs';
   function favGet() {
-    return readStore(FAV_KEY);
+    return readStore(userStoreKey(FAV_KEY));
   }
   function favHas(q) {
     const key = String(q == null ? '' : q).trim().toLowerCase();
@@ -1619,12 +1631,12 @@
     if (!item.q || favHas(item.q)) return null;
     const list = favGet();
     list.unshift(item);
-    writeStore(FAV_KEY, list.slice(0, 50));
+    writeStore(userStoreKey(FAV_KEY), list.slice(0, 50));
     return item;
   }
   function favRemove(q) {
     const key = String(q == null ? '' : q).trim().toLowerCase();
-    writeStore(FAV_KEY, favGet().filter((f) => String(f.q || '').toLowerCase() !== key));
+    writeStore(userStoreKey(FAV_KEY), favGet().filter((f) => String(f.q || '').toLowerCase() !== key));
   }
 
   /* ----------------------------------------------------------
@@ -1633,19 +1645,20 @@
   const AVATAR_KEY = 'nabd-avatar';
   const DL_KEY = 'nabd-dlcount';
   function avatarGet() {
-    try { return localStorage.getItem(AVATAR_KEY); } catch (e) { return null; }
+    try { return localStorage.getItem(userStoreKey(AVATAR_KEY)); } catch (e) { return null; }
   }
   function avatarSet(dataUrl) {
     try {
-      if (dataUrl) localStorage.setItem(AVATAR_KEY, dataUrl);
-      else localStorage.removeItem(AVATAR_KEY);
+      const k = userStoreKey(AVATAR_KEY);
+      if (dataUrl) localStorage.setItem(k, dataUrl);
+      else localStorage.removeItem(k);
     } catch (e) {}
   }
   function dlCount() {
-    try { return parseInt(localStorage.getItem(DL_KEY) || '0', 10) || 0; } catch (e) { return 0; }
+    try { return parseInt(localStorage.getItem(userStoreKey(DL_KEY)) || '0', 10) || 0; } catch (e) { return 0; }
   }
   function recordDownload(fileType, searchId) {
-    try { localStorage.setItem(DL_KEY, String(dlCount() + 1)); } catch (e) {}
+    try { localStorage.setItem(userStoreKey(DL_KEY), String(dlCount() + 1)); } catch (e) {}
     api('/api/downloads', { method: 'POST', body: { fileType: fileType || 'report', searchId: searchId || null } })
       .catch(() => {});
   }

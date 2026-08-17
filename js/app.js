@@ -14,6 +14,7 @@
   const toastEl = () => $('appToast');
   const T = (key) => { if (toastEl()) N.toast(toastEl(), L(key)); };
   document.addEventListener('nabd-toast', (e) => { if (e && e.detail && e.detail.key) T(e.detail.key); });
+  function userKey(base) { const u = N.getUser(); return (u && u.id) ? base + '-' + u.id : base; }
 
   /* ----------------------------------------------------------
      AUTH GUARD — protected application routes.
@@ -99,7 +100,7 @@
     if (!notifs.length) return 0;
     const read = new Set();
     try {
-      const raw = JSON.parse(localStorage.getItem('nabd-read') || '[]');
+      const raw = JSON.parse(localStorage.getItem(userKey('nabd-read')) || '[]');
       if (Array.isArray(raw)) raw.forEach((id) => read.add(id));
     } catch (e) {}
     return notifs.filter((n) => n && !read.has(n.id)).length;
@@ -515,10 +516,10 @@
       if (!draft) { T('app.toast.noexport'); return; }
       const writeDraft = (d) => {
         let saved = [];
-        try { saved = JSON.parse(localStorage.getItem('nabd-saved-reports') || '[]'); if (!Array.isArray(saved)) saved = []; } catch (e) { saved = []; }
+        try { saved = JSON.parse(localStorage.getItem(userKey('nabd-saved-reports')) || '[]'); if (!Array.isArray(saved)) saved = []; } catch (e) { saved = []; }
         saved.unshift(d);
         saved = saved.slice(0, 20);
-        localStorage.setItem('nabd-saved-reports', JSON.stringify(saved));
+        localStorage.setItem(userKey('nabd-saved-reports'), JSON.stringify(saved));
       };
       const compact = (d) => {
         const r = d.r || {};
@@ -1688,7 +1689,7 @@
     const stLabel = { done: 'app.st.done', running: 'app.st.running', failed: 'app.st.failed' };
     const catLabel = { news: 'app.cat.news', social: 'app.cat.social', gov: 'app.cat.gov', sport: 'app.cat.sport', business: 'app.cat.business' };
     const stCls = { done: 'ok', running: 'warn', failed: 'bad' };
-    const pins = (() => { try { return JSON.parse(localStorage.getItem('nabd-pins') || '[]'); } catch (e) { return []; } })();
+    const pins = (() => { try { return JSON.parse(localStorage.getItem(userKey('nabd-pins')) || '[]'); } catch (e) { return []; } })();
 
     function srcLabel(r) {
       const s = N.formatNumber ? N.formatNumber(r.src) : r.src;
@@ -1809,7 +1810,7 @@
           if (N.favRemove) N.favRemove(r.query);
           T('app.toast.favOff');
         }
-        try { localStorage.setItem('nabd-pins', JSON.stringify(pins)); } catch (err) {}
+        try { localStorage.setItem(userKey('nabd-pins'), JSON.stringify(pins)); } catch (err) {}
         render();
       } else if (btn.dataset.act === 'del') {
         if (N.historyRemove) N.historyRemove(r.id);
@@ -1828,13 +1829,13 @@
     const empty = $('repEmpty');
     function savedReports() {
       try {
-        const raw = localStorage.getItem('nabd-saved-reports') || '[]';
+        const raw = localStorage.getItem(userKey('nabd-saved-reports')) || '[]';
         const arr = JSON.parse(raw);
         return Array.isArray(arr) ? arr : [];
       } catch (e) { return []; }
     }
     function writeSaved(list) {
-      try { localStorage.setItem('nabd-saved-reports', JSON.stringify(list.slice(0, 20))); } catch (e) {}
+      try { localStorage.setItem(userKey('nabd-saved-reports'), JSON.stringify(list.slice(0, 20))); } catch (e) {}
     }
     function renderGrid() {
       if (!grid) return;
@@ -2506,7 +2507,7 @@
     const empty = $('notifEmpty');
     const unreadEl = $('notifUnread');
     const filters = document.querySelectorAll('[data-nf]');
-    const read = (() => { try { return JSON.parse(localStorage.getItem('nabd-read') || '[]'); } catch (e) { return []; } })();
+    const read = (() => { try { return JSON.parse(localStorage.getItem(userKey('nabd-read')) || '[]'); } catch (e) { return []; } })();
     let cur = 'all';
     const ICONS = { ai: ['!', 'danger'], trend: ['▲', 'pos'], system: ['◷', 'warn'], reports: ['PDF', 'neu'], conn: ['f', 'neu'], export: ['CSV', 'pos'] };
 
@@ -2550,14 +2551,14 @@
       const id = it.dataset.nid;
       if (read.indexOf(id) === -1) {
         read.push(id);
-        try { localStorage.setItem('nabd-read', JSON.stringify(read)); } catch (err) {}
+        try { localStorage.setItem(userKey('nabd-read'), JSON.stringify(read)); } catch (err) {}
         paint();
       }
     });
     const mark = $('notifMark');
     if (mark) mark.addEventListener('click', () => {
       dataRows().forEach((n) => { if (read.indexOf(n.id) === -1) read.push(n.id); });
-      try { localStorage.setItem('nabd-read', JSON.stringify(read)); } catch (err) {}
+      try { localStorage.setItem(userKey('nabd-read'), JSON.stringify(read)); } catch (err) {}
       paint();
     });
     document.addEventListener('app-render', paint);
@@ -2606,7 +2607,7 @@
       if (!wrap) return;
       const hist = N.historyGet ? N.historyGet() : [];
       let pins = [];
-      try { pins = JSON.parse(localStorage.getItem('nabd-pins') || '[]'); } catch (e) {}
+      try { pins = JSON.parse(localStorage.getItem(userKey('nabd-pins')) || '[]'); } catch (e) {}
       const items = hist.filter((r) => pins.indexOf(r.id) !== -1);
       if (empty) empty.hidden = items.length > 0;
       wrap.innerHTML = items.map((r) => {
@@ -2647,10 +2648,10 @@
         const row = ub.closest('.app-row');
         const id = row && row.dataset.id;
         let pins = [];
-        try { pins = JSON.parse(localStorage.getItem('nabd-pins') || '[]'); } catch (err) {}
+        try { pins = JSON.parse(localStorage.getItem(userKey('nabd-pins')) || '[]'); } catch (err) {}
         const ix = pins.indexOf(id);
         if (ix !== -1) pins.splice(ix, 1);
-        try { localStorage.setItem('nabd-pins', JSON.stringify(pins)); } catch (err) {}
+        try { localStorage.setItem(userKey('nabd-pins'), JSON.stringify(pins)); } catch (err) {}
         renderSearches();
         T('app.toast.favOff');
       }
@@ -2664,8 +2665,8 @@
     if (!wrap) return;
     const folderTpl = (name, on) => '<button class="filter-chip' + (on ? ' active' : '') + '" data-folder="' + name + '">' + name + '</button>';
     const chipsWrap = $('searchFolders');
-    const folders = (() => { try { return JSON.parse(localStorage.getItem('nabd-folders') || '["' + L('srch.f1') + '","' + L('srch.f2') + '"]'); } catch (e) { return [L('srch.f1'), L('srch.f2')]; } })();
-    function saveFolders() { try { localStorage.setItem('nabd-folders', JSON.stringify(folders)); } catch (e) {} }
+    const folders = (() => { try { return JSON.parse(localStorage.getItem(userKey('nabd-folders')) || '["' + L('srch.f1') + '","' + L('srch.f2') + '"]'); } catch (e) { return [L('srch.f1'), L('srch.f2')]; } })();
+    function saveFolders() { try { localStorage.setItem(userKey('nabd-folders'), JSON.stringify(folders)); } catch (e) {} }
     function paintChips() {
       if (!chipsWrap) return;
       chipsWrap.innerHTML = '<button class="filter-chip active" data-folder="all">' + L('srch.all') + '</button>'

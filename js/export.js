@@ -10,6 +10,7 @@
   if (!N) return;
   const L = (k) => N.t(k);
   const $ = (id) => document.getElementById(id);
+  function userKey(base) { const u = N.getUser(); return (u && u.id) ? base + '-' + u.id : base; }
 
   const KEY = 'nabd-export';
   const report = $('report');
@@ -919,10 +920,10 @@
     } else if (act === 'save') {
       try {
         let saved = [];
-        try { saved = JSON.parse(localStorage.getItem('nabd-saved-reports') || '[]'); if (!Array.isArray(saved)) saved = []; } catch (err) { saved = []; }
+        try { saved = JSON.parse(localStorage.getItem(userKey('nabd-saved-reports')) || '[]'); if (!Array.isArray(saved)) saved = []; } catch (err) { saved = []; }
         saved.unshift(d);
         saved = saved.slice(0, 20);
-        localStorage.setItem('nabd-saved-reports', JSON.stringify(saved));
+        localStorage.setItem(userKey('nabd-saved-reports'), JSON.stringify(saved));
         if (N.activityAdd) N.activityAdd('save', { q: String(d.q || (d.r && d.r.query) || '') });
         N.toast(document.body, L('app.toast.savedReport'));
       } catch (err) {
