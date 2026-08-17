@@ -2238,6 +2238,11 @@ html[dir="rtl"] .field select {
 /* ------------------------------------------------------------
    17. RESPONSIVE
    ------------------------------------------------------------ */
+@media (min-width: 1400px) {
+  .auth-panel { padding: 120px 60px 60px; }
+  .auth-card { max-width: 460px; padding: 44px 42px; }
+  .auth-title { font-size: 2.1rem; }
+}
 @media (max-width: 1100px) {
   .usecase-grid { grid-template-columns: repeat(2, 1fr); }
   .hero-inner { grid-template-columns: 1fr; gap: 56px; }
@@ -2313,21 +2318,71 @@ html[dir="rtl"] .field select {
   .ws-query-text { max-width: 180px; }
   .region-grid { grid-template-columns: 1fr; }
   .donut { width: 150px; height: 150px; }
-  .auth-card { padding: 30px 22px; }
+  .auth-panel { padding: 90px 20px 32px; }
+  .auth-card { padding: 28px 20px; border-radius: 20px; }
+  .auth-title { font-size: 1.55rem; }
+  .auth-sub { font-size: .88rem; margin-bottom: 24px; }
+  .auth-logo { margin-bottom: 22px; }
+  .field input, .field select { padding: 12px 14px; font-size: .9rem; border-radius: 11px; }
   .ws-page { padding-top: 96px; }
   .lang-toggle { padding: 7px 10px; font-size: .78rem; }
   .nav-actions { gap: 6px; }
 }
 
 @media (max-width: 420px) {
-  .auth-panel { padding: 100px 20px 40px; }
-  .auth-card { padding: 26px 18px; }
-  .auth-title { font-size: 1.6rem; }
-  .field-row { flex-direction: column; align-items: stretch; }
+  .auth-panel { padding: 80px 16px 28px; }
+  .auth-card { padding: 24px 16px; border-radius: 18px; }
+  .auth-title { font-size: 1.35rem; letter-spacing: -.02em; }
+  .auth-sub { font-size: .82rem; margin-bottom: 20px; }
+  .auth-logo { margin-bottom: 18px; font-size: 1rem; }
+  .field-row { flex-direction: column; align-items: stretch; gap: 0; }
   .field-row .field { flex: 1 1 auto !important; }
+  .field { margin-bottom: 14px; }
+  .field label { font-size: .72rem; margin-bottom: 6px; }
+  .field input, .field select { padding: 11px 13px; font-size: .85rem; border-radius: 10px; }
+  .pwd-toggle svg { width: 16px; height: 16px; }
+  .pwd-toggle { right: 12px; }
+  .auth-submit { padding: 13px; font-size: .92rem; border-radius: 12px; }
+  .auth-back { font-size: .82rem; }
+  .auth-switch { font-size: .82rem; margin-top: 18px; }
+  .auth-terms { margin-bottom: 16px; }
+  .check { font-size: .78rem; }
   .social-row { flex-direction: column; }
   .social-row .btn { justify-content: center; }
   .nav-actions .nav-signin, .nav-actions .btn.btn-primary { font-size: .8rem; padding: 9px 14px; }
+  .otp-info { font-size: .78rem; }
+  .otp-info .field-hint { font-size: .78rem; }
+  .auth-otp-resend { font-size: .8rem; }
+  .auth-otp .auth-title { font-size: 1.35rem; }
+  .auth-otp .auth-sub { font-size: .82rem; }
+}
+
+@media (max-width: 360px) {
+  .auth-panel { padding: 70px 12px 24px; }
+  .auth-card { padding: 20px 14px; border-radius: 16px; }
+  .auth-title { font-size: 1.2rem; }
+  .auth-sub { font-size: .78rem; margin-bottom: 16px; }
+  .auth-logo { margin-bottom: 14px; font-size: .92rem; gap: 8px; }
+  .field { margin-bottom: 12px; }
+  .field label { font-size: .68rem; margin-bottom: 5px; }
+  .field input, .field select { padding: 10px 12px; font-size: .82rem; border-radius: 9px; }
+  .auth-submit { padding: 12px; font-size: .88rem; }
+  .pwd-strength { margin-top: 4px; }
+  .pwd-meter { height: 3px; }
+  .check { gap: 8px; font-size: .74rem; }
+  .check .box { width: 16px; height: 16px; border-radius: 5px; }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .auth-panel { padding: 60px 20px 20px; min-height: auto; }
+  .auth-page { min-height: auto; }
+  .auth-card { max-height: none; padding: 20px 18px; }
+  .auth-logo { margin-bottom: 10px; }
+  .auth-title { font-size: 1.2rem; margin-bottom: 4px; }
+  .auth-sub { font-size: .78rem; margin-bottom: 14px; }
+  .auth-terms { margin-bottom: 10px; }
+  .auth-submit { padding: 10px; }
+  .auth-switch { margin-top: 12px; font-size: .78rem; }
 }
 
 /* ------------------------------------------------------------
