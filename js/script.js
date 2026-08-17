@@ -1812,8 +1812,8 @@
         const rect = heroEl.getBoundingClientRect();
         const h = heroEl.offsetHeight;
         const progress = Math.max(0, Math.min(1, -rect.top / (h - window.innerHeight || h)));
-        heroImg.style.transform = 'scale(' + (1 + progress * 0.12) + ')';
-        heroOv.style.background = 'rgba(0,0,0,' + (0.20 + progress * 0.60) + ')';
+        heroImg.style.transform = 'scale(' + (0.85 + progress * 0.12) + ')';
+        heroOv.style.background = 'rgba(0,0,0,' + (0.40 + progress * 0.50) + ')';
         heroCnt.style.opacity = 1 - progress;
         heroCnt.style.transform = 'translateY(' + (-progress * 20) + 'px)';
         heroTicking = false;
