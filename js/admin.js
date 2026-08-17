@@ -22,6 +22,10 @@
     try { document.dispatchEvent(new CustomEvent('nabd-toast', { detail: { msg: msg } })); } catch (e) {}
   }
 
+  function getInitials(first, last) {
+    return ((first || '')[0] || '') + ((last || '')[0] || '');
+  }
+
   async function loadStats() {
     try {
       const res = await fetch('/api/users?action=admin-stats', { headers: { Accept: 'application/json' }, credentials: 'include' });
@@ -44,8 +48,7 @@
       const data = await res.json();
       if (!data.ok) return;
       allUsers = data.users || [];
-      filteredUsers = allUsers;
-      renderUsers();
+      applyFilters();
       const total = data.total || 0;
       const cnt = $('adminCount');
       if (cnt) cnt.textContent = (currentOffset + 1) + '–' + Math.min(currentOffset + PAGE_SIZE, total) + ' of ' + total;
@@ -56,19 +59,62 @@
     } catch (e) {}
   }
 
+  function applyFilters() {
+    const q = (($('adminSearch') || {}).value || '').toLowerCase().trim();
+    const roleFilter = (($('adminRoleFilter') || {}).value || 'all');
+    const dateFilter = (($('adminDateFilter') || {}).value || 'all');
+    const now = Date.now();
+
+    filteredUsers = allUsers.filter((u) => {
+      if (q) {
+        const name = ((u.firstName || '') + ' ' + (u.lastName || '') + ' ' + (u.email || '')).toLowerCase();
+        if (name.indexOf(q) === -1) return false;
+      }
+      if (roleFilter !== 'all') {
+        const role = u.role || 'analyst';
+        if (role !== roleFilter) return false;
+      }
+      if (dateFilter !== 'all' && u.createdAt) {
+        const created = new Date(u.createdAt).getTime();
+        if (dateFilter === 'today') {
+          const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+          if (created < startOfDay.getTime()) return false;
+        } else if (dateFilter === 'week') {
+          if (created < now - 7 * 86400000) return false;
+        } else if (dateFilter === 'month') {
+          if (created < now - 30 * 86400000) return false;
+        }
+      }
+      return true;
+    });
+
+    renderUsers();
+  }
+
   function renderUsers() {
     const tbody = $('adminUserBody');
+    const empty = $('adminEmpty');
+    const tableWrap = tbody && tbody.closest('.admin-table-wrap');
     if (!tbody) return;
     tbody.innerHTML = '';
     const L = (typeof I18N !== 'undefined' && I18N[typeof lang !== 'undefined' ? lang : 'en']) || {};
+
+    if (filteredUsers.length === 0) {
+      if (empty) empty.hidden = false;
+      if (tableWrap) tableWrap.querySelector('table').style.display = 'none';
+    } else {
+      if (empty) empty.hidden = true;
+      if (tableWrap) tableWrap.querySelector('table').style.display = '';
+    }
+
     filteredUsers.forEach((u) => {
       const role = u.role || 'analyst';
       const tr = document.createElement('tr');
       tr.innerHTML =
-        '<td>' + (u.firstName || '') + ' ' + (u.lastName || '') + '</td>'
-        + '<td class="mono" style="font-size:.8rem">' + (u.email || '') + '</td>'
+        '<td class="admin-user-name">' + (u.firstName || '') + ' ' + (u.lastName || '') + '</td>'
+        + '<td class="admin-user-email">' + (u.email || '') + '</td>'
         + '<td><span class="role-chip ' + role + '">' + role + '</span></td>'
-        + '<td class="mono" style="font-size:.78rem">' + formatDate(u.createdAt) + '</td>'
+        + '<td style="font-size:.82rem;color:var(--text-muted)">' + formatDate(u.createdAt) + '</td>'
         + '<td>'
         + '<button class="btn btn-ghost btn-sm admin-view-btn" data-uid="' + u.id + '">' + (L['admin.action.view'] || 'View') + '</button>'
         + '</td>';
@@ -90,15 +136,26 @@
       if (!data.ok) return;
       const u = data.user;
       const usage = data.usage || {};
-      const L = (typeof I18N !== 'undefined' && I18N[typeof lang !== 'undefined' ? lang : 'en']) || {};
       const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
       set('admName', (u.firstName || '') + ' ' + (u.lastName || ''));
       set('admEmail', u.email || '');
-      set('admRole', u.role || 'analyst');
+      set('admRole', (u.role || 'analyst').replace('_', ' '));
       set('admJoined', formatDate(u.createdAt));
       set('admAnalyses', (usage.analyses || 0).toLocaleString());
       set('admSearches', (usage.searches || 0).toLocaleString());
       set('admDownloads', (usage.downloads || 0).toLocaleString());
+
+      const avatar = $('admAvatar');
+      if (avatar) avatar.textContent = getInitials(u.firstName, u.lastName);
+
+      const modalEmail = $('admModalEmail');
+      if (modalEmail) modalEmail.textContent = u.email || '';
+
+      const roleBadge = $('admRole');
+      if (roleBadge) {
+        const r = u.role || 'analyst';
+        roleBadge.innerHTML = '<span class="role-chip ' + r + '">' + r + '</span>';
+      }
 
       const sel = $('admRoleSelect');
       if (sel) sel.value = u.role || 'analyst';
@@ -162,15 +219,17 @@
 
     const search = $('adminSearch');
     if (search) {
-      search.addEventListener('input', () => {
-        const q = search.value.toLowerCase().trim();
-        if (!q) { filteredUsers = allUsers; } else {
-          filteredUsers = allUsers.filter((u) =>
-            ((u.firstName || '') + ' ' + (u.lastName || '') + ' ' + (u.email || '')).toLowerCase().indexOf(q) !== -1
-          );
-        }
-        renderUsers();
-      });
+      search.addEventListener('input', () => { applyFilters(); });
+    }
+
+    const roleFilter = $('adminRoleFilter');
+    if (roleFilter) {
+      roleFilter.addEventListener('change', () => { applyFilters(); });
+    }
+
+    const dateFilter = $('adminDateFilter');
+    if (dateFilter) {
+      dateFilter.addEventListener('change', () => { applyFilters(); });
     }
 
     const prev = $('adminPrev');
