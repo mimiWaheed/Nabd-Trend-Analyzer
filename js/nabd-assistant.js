@@ -36,9 +36,23 @@
     }
   };
 
+  const MAX_STORED = 40;
+  const STORAGE_KEY = 'nabd-chat';
+
   let state = { open: false, bubbleShown: false, messages: [], sending: false };
   let els = {};
   let config = {};
+
+  function loadHistory() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function saveHistory() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.messages.slice(-MAX_STORED))); } catch (e) {}
+  }
 
   function str(k) {
     const lang = document.documentElement.lang || 'en';
@@ -110,8 +124,26 @@
     state.messages = [];
   }
 
+  function restoreMessages() {
+    const msgs = els.messages;
+    if (!msgs || !state.messages.length) return;
+    msgs.innerHTML = '';
+    state.messages.forEach(function (m) {
+      const div = document.createElement('div');
+      div.className = 'nabd-msg nabd-msg-' + (m.role === 'assistant' ? 'bot' : 'user');
+      if (m.role === 'assistant') {
+        div.innerHTML = '<div class="nabd-msg-avatar">N</div><div class="nabd-msg-body">' + renderMarkdown(m.content) + '</div>';
+      } else {
+        div.innerHTML = '<div class="nabd-msg-body nabd-msg-user-body">' + esc(m.content) + '</div>';
+      }
+      msgs.appendChild(div);
+    });
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
   function addMessage(role, content) {
     state.messages.push({ role, content });
+    saveHistory();
     const msgs = els.messages;
     if (!msgs) return;
     const chipWrap = msgs.querySelector('.nabd-chips');
@@ -184,6 +216,7 @@
     els.fab.classList.toggle('active', state.open);
     els.fab.setAttribute('aria-label', state.open ? str('close') : str('open'));
     if (state.open && state.messages.length === 0) showWelcome();
+    if (state.open && state.messages.length > 0) restoreMessages();
     if (state.open) {
       setTimeout(() => els.input && els.input.focus(), 200);
     }
@@ -238,6 +271,7 @@
       close: container.querySelector('.nabd-panel-close')
     };
 
+    state.messages = loadHistory();
     bind();
   }
 

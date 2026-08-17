@@ -1,7 +1,6 @@
 /* POST /api/nabd — NABD AI assistant endpoint.
    Calls an OpenAI-compatible API server-side. Never exposes keys to the client. */
 
-const { requireAuth } = require('../../lib/auth');
 const { asyncBody, fail, ok } = require('../../lib/respond');
 
 const SYSTEM_PROMPT = `You are NABD — the intelligent assistant of the NABD (نبض) trend intelligence platform.
@@ -32,9 +31,6 @@ function getProviderConfig() {
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return fail(res, 405, 'METHOD_NOT_ALLOWED');
-
-  const auth = await requireAuth(req, res);
-  if (!auth) return;
 
   let body;
   try { body = await asyncBody(req); } catch (e) { return fail(res, 400, e.code || 'BAD_REQUEST'); }
