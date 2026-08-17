@@ -2271,7 +2271,7 @@
 
   /* ----------------------------------------------------------
      API CONFIG — the n8n webhook URL is environment-configurable.
-     The Vercel serverless route /api/config serves it from
+     The Vercel serverless route /api/nabd?action=config serves it from
      NABD_WEBHOOK_URL; when that route is unavailable (local static
      preview) the production default is used. Resolved once + cached.
      ---------------------------------------------------------- */
@@ -2280,7 +2280,7 @@
   let apiConfigPromise = null;
   function loadApiConfig() {
     if (!apiConfigPromise) {
-      apiConfigPromise = fetch('/api/config', { headers: { Accept: 'application/json' }, cache: 'no-store' })
+      apiConfigPromise = fetch('/api/nabd?action=config', { headers: { Accept: 'application/json' }, cache: 'no-store' })
         .then((res) => (res.ok ? res.json() : Promise.reject(new Error('config http ' + res.status))))
         .then((cfg) => (cfg && typeof cfg === 'object' ? cfg : {}))
         .catch(() => ({}));

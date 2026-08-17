@@ -1,7 +1,17 @@
-/* POST /api/nabd — NABD AI assistant endpoint.
-   Calls an OpenAI-compatible API server-side. Never exposes keys to the client. */
+/* /api/nabd — NABD AI assistant + config endpoint (Vercel serverless).
+   POST  /api/nabd              — AI chat (OpenAI-compatible).
+   GET   /api/nabd?action=config — serves the n8n webhook URL from env. */
 
-const { asyncBody, fail, ok } = require('../../lib/respond');
+const { asyncBody, fail, json, ok } = require('../../lib/respond');
+
+/* ---------- config action (GET /api/nabd?action=config) ---------- */
+function handleConfig(_req, res) {
+  const url = process.env.NABD_WEBHOOK_URL;
+  if (!url) return json(res, 200, { ok: false, error: 'NABD_WEBHOOK_URL_NOT_SET' });
+  return json(res, 200, { ok: true, webhookUrl: url });
+}
+
+/* ---------- chat action (POST /api/nabd) ---------- */
 
 const SYSTEM_PROMPT = `You are NABD (نبض) — a friendly, helpful assistant for the NABD trend intelligence platform in Egypt. You talk like a real person, not like a chatbot.
 
@@ -69,6 +79,8 @@ function getProviderConfig() {
 }
 
 module.exports = async function handler(req, res) {
+  const q = new URL(req.url || '/', 'http://localhost').searchParams;
+  if (req.method === 'GET' && q.get('action') === 'config') return handleConfig(req, res);
   if (req.method !== 'POST') return fail(res, 405, 'METHOD_NOT_ALLOWED');
 
   let body;
