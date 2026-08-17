@@ -66,7 +66,7 @@
     { id: 'dashboard', href: 'dashboard.html', key: 'app.nav.dashboard', ic: IC.grid, sep: 'app.sep1' },
     { id: 'history', href: 'history.html', key: 'app.nav.history', ic: IC.clock },
     { id: 'reports', href: 'reports.html', key: 'app.nav.reports', ic: IC.file },
-    { id: 'citizen-portal', href: 'citizen-portal.html', key: 'app.nav.citizen-portal', ic: IC.bell },
+    { id: 'citizen-portal', href: 'citizen-portal.html', key: 'app.nav.citizen-portal', ic: 'M22 2 11 13M22 2 15 22l-4-9-9-4z', sep: 'app.sep3' },
     { id: 'private', href: 'social.html', key: 'app.nav.social', ic: IC.shield },
     { id: 'connections', href: 'connections.html', key: 'app.nav.connections', ic: IC.link, sep: 'app.sep2' },
     { id: 'favorites', href: 'favorites.html', key: 'app.nav.favorites', ic: IC.star },
