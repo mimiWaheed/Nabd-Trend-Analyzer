@@ -980,7 +980,7 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 120px 44px 60px;
+  padding: 44px 44px 60px;
 }
 .auth-card {
   width: 100%;
@@ -2239,7 +2239,7 @@ html[dir="rtl"] .field select {
    17. RESPONSIVE
    ------------------------------------------------------------ */
 @media (min-width: 1400px) {
-  .auth-panel { padding: 120px 60px 60px; }
+  .auth-panel { padding: 44px 60px 60px; }
   .auth-card { max-width: 460px; padding: 44px 42px; }
   .auth-title { font-size: 2.1rem; }
 }
@@ -2252,7 +2252,7 @@ html[dir="rtl"] .field select {
   .ws-grid > .ws-card:nth-child(n) { grid-column: span 6 !important; }
   .ws-grid > .summary-card { grid-column: span 12 !important; }
   .auth-page { flex-direction: column; }
-  .auth-panel { max-width: none; padding: 110px 28px 40px; }
+  .auth-panel { max-width: none; padding: 36px 28px 40px; }
   .auth-art { display: none; }
   .conn-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
   .doc-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
@@ -2340,7 +2340,7 @@ html[dir="rtl"] .field select {
   .ws-query-text { max-width: 180px; }
   .region-grid { grid-template-columns: 1fr; }
   .donut { width: 150px; height: 150px; }
-  .auth-panel { padding: 90px 20px 32px; }
+  .auth-panel { padding: 36px 20px 32px; }
   .auth-card { padding: 28px 20px; border-radius: 20px; }
   .auth-title { font-size: 1.55rem; }
   .auth-sub { font-size: .88rem; margin-bottom: 24px; }
@@ -2407,7 +2407,7 @@ html[dir="rtl"] .field select {
 }
 
 @media (max-width: 420px) {
-  .auth-panel { padding: 80px 16px 28px; }
+  .auth-panel { padding: 24px 16px 28px; }
   .auth-card { padding: 24px 16px; border-radius: 18px; }
   .auth-title { font-size: 1.35rem; letter-spacing: -.02em; }
   .auth-sub { font-size: .82rem; margin-bottom: 20px; }
@@ -2435,7 +2435,7 @@ html[dir="rtl"] .field select {
 }
 
 @media (max-width: 360px) {
-  .auth-panel { padding: 70px 12px 24px; }
+  .auth-panel { padding: 20px 12px 24px; }
   .auth-card { padding: 20px 14px; border-radius: 16px; }
   .auth-title { font-size: 1.2rem; }
   .auth-sub { font-size: .78rem; margin-bottom: 16px; }
@@ -2451,7 +2451,7 @@ html[dir="rtl"] .field select {
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
-  .auth-panel { padding: 60px 20px 20px; min-height: auto; }
+  .auth-panel { padding: 16px 20px 20px; min-height: auto; }
   .auth-page { min-height: auto; }
   .auth-card { max-height: none; padding: 20px 18px; }
   .auth-logo { margin-bottom: 10px; }
@@ -3472,6 +3472,15 @@ html[dir="rtl"] .db-results .summary-body .empty-state { text-align: right; }
   .side-backdrop.show { opacity: 1; pointer-events: auto; }
   .app-side.collapsed { width: var(--side-w); }
   .kv { grid-template-columns: 1fr; }
+}
+/* RTL sidebar slides from right */
+@media (max-width: 720px) {
+  html[dir="rtl"] .app-side {
+    transform: translateX(100%);
+    inset-inline-end: 0;
+    inset-inline-start: auto;
+  }
+  html[dir="rtl"] .app-side.mobile-open { transform: translateX(0); }
 }
 
 /* ============================================================
@@ -4934,25 +4943,7 @@ html[dir="rtl"] .app-window { text-align: right; }
 .nabd-send:active { transform: scale(.95); }
 .nabd-send svg { width: 18px; height: 18px; color: #fff; }
 
-/* Mobile */
-@media (max-width: 480px) {
-  .nabd-assistant { bottom: 16px; right: 16px; }
-  [dir="rtl"] .nabd-assistant { right: auto; left: 16px; }
-  .nabd-panel {
-    width: calc(100vw - 32px); height: calc(100vh - 120px);
-    bottom: 64px; right: -8px;
-    border-radius: 18px;
-  }
-  [dir="rtl"] .nabd-panel { right: auto; left: -8px; }
-  .nabd-bubble { width: calc(100vw - 80px); right: -8px; }
-  [dir="rtl"] .nabd-bubble { right: auto; left: -8px; }
-  .nabd-fab { width: 50px; height: 50px; }
-  .nabd-fab-ic { width: 22px; height: 22px; }
-}
-@media (min-width: 481px) and (max-width: 768px) {
-  .nabd-panel { width: 340px; height: 460px; }
-  .nabd-bubble { width: 260px; }
-}
+/* Mobile — handled in section 19 below */
 
 /* ============================================================
    16b. COMPREHENSIVE RESPONSIVE — all breakpoints 320px–1920px+
@@ -5552,4 +5543,131 @@ html[dir="rtl"] .app-window { text-align: right; }
   .cp-form-actions .btn { width: 100%; justify-content: center; }
   .cp-incident-row { padding: 12px; border-radius: 8px; }
   .cp-incident-query { font-size: .84rem; }
+}
+
+/* ============================================================
+   18. AUTH PAGES — signup / signin responsive fixes
+   ============================================================ */
+.auth-page {
+  justify-content: center;
+  align-items: center;
+}
+.auth-card {
+  max-width: 430px;
+  max-height: calc(100dvh - 88px);
+  overflow-y: auto;
+}
+.field-row {
+  display: flex;
+  gap: 14px;
+}
+.field-row .field {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 18px;
+}
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 28px 20px;
+    border-radius: 20px;
+    max-height: calc(100dvh - 32px);
+  }
+  .field-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  .field-row .field {
+    flex: none;
+  }
+  .auth-title { font-size: 1.5rem; }
+  .auth-sub { font-size: .88rem; margin-bottom: 22px; }
+  .auth-submit { padding: 13px; font-size: .92rem; }
+  .auth-switch { font-size: .82rem; }
+}
+@media (max-width: 375px) {
+  .auth-card { padding: 24px 16px; }
+  .auth-title { font-size: 1.35rem; }
+}
+
+/* ============================================================
+   19. NABD ASSISTANT — responsive + RTL fixes
+   ============================================================ */
+@media (max-width: 768px) {
+  .nabd-panel {
+    width: calc(100vw - 24px);
+    height: calc(100vh - 100px);
+    bottom: 64px;
+    right: -4px;
+    border-radius: 18px;
+  }
+  [dir="rtl"] .nabd-panel { right: auto; left: -4px; }
+  .nabd-bubble { width: calc(100vw - 72px); }
+  .nabd-input { font-size: .82rem; padding: 9px 12px; }
+  .nabd-send { width: 36px; height: 36px; }
+  .nabd-send svg { width: 16px; height: 16px; }
+  .nabd-msg-actions { padding-left: 0; padding-right: 0; }
+  [dir="rtl"] .nabd-msg-actions { padding-right: 0; }
+}
+@media (max-width: 480px) {
+  .nabd-assistant { bottom: 16px; right: 16px; }
+  [dir="rtl"] .nabd-assistant { right: auto; left: 16px; }
+  .nabd-panel {
+    width: calc(100vw - 32px);
+    height: calc(100vh - 120px);
+    bottom: 64px;
+    right: -8px;
+    border-radius: 18px;
+  }
+  [dir="rtl"] .nabd-panel { right: auto; left: -8px; }
+  .nabd-bubble { width: calc(100vw - 80px); right: -8px; }
+  [dir="rtl"] .nabd-bubble { right: auto; left: -8px; }
+  .nabd-fab { width: 50px; height: 50px; }
+  .nabd-fab-ic { width: 22px; height: 22px; }
+  .nabd-panel-head { padding: 12px; }
+  .nabd-panel-messages { padding: 12px; }
+  .nabd-panel-input { padding: 10px; }
+}
+@media (min-width: 481px) and (max-width: 768px) {
+  .nabd-panel { width: 380px; height: 480px; }
+  .nabd-bubble { width: 280px; }
+}
+
+/* ============================================================
+   20. SIDEBAR — separate collapse btn from brand link
+   ============================================================ */
+.app-side .collapse-btn {
+  z-index: 2;
+}
+.app-brand-side {
+  position: relative;
+  z-index: 1;
+}
+.app-side-head:hover .app-brand-side,
+.app-side-head:focus-within .app-brand-side {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ============================================================
+   21. RTL / ARABIC — responsive fixes
+   ============================================================ */
+/* Arabic font slightly larger — guard against overflow at narrow widths */
+html[dir="rtl"] .auth-card { overflow-x: hidden; }
+html[dir="rtl"] .ws-query-text { word-break: break-word; }
+html[dir="rtl"] .nabd-msg-body { word-break: break-word; }
+html[dir="rtl"] .nabd-input { font-family: var(--font-ar); }
+html[dir="rtl"] .nabd-chip { font-family: var(--font-ar); }
+html[dir="rtl"] .nabd-bubble p { font-family: var(--font-ar); }
+html[dir="rtl"] .nabd-action-btn { font-family: var(--font-ar); }
+
+/* RTL profile photo / crop handles — clamp negative offsets on small screens */
+@media (max-width: 480px) {
+  html[dir="rtl"] .prof-photo-btn { left: 0; }
+  html[dir="rtl"] .crop-handle { left: 0; }
+}
+
+/* RTL buttons — prevent overflow at narrow widths */
+@media (max-width: 480px) {
+  html[dir="rtl"] .btn { max-width: 100%; }
+  html[dir="rtl"] .auth-submit { max-width: 100%; }
 }
