@@ -3506,6 +3506,13 @@ html[dir="rtl"] .db-results .summary-body .empty-state { text-align: right; }
 .db-fbrow .fb-acct { font-size: .68rem; letter-spacing: .03em; color: var(--text-muted); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .db-seg { margin-inline-start: auto; }
 .db-seg .seg-btn { padding: 6px 13px; font-size: .78rem; }
+.db-greet {
+  font-size: .92rem;
+  color: var(--text-soft);
+  line-height: 1.5;
+  animation: dbFadeIn .5s var(--ease) both;
+}
+.db-greet b { color: var(--text); font-weight: 600; }
 .db-query { display: flex; flex-direction: column; }
 .db-query .search-box { width: 100%; max-width: none; }
 
@@ -3648,10 +3655,12 @@ html[dir="rtl"] .sug-chip { text-align: right; }
   letter-spacing: .05em;
   color: var(--text-muted);
   font-family: var(--mono);
-  opacity: .35;
-  transition: opacity .3s var(--ease);
+  opacity: .25;
+  transition: opacity .45s var(--ease), color .3s var(--ease), transform .3s var(--ease);
+  transform: translateY(0);
 }
-.db-scan-steps .step.on { opacity: 1; color: var(--accent); }
+.db-scan-steps .step.on { opacity: 1; color: var(--accent); transform: translateY(-1px); }
+.db-scan-steps .step.done { opacity: .5; color: var(--accent-2, #8B7CF6); text-decoration: line-through; text-decoration-color: rgba(139, 124, 246, .4); }
 
 .db-fade { animation: dbFadeIn .5s var(--ease) both; }
 @keyframes dbFadeIn {
@@ -3823,7 +3832,6 @@ html[dir="rtl"] .sug-chip { text-align: right; }
 }
 [dir="rtl"] .db-load-query::before { margin-right: 0; margin-left: 8px; }
 @keyframes dbDotPulse { 50% { opacity: .45; transform: scale(.85); } }
-.db-scan-steps .step.done { opacity: .75; color: var(--text-muted); text-decoration: line-through; text-decoration-color: rgba(139, 124, 246, .45); }
 .db-progress {
   width: 100%;
   max-width: 420px;

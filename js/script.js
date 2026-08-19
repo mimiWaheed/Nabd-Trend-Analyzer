@@ -2114,13 +2114,12 @@
     const total = segs.reduce((s, x) => s + x.v, 0);
     let acc = 0;
     segs.forEach((seg) => {
-      const len = (seg.v / total) * C - 3.5;
+      const len = (seg.v / total) * C - 7;
       const c = document.createElementNS(ns, 'circle');
       c.setAttribute('class', 'd-seg');
       c.setAttribute('cx', cx); c.setAttribute('cy', cy); c.setAttribute('r', r);
       c.setAttribute('stroke', seg.color);
       c.setAttribute('stroke-dasharray', `${len.toFixed(2)} ${(C - len).toFixed(2)}`);
-      c.style.filter = seg.color === '#7A8BB5' ? '' : `drop-shadow(0 0 6px ${seg.color}66)`;
       c.setAttribute('data-final', (-acc).toFixed(2));
       c.setAttribute('stroke-dashoffset', (-(acc + len)).toFixed(2));
       acc += len;
@@ -2129,7 +2128,7 @@
     const bg = document.createElementNS(ns, 'circle');
     bg.setAttribute('class', 'd-bg');
     bg.setAttribute('cx', cx); bg.setAttribute('cy', cy); bg.setAttribute('r', r);
-    svg.appendChild(bg);
+    svg.insertBefore(bg, svg.firstChild);
     const center = document.createElement('div');
     center.setAttribute('class', 'donut-center');
     center.innerHTML = `<b>${centerBold}</b><span>${centerLabel}</span>`;

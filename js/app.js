@@ -347,9 +347,11 @@
     const STEPS = ['db.loading.1', 'db.loading.2', 'db.loading.3', 'db.loading.4', 'db.loading.5', 'db.loading.6'];
 
     /* ---------- embedded analysis state machine ---------- */
+    const greetEl = $('dbGreet');
     function setState(s) {
       analysisState = s;
       if (PRV) PRV.hidden = s !== 'preview';
+      if (greetEl) greetEl.hidden = s !== 'preview';
       if (LOD) {
         LOD.hidden = s !== 'loading';
         if (s === 'loading') LOD.classList.remove('db-exit');
@@ -414,6 +416,10 @@
         let i = 0;
         const tick = () => {
           if (i < steps.length) {
+            if (i > 0) {
+              steps[i - 1].classList.remove('on');
+              steps[i - 1].classList.add('done');
+            }
             steps[i].classList.add('on');
             if (scanText) scanText.textContent = L('db.loading.' + (i + 1));
             setProgress(Math.round(((i + 1) / steps.length) * 82));
@@ -421,6 +427,7 @@
             loadTimer = setTimeout(tick, ms / steps.length);
           } else {
             setProgress(100);
+            if (scanText) scanText.textContent = L('db.ready');
             res();
           }
         };
@@ -714,6 +721,7 @@
       input.addEventListener('input', () => {
         input.style.height = 'auto';
         input.style.height = Math.min(input.scrollHeight, 110) + 'px';
+        if (PRV) PRV.hidden = input.value.trim().length > 0;
       });
     }
     if (resetBtn) resetBtn.addEventListener('click', () => { resetToPreview(); T('ws.toast.new'); });
@@ -848,6 +856,37 @@
     }
     document.addEventListener('app-render', paintSuggestions);
     paintSuggestions();
+
+    /* ---------- greeting message above query box ---------- */
+    function paintGreeting() {
+      const el = $('dbGreet');
+      if (!el) return;
+      const u = N.getUser();
+      const fn = u ? ((u.firstName || u.first || '').trim() || (u.name || '').trim().split(/\s+/)[0] || '') : '';
+      const name = fn || '';
+      const greetings = name
+        ? [
+            'Welcome back, <b>' + esc(name) + '</b>. What would you like to explore today?',
+            'Good to see you, <b>' + esc(name) + '</b>. Ask NABD anything about Egypt.',
+            'Hey <b>' + esc(name) + '</b>! Ready to dive into the latest trends?',
+            'Hello <b>' + esc(name) + '</b>. Let\u2019s uncover what\u2019s happening in Egypt.',
+            '\u0645\u0631\u062D\u0628\u0627\u064B \u0628\u0643 \u062C\u0627\u0646 <b>' + esc(name) + '</b>. \u0645\u0627 \u0627\u0644\u0630\u064A \u062A\u0628\u062D\u062B \u0639\u0646\u0647 \u0627\u0644\u064A\u0648\u0645\u061F',
+            '\u0623\u0647\u0644\u0627\u064B \u064A\u0627 <b>' + esc(name) + '</b>. \u0647\u0644 \u062A\u0631\u064A\u062F \u0627\u0633\u062A\u0643\u0634\u0641 \u0623\u062D\u062F\u062B \u0645\u0635\u0631 \u0627\u0644\u064A\u0648\u0645\u061F',
+            '\u064A\u0627 <b>' + esc(name) + '</b>! \u0627\u0644\u0648\u0642\u062A \u0627\u0644\u0623\u062E\u064A\u0631 \u0645\u0639\u0643 \u0627\u0644\u064A\u0648\u0645\u061F \u0645\u0646 \u0645\u0635\u0631.'
+          ]
+        : [
+            'What would you like to explore today?',
+            'Ask NABD anything about Egypt.',
+            'Ready to dive into the latest trends?',
+            'Let\u2019s uncover what\u2019s happening in Egypt.',
+            '\u0645\u0627 \u0627\u0644\u0630\u064A \u062A\u0628\u062D\u062B \u0639\u0646\u0647 \u0627\u0644\u064A\u0648\u0645\u061F\u061F',
+            '\u0647\u0644 \u062A\u0631\u064A\u062F \u0627\u0633\u062A\u0643\u0634\u0641 \u0623\u062D\u062F\u062B \u0645\u0635\u0631 \u0627\u0644\u064A\u0648\u0645\u061F\u061F'
+          ];
+      const idx = Math.floor(Math.random() * greetings.length);
+      el.innerHTML = greetings[idx];
+    }
+    document.addEventListener('app-render', paintGreeting);
+    paintGreeting();
 
     /* ---------- sentiment donut (real response → existing component) ---------- */
     function renderDonut() {
@@ -1058,10 +1097,9 @@
     function topicPie(items) {
       if (!items || !items.length) return '';
       const palette = ['#5EA2FF', '#F5B84A', '#35D07F', '#7A5CFF', '#F45D5D'];
-      const vals = items.map((t) => {
+      const vals = items.map((t, i) => {
         const v = Math.max(0, num(pick(t, ['count', 'vol', 'volume', 'value'], null)) || 0);
-        const sev = sevCls(pick(t, ['sev', 'severity', 'level'], ''));
-        const color = SEV_HEX[sev] || palette[0];
+        const color = palette[i % palette.length];
         const label = String(pick(t, ['label', 'name', 'topic', 'title'], '—'));
         return { v: v, color: color, label: label };
       });
