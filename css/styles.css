@@ -5031,7 +5031,6 @@ html[dir="rtl"] .app-window { text-align: right; }
   .trend-item { grid-template-columns: 22px 1fr 56px 38px; gap: 8px; }
   .trend-vol { display: none; }
   .cp-categories { grid-template-columns: repeat(2, 1fr); }
-  .nabd-panel { width: 340px; height: 460px; }
   .cap-row { grid-template-columns: 36px 1fr; gap: 10px; padding: 14px 0; }
   .prod-lead { font-size: 1.35rem; }
   .prod-intro { font-size: .92rem; }
@@ -5094,8 +5093,6 @@ html[dir="rtl"] .app-window { text-align: right; }
   .key-row { flex-wrap: wrap; }
   .key-prefix { font-size: .74rem; padding: 6px 10px; }
   .bar-track { height: 5px; }
-  .nabd-panel { width: calc(100vw - 32px); height: calc(100vh - 120px); bottom: 64px; }
-  .nabd-bubble { width: calc(100vw - 80px); }
   .legal-title { font-size: 1.8rem; }
   .legal-card { padding: 22px 18px; }
   .legal-card h2 { font-size: 1.1rem; margin-top: 28px; }
