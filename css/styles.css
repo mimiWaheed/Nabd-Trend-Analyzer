@@ -3552,7 +3552,7 @@ html[dir="rtl"] .db-results .summary-body .empty-state { text-align: right; }
 .db-query { display: flex; flex-direction: column; }
 .db-query .search-box { width: 100%; max-width: none; }
 
-.db-preview { display: flex; flex-direction: column; gap: 12px; }
+.db-preview { display: none; }
 .db-preview-head {
   display: flex;
   align-items: baseline;
@@ -3960,7 +3960,175 @@ html[dir="rtl"] .sug-chip { text-align: right; }
   .db-loading { padding: 46px 16px; }
 }
 
-/* ---------- Arabic text safety — overflow prevention only, no visual changes ---------- */
+/* ============================================================
+   20b. DASHBOARD HOME — AI-first landing redesign
+   ============================================================ */
+
+/* --- Hero brand logo --- */
+.db-hero-brand {
+  display: flex;
+  justify-content: center;
+  padding: 18px 0 6px;
+  animation: dbHeroLogoIn .65s var(--ease) both;
+}
+@keyframes dbHeroLogoIn {
+  from { opacity: 0; transform: translateY(12px) scale(.96); }
+  to { opacity: 1; transform: none; }
+}
+.db-hero-logo {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.88), rgba(255,255,255,.22) 40%, transparent 60%), var(--grad);
+  display: grid; place-items: center;
+  box-shadow: 0 0 22px rgba(94, 162, 255, .55), 0 8px 28px -8px rgba(94, 162, 255, .35);
+  animation: orbFloat 5s ease-in-out infinite;
+}
+.db-hero-logo-core {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--bg);
+  box-shadow: inset 0 0 5px rgba(0,0,0,.5), 0 0 10px rgba(255,255,255,.3);
+}
+
+/* --- Enhanced greeting --- */
+.db-greet {
+  font-size: 1.15rem;
+  font-weight: 500;
+  padding: 10px 0 6px;
+}
+.db-greet-name {
+  font-weight: 800;
+  font-size: 1.22rem;
+  letter-spacing: -.02em;
+}
+
+/* --- Hero search box --- */
+.db-query-hero {
+  max-width: 780px;
+  margin: 0 auto;
+}
+.db-search-hero {
+  padding: 12px 12px 12px 24px;
+  border-radius: 20px;
+  background: var(--glass-strong);
+  border: 1.5px solid var(--border-strong);
+  box-shadow: 0 24px 80px -24px rgba(0, 0, 0, .7), 0 0 0 0 transparent;
+  transition: border-color .35s var(--ease), box-shadow .35s var(--ease), transform .35s var(--ease);
+}
+.db-search-hero:focus-within {
+  border-color: rgba(110, 168, 255, .5);
+  box-shadow: 0 24px 80px -24px rgba(0, 0, 0, .7), 0 0 48px -12px rgba(110, 168, 255, .32);
+}
+.db-search-hero .search-icon svg { width: 22px; height: 22px; }
+
+.db-search-hero .search-input-wrap textarea {
+  font-size: 1.02rem;
+  padding: 14px 0;
+  min-height: 30px;
+}
+.db-search-hero .search-input-wrap textarea::placeholder {
+  color: transparent;
+}
+.db-search-hero:focus-within .search-input-wrap textarea::placeholder,
+.db-search-hero .search-input-wrap textarea:focus::placeholder {
+  color: var(--text-muted);
+}
+
+/* --- Rotating suggestion inside input --- */
+.db-rotate-suggest {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity .35s var(--ease);
+}
+.db-rotate-suggest.on {
+  opacity: 1;
+}
+.db-rotate-suggest span {
+  position: absolute;
+  left: 0; right: 0;
+  font-size: 1.02rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .45s var(--ease), transform .45s var(--ease);
+}
+.db-rotate-suggest span.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+.db-rotate-suggest span.exit {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* hide rotating suggest when user is typing */
+.db-rotate-suggest.hidden {
+  display: none;
+}
+
+/* --- Premium Analyze CTA --- */
+.btn-search-hero {
+  padding: 15px 30px;
+  border-radius: 14px;
+  font-size: .98rem;
+  background: linear-gradient(135deg, #5EA2FF 0%, #7B6CF6 100%);
+  box-shadow: 0 8px 32px -6px rgba(94, 162, 255, .65), inset 0 1px 0 rgba(255, 255, 255, .28);
+}
+.btn-search-hero:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 14px 42px -6px rgba(94, 162, 255, .85), inset 0 1px 0 rgba(255, 255, 255, .28);
+  filter: brightness(1.1);
+}
+.btn-search-hero:active {
+  transform: translateY(0) scale(.98);
+  filter: brightness(.95);
+}
+
+/* --- Secondary nav cards --- */
+.db-nav-secondary {
+  opacity: .88;
+  transition: opacity .3s var(--ease);
+}
+.db-nav-secondary:hover {
+  opacity: 1;
+}
+.db-nav-secondary .qa-card {
+  background: var(--surface-1);
+  border-color: var(--line-soft);
+}
+.db-nav-secondary .qa-card:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+
+/* --- Centered dock layout --- */
+.db-dock {
+  align-items: stretch;
+}
+
+/* --- Responsive adjustments for hero --- */
+@media (max-width: 640px) {
+  .db-hero-logo { width: 44px; height: 44px; }
+  .db-hero-logo-core { width: 14px; height: 14px; }
+  .db-hero-brand { padding: 14px 0 4px; }
+  .db-greet { font-size: 1.02rem; }
+  .db-greet-name { font-size: 1.08rem; }
+  .db-search-hero { padding: 10px 10px 10px 18px; border-radius: 16px; }
+  .db-search-hero .search-input-wrap textarea { font-size: .95rem; }
+  .btn-search-hero { padding: 13px 22px; font-size: .9rem; border-radius: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .db-hero-brand { animation: none !important; }
+  .db-rotate-suggest span { transition: none !important; }
+}
 .db-results .ws-card .trend-name,
 .db-results .ws-card .hl-text,
 .db-results .ws-card .feed-text,

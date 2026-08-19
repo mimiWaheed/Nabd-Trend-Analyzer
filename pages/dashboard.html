@@ -28,7 +28,7 @@
   <div id="appShell"></div>
 
   <main class="app-main">
-    <div class="app-head" id="dbAppHead">
+    <div class="app-head" id="dbAppHead" hidden>
       <div>
         <h1 data-i18n="app.title.dashboard">Dashboard</h1>
         <p data-i18n="app.sub.dashboard">Your intelligence hub — briefing, trends and everything you pinned in one place.</p>
@@ -73,26 +73,32 @@
         <button type="button" class="btn btn-ghost btn-sm" id="dbFbDis" hidden data-i18n="db.fb.disconnect">Disconnect</button>
       </div>
 
+      <!-- Brand hero -->
+      <div class="db-hero-brand">
+        <span class="db-hero-logo" aria-hidden="true"><span class="db-hero-logo-core"></span></span>
+      </div>
+
       <!-- Greeting -->
       <div class="db-greet" id="dbGreet"></div>
 
-      <!-- Analysis query box -->
-      <div class="db-query">
-        <div class="search-box" id="dbSearchBox">
+      <!-- Analysis query box — AI assistant style -->
+      <div class="db-query db-query-hero">
+        <div class="search-box db-search-hero" id="dbSearchBox">
           <span class="search-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
           </span>
           <div class="search-input-wrap">
             <textarea id="dbSearchInput" rows="1" autocomplete="off" spellcheck="false" data-i18n-ph="search.ph" placeholder="Ask NABD about Egypt…" aria-label="Ask NABD about Egypt"></textarea>
+            <div class="db-rotate-suggest" id="dbRotateSuggest" aria-hidden="true"></div>
           </div>
-          <button class="btn-search" id="dbSearchBtn" type="button">
+          <button class="btn-search btn-search-hero" id="dbSearchBtn" type="button">
             <span class="btn-search-label" data-i18n="search.btn">Analyze</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </button>
         </div>
       </div>
 
-      <!-- STATE A — restrained intelligence preview (no fabricated numbers) -->
+      <!-- STATE A — restrained intelligence preview (no fabricated numbers) — visually secondary, rotating suggestions are in the input -->
       <div class="db-preview" id="dbPreview">
         <div class="db-preview-head">
           <span class="card-title" data-i18n="ws.preview.t">Start a new analysis</span>
@@ -101,8 +107,8 @@
         <div class="db-suggest" id="dbSuggestions" role="group" aria-label="Suggested queries"></div>
       </div>
 
-      <!-- Navigation cards (hidden during analysis) -->
-      <div class="db-nav-section" id="dbQuickWrap">
+      <!-- Navigation cards (hidden during analysis) — secondary actions -->
+      <div class="db-nav-section db-nav-secondary" id="dbQuickWrap">
         <span class="db-nav-label" data-i18n="db.nav.label">Navigate to your NABD application</span>
         <div class="qa-grid" id="dbQuick">
           <div class="qa-card" data-qa="new">

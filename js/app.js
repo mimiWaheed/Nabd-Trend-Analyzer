@@ -313,7 +313,6 @@
 
   /* ---------------- dashboard ---------------- */
   function initDashboard() {
-    const PRV = $('dbPreview');
     const LOD = $('dbLoading');
     const RES = $('dbResults');
     const input = $('dbSearchInput');
@@ -350,13 +349,26 @@
     const greetEl = $('dbGreet');
     const quickWrap = $('dbQuickWrap');
     const suggestRow = $('dbSuggestRow');
+    const heroBrand = document.querySelector('.db-hero-brand');
+    const rotateSugg = $('dbRotateSuggest');
+    const appHead = $('dbAppHead');
     function setState(s) {
       analysisState = s;
       const preview = s === 'preview';
-      if (PRV) PRV.hidden = !preview;
       if (greetEl) greetEl.hidden = !preview;
       if (quickWrap) quickWrap.hidden = !preview;
       if (suggestRow) suggestRow.hidden = !preview;
+      if (heroBrand) heroBrand.hidden = !preview;
+      if (appHead) appHead.hidden = !preview;
+      if (rotateSugg) {
+        if (preview && (!input || input.value.trim().length === 0)) {
+          rotateSugg.classList.remove('hidden');
+          rotateSugg.classList.add('on');
+        } else {
+          rotateSugg.classList.add('hidden');
+          rotateSugg.classList.remove('on');
+        }
+      }
       if (LOD) {
         LOD.hidden = s !== 'loading';
         if (s === 'loading') LOD.classList.remove('db-exit');
@@ -498,7 +510,18 @@
       setProgress(0);
       if (input) input.value = '';
       setState('preview');
-      if (input) input.focus();
+      if (rotateSugg) {
+        rotateIdx = 0;
+        var spans = rotateSugg.querySelectorAll('span');
+        spans.forEach(function (s, i) {
+          s.classList.remove('active', 'exit');
+          if (i === 0) s.classList.add('active');
+        });
+        rotatePaused = false;
+        rotateSugg.classList.remove('hidden');
+        rotateSugg.classList.add('on');
+        startRotate();
+      }
       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
     }
 
@@ -726,7 +749,6 @@
       input.addEventListener('input', () => {
         input.style.height = 'auto';
         input.style.height = Math.min(input.scrollHeight, 110) + 'px';
-        if (PRV) PRV.hidden = input.value.trim().length > 0;
       });
     }
     if (resetBtn) resetBtn.addEventListener('click', () => { resetToPreview(); T('ws.toast.new'); });
@@ -862,6 +884,91 @@
     document.addEventListener('app-render', paintSuggestions);
     paintSuggestions();
 
+    /* ---------- rotating suggestion inside the hero input ---------- */
+    const ROTATE_INTERVAL = 3000;
+    const ROTATE_FADE = 450;
+    let rotateTimer = null;
+    let rotateIdx = 0;
+    let rotatePaused = false;
+    const rotateEl = $('dbRotateSuggest');
+    function buildRotatingSuggestions() {
+      if (!rotateEl || !input) return;
+      const items = Array.isArray(N.QUERIES && N.QUERIES[N.lang]) ? N.QUERIES[N.lang] : [];
+      if (!items.length) { rotateEl.classList.remove('on'); return; }
+      rotateEl.innerHTML = items.map((q, i) =>
+        '<span' + (i === 0 ? ' class="active"' : '') + '>' + esc(q) + '</span>'
+      ).join('');
+      rotateEl.classList.add('on');
+      rotateIdx = 0;
+      startRotate();
+    }
+    function startRotate() {
+      stopRotate();
+      if (rotatePaused) return;
+      rotateTimer = setInterval(rotateStep, ROTATE_INTERVAL);
+    }
+    function stopRotate() {
+      if (rotateTimer) { clearInterval(rotateTimer); rotateTimer = null; }
+    }
+    function rotateStep() {
+      if (!rotateEl || !input) return;
+      if (input.value.trim().length > 0) return;
+      const spans = rotateEl.querySelectorAll('span');
+      if (spans.length < 2) return;
+      var current = spans[rotateIdx];
+      rotateIdx = (rotateIdx + 1) % spans.length;
+      var next = spans[rotateIdx];
+      current.classList.remove('active');
+      current.classList.add('exit');
+      next.classList.add('active');
+      setTimeout(function () {
+        current.classList.remove('exit');
+      }, ROTATE_FADE + 50);
+    }
+    function pauseRotate() {
+      rotatePaused = true;
+      if (rotateEl) rotateEl.classList.remove('on');
+      stopRotate();
+    }
+    function resumeRotate() {
+      if (!input || input.value.trim().length > 0) return;
+      rotatePaused = false;
+      if (rotateEl) rotateEl.classList.add('on');
+      startRotate();
+    }
+    function showRotateSuggestions() {
+      if (!rotateEl || !input) return;
+      if (input.value.trim().length === 0) {
+        rotateEl.classList.remove('hidden');
+        rotateEl.classList.add('on');
+        resumeRotate();
+      }
+    }
+    function hideRotateSuggestions() {
+      if (!rotateEl) return;
+      rotateEl.classList.add('hidden');
+      rotateEl.classList.remove('on');
+      stopRotate();
+    }
+    if (input) {
+      input.addEventListener('focus', function () {
+        pauseRotate();
+      });
+      input.addEventListener('blur', function () {
+        setTimeout(function () {
+          resumeRotate();
+        }, 150);
+      });
+      input.addEventListener('input', function () {
+        if (input.value.trim().length > 0) {
+          hideRotateSuggestions();
+        } else {
+          showRotateSuggestions();
+        }
+      });
+    }
+    buildRotatingSuggestions();
+
     /* ---------- greeting message above query box ---------- */
     function paintGreeting() {
       const el = $('dbGreet');
@@ -869,27 +976,26 @@
       const u = N.getUser();
       const fn = u ? ((u.firstName || u.first || '').trim() || (u.name || '').trim().split(/\s+/)[0] || '') : '';
       const name = fn || '';
-      const ico = '<span class="db-greet-icon">' + (N.lang === 'ar' ? 'نبض' : 'N') + '</span>';
       const greetings = N.lang === 'ar'
         ? (name
           ? [
-              ico + '\u0645\u0631\u062D\u0628\u0627\u064B <span class="db-greet-name">' + esc(name) + '</span> \u0641\u064A \u0646\u0628\u0636\u060C \u0645\u0627 \u0627\u0644\u0630\u064A \u062A\u0628\u062D\u062B \u0639\u0646\u0647 \u0627\u0644\u064A\u0648\u0645\u061F',
-              ico + '\u0623\u0647\u0644\u0627\u064B <span class="db-greet-name">' + esc(name) + '</span>! \u0647\u0644 \u062A\u0631\u064A\u062F \u0627\u0633\u062A\u0643\u0634\u0641 \u0634\u062E\u0635 \u0645\u0635\u0631 \u0627\u0644\u064A\u0648\u0645\u061F',
-              ico + '\u064A\u0627 <span class="db-greet-name">' + esc(name) + '</span>! \u0627\u0644\u0648\u0642\u062A \u0627\u0644\u0623\u062E\u064A\u0631 \u0645\u0639\u0643 \u0627\u0644\u064A\u0648\u0645\u060C \u0645\u0646 \u0641\u0636\u0644 \u0645\u0635\u0631.'
+              '\u0645\u0631\u062D\u0628\u0627\u064B <span class="db-greet-name">' + esc(name) + '</span> \u0641\u064A \u0646\u0628\u0636\u060C \u0645\u0627 \u0627\u0644\u0630\u064A \u062A\u0628\u062D\u062B \u0639\u0646\u0647 \u0627\u0644\u064A\u0648\u0645\u061F',
+              '\u0623\u0647\u0644\u0627\u064B <span class="db-greet-name">' + esc(name) + '</span>! \u0647\u0644 \u062A\u0631\u064A\u062F \u0627\u0633\u062A\u0643\u0634\u0641 \u0634\u062E\u0635 \u0645\u0635\u0631 \u0627\u0644\u064A\u0648\u0645\u061F',
+              '\u064A\u0627 <span class="db-greet-name">' + esc(name) + '</span>! \u0627\u0644\u0648\u0642\u062A \u0627\u0644\u0623\u062E\u064A\u0631 \u0645\u0639\u0643 \u0627\u0644\u064A\u0648\u0645\u060C \u0645\u0646 \u0641\u0636\u0644 \u0645\u0635\u0631.'
             ]
           : [
-              ico + '\u0645\u0627 \u0627\u0644\u0630\u064A \u062A\u0628\u062D\u062B \u0639\u0646\u0647 \u0627\u0644\u064A\u0648\u0645\u061F',
-              ico + '\u0627\u0633\u0623\u0644 \u0646\u0628\u0636 \u0639\u0646 \u0623\u064A \u0634\u0624\u0648\u0646 \u0645\u0635\u0631\u061F'
+              '\u0645\u0627 \u0627\u0644\u0630\u064A \u062A\u0628\u062D\u062B \u0639\u0646\u0647 \u0627\u0644\u064A\u0648\u0645\u061F',
+              '\u0627\u0633\u0623\u0644 \u0646\u0628\u0636 \u0639\u0646 \u0623\u064A \u0634\u0624\u0648\u0646 \u0645\u0635\u0631\u061F'
             ])
         : (name
           ? [
-              ico + 'Welcome back, <span class="db-greet-name">' + esc(name) + '</span>. What are we looking into today?',
-              ico + 'Hey <span class="db-greet-name">' + esc(name) + '</span>! Ready to explore what\'s happening in Egypt?',
-              ico + 'Good to see you, <span class="db-greet-name">' + esc(name) + '</span>. Let\'s uncover some insights.'
+              'Welcome back, <span class="db-greet-name">' + esc(name) + '</span>. What are we looking into today?',
+              'Hey <span class="db-greet-name">' + esc(name) + '</span>! Ready to explore what\'s happening in Egypt?',
+              'Good to see you, <span class="db-greet-name">' + esc(name) + '</span>. Let\'s uncover some insights.'
             ]
           : [
-              ico + 'What would you like to explore today?',
-              ico + 'Ask NABD anything about Egypt.'
+              'What would you like to explore today?',
+              'Ask NABD anything about Egypt.'
             ]);
       const idx = Math.floor(Math.random() * greetings.length);
       el.innerHTML = greetings[idx];
