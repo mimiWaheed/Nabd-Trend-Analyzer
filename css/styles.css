@@ -5552,16 +5552,14 @@ html[dir="rtl"] .app-window { text-align: right; }
    ============================================================ */
 .auth-page {
   justify-content: center;
-  align-items: center;
 }
 .auth-card {
+  width: 100%;
   max-width: 430px;
   max-height: calc(100dvh - 48px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-}
-.auth-panel {
-  align-items: center;
+  margin: 0 auto;
 }
 .field-row {
   display: flex;
@@ -5648,14 +5646,14 @@ html[dir="rtl"] .auth-card { overflow-x: hidden; }
    ============================================================ */
 @media (max-width: 768px) {
   .nabd-panel {
-    width: calc(100vw - 24px);
-    height: calc(100vh - 100px);
-    bottom: 64px;
-    right: -4px;
+    width: min(380px, calc(100vw - 24px));
+    height: min(520px, calc(100vh - 140px));
+    bottom: 68px;
+    right: 0;
     border-radius: 18px;
   }
-  [dir="rtl"] .nabd-panel { right: auto; left: -4px; }
-  .nabd-bubble { width: calc(100vw - 72px); }
+  [dir="rtl"] .nabd-panel { right: auto; left: 0; }
+  .nabd-bubble { width: min(280px, calc(100vw - 72px)); }
   .nabd-input { font-size: .82rem; padding: 9px 12px; }
   .nabd-send { width: 36px; height: 36px; }
   .nabd-send svg { width: 16px; height: 16px; }
@@ -5667,23 +5665,19 @@ html[dir="rtl"] .auth-card { overflow-x: hidden; }
   [dir="rtl"] .nabd-assistant { right: auto; left: 16px; }
   .nabd-panel {
     width: calc(100vw - 32px);
-    height: calc(100vh - 120px);
+    height: min(480px, calc(100vh - 120px));
     bottom: 64px;
-    right: -8px;
+    right: 0;
     border-radius: 18px;
   }
-  [dir="rtl"] .nabd-panel { right: auto; left: -8px; }
-  .nabd-bubble { width: calc(100vw - 80px); right: -8px; }
-  [dir="rtl"] .nabd-bubble { right: auto; left: -8px; }
+  [dir="rtl"] .nabd-panel { right: auto; left: 0; }
+  .nabd-bubble { width: calc(100vw - 80px); right: 0; }
+  [dir="rtl"] .nabd-bubble { right: auto; left: 0; }
   .nabd-fab { width: 50px; height: 50px; }
   .nabd-fab-ic { width: 22px; height: 22px; }
   .nabd-panel-head { padding: 12px; }
   .nabd-panel-messages { padding: 12px; }
   .nabd-panel-input { padding: 10px; }
-}
-@media (min-width: 481px) and (max-width: 768px) {
-  .nabd-panel { width: 380px; height: 480px; }
-  .nabd-bubble { width: 280px; }
 }
 
 /* ============================================================
