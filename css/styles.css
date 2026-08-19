@@ -5286,7 +5286,6 @@ html[dir="rtl"] .app-window { text-align: right; }
 .doc-grid,
 .hist-grid,
 .legal-card,
-.nabd-panel,
 .nabd-bubble {
   max-width: 100%;
   overflow: hidden;
