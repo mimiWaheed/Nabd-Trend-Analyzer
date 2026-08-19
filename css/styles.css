@@ -3477,10 +3477,12 @@ html[dir="rtl"] .db-results .summary-body .empty-state { text-align: right; }
 @media (max-width: 720px) {
   html[dir="rtl"] .app-side {
     transform: translateX(100%);
-    inset-inline-end: 0;
-    inset-inline-start: auto;
+    inset-inline-start: 0;
+    inset-inline-end: auto;
   }
   html[dir="rtl"] .app-side.mobile-open { transform: translateX(0); }
+  html[dir="rtl"] .app-top { inset-inline-start: 0; }
+  html[dir="rtl"] .app-main { margin-inline-start: 0; }
 }
 
 /* ============================================================
@@ -5554,8 +5556,12 @@ html[dir="rtl"] .app-window { text-align: right; }
 }
 .auth-card {
   max-width: 430px;
-  max-height: calc(100dvh - 88px);
+  max-height: calc(100dvh - 48px);
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.auth-panel {
+  align-items: center;
 }
 .field-row {
   display: flex;
@@ -5566,27 +5572,75 @@ html[dir="rtl"] .app-window { text-align: right; }
   min-width: 0;
   margin-bottom: 18px;
 }
+/* Override inline styles on signup field-row */
+.field-row[style*="margin:0"] {
+  margin-bottom: 18px !important;
+  align-items: flex-start !important;
+}
+.field-row[style*="margin:0"] .field {
+  flex: 1 !important;
+  margin: 0 0 18px !important;
+}
+
+/* ---- Mobile: make everything compact ---- */
 @media (max-width: 480px) {
   .auth-card {
-    padding: 28px 20px;
-    border-radius: 20px;
-    max-height: calc(100dvh - 32px);
+    max-width: 100%;
+    padding: 24px 18px;
+    border-radius: 18px;
+    max-height: calc(100dvh - 24px);
   }
   .field-row {
     flex-direction: column;
     gap: 0;
   }
-  .field-row .field {
-    flex: none;
+  .field-row .field,
+  .field-row[style*="margin:0"] .field {
+    flex: none !important;
+    width: 100%;
   }
-  .auth-title { font-size: 1.5rem; }
-  .auth-sub { font-size: .88rem; margin-bottom: 22px; }
-  .auth-submit { padding: 13px; font-size: .92rem; }
-  .auth-switch { font-size: .82rem; }
+  .auth-logo { margin-bottom: 20px; }
+  .auth-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
+  .auth-sub { font-size: .82rem; margin-bottom: 18px; }
+  .field { margin-bottom: 12px; }
+  .field label { font-size: .72rem; margin-bottom: 5px; }
+  .field input, .field select { padding: 10px 12px; font-size: .85rem; border-radius: 10px; }
+  .auth-submit { padding: 12px; font-size: .88rem; border-radius: 11px; }
+  .auth-back { font-size: .8rem; }
+  .auth-switch { font-size: .8rem; margin-top: 14px; }
+  .check { font-size: .76rem; }
+  .pwd-toggle svg { width: 16px; height: 16px; }
+  .pwd-strength { margin-top: 3px; }
+  .pwd-meter { height: 3px; }
+  .social-row .btn { padding: 10px 14px; font-size: .82rem; }
+  .otp-info { font-size: .76rem; }
+  .auth-otp-resend { font-size: .78rem; }
+  .auth-otp .auth-title { font-size: 1.3rem; }
+  .auth-otp .auth-sub { font-size: .8rem; }
 }
 @media (max-width: 375px) {
-  .auth-card { padding: 24px 16px; }
-  .auth-title { font-size: 1.35rem; }
+  .auth-card { padding: 20px 14px; border-radius: 14px; }
+  .auth-title { font-size: 1.15rem; }
+  .auth-sub { font-size: .78rem; margin-bottom: 14px; }
+  .auth-logo { margin-bottom: 16px; font-size: .95rem; }
+  .field input, .field select { padding: 9px 11px; font-size: .82rem; }
+  .auth-submit { padding: 11px; font-size: .84rem; }
+}
+
+/* RTL: Arabic fonts are wider — shrink a bit more */
+html[dir="rtl"] .auth-card { overflow-x: hidden; }
+@media (max-width: 480px) {
+  html[dir="rtl"] .auth-title { font-size: 1.2rem; }
+  html[dir="rtl"] .auth-sub { font-size: .78rem; }
+  html[dir="rtl"] .field input, html[dir="rtl"] .field select { font-size: .82rem; }
+  html[dir="rtl"] .auth-submit { font-size: .84rem; }
+  html[dir="rtl"] .auth-back { font-size: .78rem; }
+  html[dir="rtl"] .auth-switch { font-size: .76rem; }
+}
+@media (max-width: 375px) {
+  html[dir="rtl"] .auth-title { font-size: 1.05rem; }
+  html[dir="rtl"] .auth-sub { font-size: .74rem; }
+  html[dir="rtl"] .field input, html[dir="rtl"] .field select { font-size: .78rem; }
 }
 
 /* ============================================================
@@ -5651,8 +5705,7 @@ html[dir="rtl"] .app-window { text-align: right; }
 /* ============================================================
    21. RTL / ARABIC — responsive fixes
    ============================================================ */
-/* Arabic font slightly larger — guard against overflow at narrow widths */
-html[dir="rtl"] .auth-card { overflow-x: hidden; }
+/* Guard against overflow at narrow widths */
 html[dir="rtl"] .ws-query-text { word-break: break-word; }
 html[dir="rtl"] .nabd-msg-body { word-break: break-word; }
 html[dir="rtl"] .nabd-input { font-family: var(--font-ar); }
