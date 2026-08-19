@@ -348,10 +348,15 @@
 
     /* ---------- embedded analysis state machine ---------- */
     const greetEl = $('dbGreet');
+    const quickWrap = $('dbQuickWrap');
+    const suggestRow = $('dbSuggestRow');
     function setState(s) {
       analysisState = s;
-      if (PRV) PRV.hidden = s !== 'preview';
-      if (greetEl) greetEl.hidden = s !== 'preview';
+      const preview = s === 'preview';
+      if (PRV) PRV.hidden = !preview;
+      if (greetEl) greetEl.hidden = !preview;
+      if (quickWrap) quickWrap.hidden = !preview;
+      if (suggestRow) suggestRow.hidden = !preview;
       if (LOD) {
         LOD.hidden = s !== 'loading';
         if (s === 'loading') LOD.classList.remove('db-exit');
@@ -864,24 +869,28 @@
       const u = N.getUser();
       const fn = u ? ((u.firstName || u.first || '').trim() || (u.name || '').trim().split(/\s+/)[0] || '') : '';
       const name = fn || '';
-      const greetings = name
-        ? [
-            'Welcome back, <b>' + esc(name) + '</b>. What would you like to explore today?',
-            'Good to see you, <b>' + esc(name) + '</b>. Ask NABD anything about Egypt.',
-            'Hey <b>' + esc(name) + '</b>! Ready to dive into the latest trends?',
-            'Hello <b>' + esc(name) + '</b>. Let\u2019s uncover what\u2019s happening in Egypt.',
-            '\u0645\u0631\u062D\u0628\u0627\u064B \u0628\u0643 \u062C\u0627\u0646 <b>' + esc(name) + '</b>. \u0645\u0627 \u0627\u0644\u0630\u064A \u062A\u0628\u062D\u062B \u0639\u0646\u0647 \u0627\u0644\u064A\u0648\u0645\u061F',
-            '\u0623\u0647\u0644\u0627\u064B \u064A\u0627 <b>' + esc(name) + '</b>. \u0647\u0644 \u062A\u0631\u064A\u062F \u0627\u0633\u062A\u0643\u0634\u0641 \u0623\u062D\u062F\u062B \u0645\u0635\u0631 \u0627\u0644\u064A\u0648\u0645\u061F',
-            '\u064A\u0627 <b>' + esc(name) + '</b>! \u0627\u0644\u0648\u0642\u062A \u0627\u0644\u0623\u062E\u064A\u0631 \u0645\u0639\u0643 \u0627\u0644\u064A\u0648\u0645\u061F \u0645\u0646 \u0645\u0635\u0631.'
-          ]
-        : [
-            'What would you like to explore today?',
-            'Ask NABD anything about Egypt.',
-            'Ready to dive into the latest trends?',
-            'Let\u2019s uncover what\u2019s happening in Egypt.',
-            '\u0645\u0627 \u0627\u0644\u0630\u064A \u062A\u0628\u062D\u062B \u0639\u0646\u0647 \u0627\u0644\u064A\u0648\u0645\u061F\u061F',
-            '\u0647\u0644 \u062A\u0631\u064A\u062F \u0627\u0633\u062A\u0643\u0634\u0641 \u0623\u062D\u062F\u062B \u0645\u0635\u0631 \u0627\u0644\u064A\u0648\u0645\u061F\u061F'
-          ];
+      const ico = '<span class="db-greet-icon">' + (N.lang === 'ar' ? 'نبض' : 'N') + '</span>';
+      const greetings = N.lang === 'ar'
+        ? (name
+          ? [
+              ico + '\u0645\u0631\u062D\u0628\u0627\u064B <span class="db-greet-name">' + esc(name) + '</span> \u0641\u064A \u0646\u0628\u0636\u060C \u0645\u0627 \u0627\u0644\u0630\u064A \u062A\u0628\u062D\u062B \u0639\u0646\u0647 \u0627\u0644\u064A\u0648\u0645\u061F',
+              ico + '\u0623\u0647\u0644\u0627\u064B <span class="db-greet-name">' + esc(name) + '</span>! \u0647\u0644 \u062A\u0631\u064A\u062F \u0627\u0633\u062A\u0643\u0634\u0641 \u0634\u062E\u0635 \u0645\u0635\u0631 \u0627\u0644\u064A\u0648\u0645\u061F',
+              ico + '\u064A\u0627 <span class="db-greet-name">' + esc(name) + '</span>! \u0627\u0644\u0648\u0642\u062A \u0627\u0644\u0623\u062E\u064A\u0631 \u0645\u0639\u0643 \u0627\u0644\u064A\u0648\u0645\u060C \u0645\u0646 \u0641\u0636\u0644 \u0645\u0635\u0631.'
+            ]
+          : [
+              ico + '\u0645\u0627 \u0627\u0644\u0630\u064A \u062A\u0628\u062D\u062B \u0639\u0646\u0647 \u0627\u0644\u064A\u0648\u0645\u061F',
+              ico + '\u0627\u0633\u0623\u0644 \u0646\u0628\u0636 \u0639\u0646 \u0623\u064A \u0634\u0624\u0648\u0646 \u0645\u0635\u0631\u061F'
+            ])
+        : (name
+          ? [
+              ico + 'Welcome back, <span class="db-greet-name">' + esc(name) + '</span>. What are we looking into today?',
+              ico + 'Hey <span class="db-greet-name">' + esc(name) + '</span>! Ready to explore what\'s happening in Egypt?',
+              ico + 'Good to see you, <span class="db-greet-name">' + esc(name) + '</span>. Let\'s uncover some insights.'
+            ]
+          : [
+              ico + 'What would you like to explore today?',
+              ico + 'Ask NABD anything about Egypt.'
+            ]);
       const idx = Math.floor(Math.random() * greetings.length);
       el.innerHTML = greetings[idx];
     }
