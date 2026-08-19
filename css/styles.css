@@ -4814,7 +4814,7 @@ html[dir="rtl"] .app-window { text-align: right; }
 /* Panel */
 .nabd-panel {
   position: absolute; bottom: 68px; right: 0;
-  width: 380px; height: 520px;
+  width: 420px; height: 560px;
   background: var(--card); border: 1px solid var(--border-strong);
   border-radius: 20px; box-shadow: 0 8px 40px rgba(0,0,0,.3);
   display: flex; flex-direction: column;
@@ -5550,9 +5550,6 @@ html[dir="rtl"] .app-window { text-align: right; }
 /* ============================================================
    18. AUTH PAGES — signup / signin responsive fixes
    ============================================================ */
-.auth-page {
-  justify-content: center;
-}
 .auth-card {
   width: 100%;
   max-width: 430px;
@@ -5646,14 +5643,14 @@ html[dir="rtl"] .auth-card { overflow-x: hidden; }
    ============================================================ */
 @media (max-width: 768px) {
   .nabd-panel {
-    width: min(380px, calc(100vw - 24px));
-    height: min(520px, calc(100vh - 140px));
+    width: min(420px, calc(100vw - 24px));
+    height: min(560px, calc(100vh - 140px));
     bottom: 68px;
     right: 0;
     border-radius: 18px;
   }
   [dir="rtl"] .nabd-panel { right: auto; left: 0; }
-  .nabd-bubble { width: min(280px, calc(100vw - 72px)); }
+  .nabd-bubble { width: min(300px, calc(100vw - 72px)); }
   .nabd-input { font-size: .82rem; padding: 9px 12px; }
   .nabd-send { width: 36px; height: 36px; }
   .nabd-send svg { width: 16px; height: 16px; }
@@ -5665,7 +5662,7 @@ html[dir="rtl"] .auth-card { overflow-x: hidden; }
   [dir="rtl"] .nabd-assistant { right: auto; left: 16px; }
   .nabd-panel {
     width: calc(100vw - 32px);
-    height: min(480px, calc(100vh - 120px));
+    height: min(520px, calc(100vh - 120px));
     bottom: 64px;
     right: 0;
     border-radius: 18px;
