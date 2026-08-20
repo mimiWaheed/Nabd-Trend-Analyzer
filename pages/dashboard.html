@@ -60,19 +60,6 @@
          ============================================================ -->
     <div class="db-dock" id="dbDock">
 
-      <!-- Facebook connection — compact, directly above the query box -->
-      <div class="db-fbrow" id="dbFbRow">
-        <button type="button" class="btn btn-ghost btn-sm" id="dbFbBtn" hidden>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-          <span data-i18n="db.fb.off">Connect Facebook</span>
-        </button>
-        <span class="status-chip ok" id="dbFbChip" hidden>
-          <span class="d"></span>
-          <span class="fb-n"><span data-i18n="db.fb.on">Facebook connected</span><span class="fb-acct mono" id="dbFbAcct"></span></span>
-        </span>
-        <button type="button" class="btn btn-ghost btn-sm" id="dbFbDis" hidden data-i18n="db.fb.disconnect">Disconnect</button>
-      </div>
-
       <!-- Brand hero -->
       <div class="db-hero-brand">
         <span class="db-hero-logo" aria-hidden="true"><span class="db-hero-logo-core"></span></span>
@@ -96,6 +83,19 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </button>
         </div>
+      </div>
+
+      <!-- Facebook connection — compact utility toggle -->
+      <div class="db-fb-util" id="dbFbRow">
+        <span class="db-fb-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </span>
+        <span class="db-fb-label" id="dbFbLabel" data-i18n="db.fb.off">Connect Facebook</span>
+        <label class="db-fb-toggle" id="dbFbToggle">
+          <input type="checkbox" id="dbFbCheck" hidden>
+          <span class="db-fb-track"></span>
+        </label>
+        <span class="db-fb-account" id="dbFbAcct"></span>
       </div>
 
       <!-- STATE A — restrained intelligence preview (no fabricated numbers) — visually secondary, rotating suggestions are in the input -->

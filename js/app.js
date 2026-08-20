@@ -319,6 +319,10 @@
     const runBtn = $('dbSearchBtn');
     const fbBtn = $('dbFbBtn');
     const fbChip = $('dbFbChip');
+    const fbRow = $('dbFbRow');
+    const fbCheck = $('dbFbCheck');
+    const fbLabel = $('dbFbLabel');
+    const fbAcctEl = $('dbFbAcct');
     const resetBtn = $('dbResetBtn');
     const exportBtn = $('dbExportBtn');
     const scanText = $('dbScanText');
@@ -495,8 +499,14 @@
       stopLoading();
       if (privMode === 'private' && !(N.fb && N.fb.read().connected)) {
         /* STEP 5 — no webhook call: existing connection UI + message */
-        if (fbBtn) fbBtn.hidden = false;
-        try { if (fbBtn && fbBtn.scrollIntoView) fbBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+        if (fbRow) {
+          fbRow.style.animation = 'none';
+          fbRow.offsetHeight;
+          fbRow.style.animation = '';
+          fbRow.style.boxShadow = '0 0 0 2px rgba(94,162,255,.45)';
+          setTimeout(() => { fbRow.style.boxShadow = ''; }, 1800);
+          try { fbRow.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+        }
         T('db.fb.need');
         return;
       }
@@ -794,12 +804,16 @@
     }
     function paintFb() {
       const st = N.fb ? N.fb.read() : { connected: false };
-      if (fbBtn) fbBtn.hidden = st.connected;
-      if (fbChip) {
-        fbChip.hidden = !st.connected;
-        if (fbAcct) fbAcct.textContent = st.connected && st.accountName ? '· ' + st.accountName : '';
+      if (fbRow) fbRow.classList.toggle('connected', st.connected);
+      if (fbCheck) fbCheck.checked = st.connected;
+      if (fbLabel) {
+        fbLabel.textContent = st.connected ? L('db.fb.on') : L('db.fb.off');
+        fbLabel.setAttribute('data-i18n', st.connected ? 'db.fb.on' : 'db.fb.off');
       }
-      if (fbDis) fbDis.hidden = !st.connected;
+      if (fbAcctEl) fbAcctEl.textContent = st.connected && st.accountName ? '· ' + st.accountName : '';
+      if (fbBtn) fbBtn.hidden = true;
+      if (fbChip) fbChip.hidden = true;
+      if (fbDis) fbDis.hidden = true;
     }
     function paintPriv() {
       if (privBadge) privBadge.hidden = privMode !== 'private';
@@ -813,19 +827,20 @@
       if (persist !== false) { try { localStorage.setItem('nabd-priv', privMode); } catch (e) {} }
       paintPriv();
     }
-    if (fbBtn) fbBtn.addEventListener('click', () => {
-      if (N.fb) N.fb.connect();
-      paintFb();
-      T('app.toast.conn');
-    });
-    if (fbDis) fbDis.addEventListener('click', async () => {
-      const ok = N.confirmDialog
-        ? await N.confirmDialog({ title: L('db.fb.conf.t'), text: L('db.fb.conf.s'), okLabel: L('db.fb.conf.ok'), cancelLabel: L('db.fb.conf.cancel') })
-        : window.confirm(L('db.fb.conf.t'));
-      if (!ok) return;
-      if (N.fb) N.fb.disconnect();
-      paintFb();
-      T('app.toast.conn');
+    if (fbCheck) fbCheck.addEventListener('change', async () => {
+      if (fbCheck.checked) {
+        if (N.fb) N.fb.connect();
+        paintFb();
+        T('app.toast.conn');
+      } else {
+        const ok = N.confirmDialog
+          ? await N.confirmDialog({ title: L('db.fb.conf.t'), text: L('db.fb.conf.s'), okLabel: L('db.fb.conf.ok'), cancelLabel: L('db.fb.conf.cancel') })
+          : window.confirm(L('db.fb.conf.t'));
+        if (!ok) { fbCheck.checked = true; return; }
+        if (N.fb) N.fb.disconnect();
+        paintFb();
+        T('app.toast.conn');
+      }
     });
     if (privSeg) privSeg.addEventListener('click', (e) => {
       const b = e.target.closest('.seg-btn');
