@@ -1491,7 +1491,7 @@ html[dir="rtl"] .auth-back svg { transform: scaleX(-1); }
 }
 .ws-kpi-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 14px;
 }
 .actions-row-card {
@@ -1515,8 +1515,9 @@ html[dir="rtl"] .auth-back svg { transform: scaleX(-1); }
   gap: 14px;
 }
 .hl-section-card {
-  padding: 20px;
+  padding: 24px;
 }
+.hl-section-card .total-summary { margin-bottom: 16px; }
 .hl-section-card .hl-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -1524,9 +1525,27 @@ html[dir="rtl"] .auth-back svg { transform: scaleX(-1); }
 }
 .ws-feed-health-grid {
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr 1fr;
   gap: 14px;
   align-items: start;
+}
+
+.ws-mid-bottom {
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  gap: 14px;
+  align-items: stretch;
+}
+.ws-mid-bottom .src-card { min-height: 0; }
+.ws-mid-bottom .src-card .vbar-chart { min-height: 140px; }
+.ws-mid-bottom .emergency-mini-card {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.emergency-mini-card .kpi-value {
+  font-size: 1.5rem;
 }
 
 /* --- AI Intelligence card (brief only — highlights are in hl-section-card) --- */
@@ -2328,6 +2347,7 @@ html[dir="rtl"] .field select {
   .dash-grid .sp-4, .dash-grid .sp-3 { grid-column: span 6; }
   .ws-main-grid { grid-template-columns: 1fr 1fr; }
   .ws-main-grid .ws-col-right { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .ws-mid-bottom { grid-template-columns: 1fr; }
   .ws-feed-health-grid { grid-template-columns: 1fr; }
   .hl-section-card .hl-list { grid-template-columns: repeat(2, 1fr); }
   .app-head h1 { font-size: 1.9rem; }
@@ -2424,6 +2444,7 @@ html[dir="rtl"] .field select {
   .ws-kpi-row { grid-template-columns: repeat(2, 1fr); }
   .ws-main-grid { grid-template-columns: 1fr; }
   .ws-main-grid .ws-col-right { grid-template-columns: 1fr; display: flex; flex-direction: column; gap: 14px; }
+  .ws-mid-bottom { grid-template-columns: 1fr; }
   .ws-feed-health-grid { grid-template-columns: 1fr; }
   .hl-section-card .hl-list { grid-template-columns: 1fr; }
   .card { padding: 14px 14px 12px; }
@@ -4318,7 +4339,6 @@ html[dir="rtl"] .sug-chip { text-align: right; }
 .db-results .ws-kpi-row .kpi-card:nth-child(1) { animation-delay: .04s; }
 .db-results .ws-kpi-row .kpi-card:nth-child(2) { animation-delay: .08s; }
 .db-results .ws-kpi-row .kpi-card:nth-child(3) { animation-delay: .12s; }
-.db-results .ws-kpi-row .kpi-card:nth-child(4) { animation-delay: .16s; }
 .db-results .ws-main-grid .ws-col-left > .ws-card:nth-child(1) { animation-delay: .2s; }
 .db-results .ws-main-grid .ws-col-left > .ws-card:nth-child(2) { animation-delay: .28s; }
 .db-results .ws-main-grid .ws-col-mid > .ws-card:nth-child(1) { animation-delay: .24s; }
@@ -5634,6 +5654,7 @@ html[dir="rtl"] .app-window { text-align: right; }
   .ws-kpi-row { grid-template-columns: repeat(2, 1fr); }
   .ws-main-grid { grid-template-columns: 1fr; }
   .ws-main-grid .ws-col-right { display: flex; flex-direction: column; gap: 14px; }
+  .ws-mid-bottom { grid-template-columns: 1fr; }
   .ws-feed-health-grid { grid-template-columns: 1fr; }
   .dash-grid .sp-8, .dash-grid .sp-7, .dash-grid .sp-6, .dash-grid .sp-5 { grid-column: span 12; }
   .dash-grid .sp-4, .dash-grid .sp-3 { grid-column: span 12; }

@@ -242,13 +242,6 @@
               </div>
               <div class="kpi-value" id="kpiSentiment">—</div>
             </div>
-            <div class="ws-card kpi-card">
-              <div class="kpi-head">
-                <span class="kpi-label" data-i18n="ws.kpi.emergency">EMERGENCY ALERTS</span>
-                <span class="delta" id="kpiCrisesDelta">—</span>
-              </div>
-              <div class="kpi-value" id="kpiCrises">—</div>
-            </div>
           </div>
 
           <!-- Actions row (above main grid) -->
@@ -357,20 +350,27 @@
                 <div class="empty-state" id="dbEmptyHashtags" hidden><p data-i18n="ws.nodata">No data available</p></div>
               </div>
 
-              <div class="ws-card card src-card">
-                <div class="card-head">
-                  <div>
-                    <h3 class="card-title" data-i18n="ws.src.t">Sources</h3>
-                    <p class="card-sub" data-i18n="ws.src.s2">PUBLISHERS FROM THIS ANALYSIS</p>
+              <div class="ws-mid-bottom">
+                <div class="ws-card card src-card">
+                  <div class="card-head">
+                    <div>
+                      <h3 class="card-title" data-i18n="ws.src.t">Sources</h3>
+                      <p class="card-sub" data-i18n="ws.src.s2">PUBLISHERS FROM THIS ANALYSIS</p>
+                    </div>
                   </div>
+                  <div class="vbar-chart" id="dbSrcList"></div>
+                  <div class="empty-state" id="dbEmptySources" hidden><p data-i18n="ws.src.na">No source data available for this analysis.</p></div>
+                  <div id="dbSrcFoot"></div>
                 </div>
-                <div class="vbar-chart" id="dbSrcList"></div>
-                <div class="empty-state" id="dbEmptySources" hidden><p data-i18n="ws.src.na">No source data available for this analysis.</p></div>
-                <div id="dbSrcFoot"></div>
+                <div class="ws-card kpi-card emergency-mini-card">
+                  <div class="kpi-head">
+                    <span class="kpi-label" data-i18n="ws.kpi.emergency">EMERGENCY ALERTS</span>
+                    <span class="delta" id="kpiCrisesDelta">—</span>
+                  </div>
+                  <div class="kpi-value" id="kpiCrises">—</div>
+                </div>
               </div>
             </div>
-
-            <!-- Col 3: Donut + Regional + Influencers -->
             <div class="ws-col ws-col-right">
               <div class="ws-card card donut-card">
                 <div class="card-head">
