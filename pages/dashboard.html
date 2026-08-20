@@ -242,6 +242,13 @@
               </div>
               <div class="kpi-value" id="kpiSentiment">—</div>
             </div>
+            <div class="ws-card kpi-card">
+              <div class="kpi-head">
+                <span class="kpi-label" data-i18n="ws.kpi.emergency">EMERGENCY ALERTS</span>
+                <span class="delta" id="kpiCrisesDelta">—</span>
+              </div>
+              <div class="kpi-value" id="kpiCrises">—</div>
+            </div>
           </div>
 
           <!-- Actions row (above main grid) -->
@@ -328,17 +335,6 @@
                 <div class="empty-state" id="dbEmptyKeywords" hidden><p data-i18n="ws.nodata">No data available</p></div>
               </div>
 
-              <div class="ws-card card ph-card">
-                <div class="card-head">
-                  <div>
-                    <h3 class="card-title" data-i18n="ws.ph.t">Top phrases</h3>
-                    <p class="card-sub" data-i18n="ws.ph.s">EMERGING 2–3 WORD PHRASES</p>
-                  </div>
-                </div>
-                <div class="heat-grid" id="dbPhList"></div>
-                <div class="empty-state" id="dbEmptyPhrases" hidden><p data-i18n="ws.nodata">No data available</p></div>
-              </div>
-
               <div class="ws-card card ht-card">
                 <div class="card-head">
                   <div>
@@ -351,6 +347,16 @@
               </div>
 
               <div class="ws-mid-bottom">
+                <div class="ws-card card ph-card">
+                  <div class="card-head">
+                    <div>
+                      <h3 class="card-title" data-i18n="ws.ph.t">Top phrases</h3>
+                      <p class="card-sub" data-i18n="ws.ph.s">EMERGING 2–3 WORD PHRASES</p>
+                    </div>
+                  </div>
+                  <div class="heat-grid" id="dbPhList"></div>
+                  <div class="empty-state" id="dbEmptyPhrases" hidden><p data-i18n="ws.nodata">No data available</p></div>
+                </div>
                 <div class="ws-card card src-card">
                   <div class="card-head">
                     <div>
@@ -361,13 +367,6 @@
                   <div class="vbar-chart" id="dbSrcList"></div>
                   <div class="empty-state" id="dbEmptySources" hidden><p data-i18n="ws.src.na">No source data available for this analysis.</p></div>
                   <div id="dbSrcFoot"></div>
-                </div>
-                <div class="ws-card kpi-card emergency-mini-card">
-                  <div class="kpi-head">
-                    <span class="kpi-label" data-i18n="ws.kpi.emergency">EMERGENCY ALERTS</span>
-                    <span class="delta" id="kpiCrisesDelta">—</span>
-                  </div>
-                  <div class="kpi-value" id="kpiCrises">—</div>
                 </div>
               </div>
             </div>

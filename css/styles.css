@@ -1491,7 +1491,7 @@ html[dir="rtl"] .auth-back svg { transform: scaleX(-1); }
 }
 .ws-kpi-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 14px;
 }
 .actions-row-card {
@@ -1514,8 +1514,8 @@ html[dir="rtl"] .auth-back svg { transform: scaleX(-1); }
   flex-direction: column;
   gap: 14px;
 }
-.hl-section-card {
-  padding: 24px;
+.hl-section-card.card {
+  padding: 20px 24px 20px;
 }
 .hl-section-card .total-summary { margin-bottom: 16px; }
 .hl-section-card .hl-list {
@@ -1532,21 +1532,12 @@ html[dir="rtl"] .auth-back svg { transform: scaleX(-1); }
 
 .ws-mid-bottom {
   display: grid;
-  grid-template-columns: 1fr 180px;
+  grid-template-columns: 1fr 1fr;
   gap: 14px;
   align-items: stretch;
 }
 .ws-mid-bottom .src-card { min-height: 0; }
-.ws-mid-bottom .src-card .vbar-chart { min-height: 140px; }
-.ws-mid-bottom .emergency-mini-card {
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-.emergency-mini-card .kpi-value {
-  font-size: 1.5rem;
-}
+.ws-mid-bottom .ph-card { min-height: 0; }
 
 /* --- AI Intelligence card (brief only — highlights are in hl-section-card) --- */
 .ai-intel-card {
@@ -2448,6 +2439,7 @@ html[dir="rtl"] .field select {
   .ws-feed-health-grid { grid-template-columns: 1fr; }
   .hl-section-card .hl-list { grid-template-columns: 1fr; }
   .card { padding: 14px 14px 12px; }
+  .hl-section-card.card { padding: 16px 18px 16px; }
   .kpi-card { padding: 12px 14px 14px; }
   .kpi-value { font-size: 1.4rem; }
   .chart-body { min-height: 180px; }
@@ -4339,6 +4331,7 @@ html[dir="rtl"] .sug-chip { text-align: right; }
 .db-results .ws-kpi-row .kpi-card:nth-child(1) { animation-delay: .04s; }
 .db-results .ws-kpi-row .kpi-card:nth-child(2) { animation-delay: .08s; }
 .db-results .ws-kpi-row .kpi-card:nth-child(3) { animation-delay: .12s; }
+.db-results .ws-kpi-row .kpi-card:nth-child(4) { animation-delay: .16s; }
 .db-results .ws-main-grid .ws-col-left > .ws-card:nth-child(1) { animation-delay: .2s; }
 .db-results .ws-main-grid .ws-col-left > .ws-card:nth-child(2) { animation-delay: .28s; }
 .db-results .ws-main-grid .ws-col-mid > .ws-card:nth-child(1) { animation-delay: .24s; }
@@ -5827,6 +5820,7 @@ html[dir="rtl"] .app-window { text-align: right; }
   .ws-grid > .kpi-card { padding: 12px 14px 14px; }
   .kpi-value { font-size: 1.4rem; }
   .card { padding: 14px 14px 12px; }
+  .hl-section-card.card { padding: 16px 18px 16px; }
   .doc-card { padding: 14px; border-radius: 12px; }
   .conn-card { padding: 14px; border-radius: 12px; }
   .mini-stat { padding: 12px; border-radius: 12px; }
@@ -5865,6 +5859,7 @@ html[dir="rtl"] .app-window { text-align: right; }
   .btn-sm { padding: 7px 12px; font-size: .76rem; }
   .kpi-value { font-size: 1.5rem; }
   .card { padding: 14px 12px; border-radius: 12px; }
+  .hl-section-card.card { padding: 16px 16px 16px; }
   .card-title { font-size: .95rem; }
   .app-row { padding: 8px 10px; gap: 7px; border-radius: 10px; }
   .row-icon { width: 28px; height: 28px; border-radius: 8px; }
