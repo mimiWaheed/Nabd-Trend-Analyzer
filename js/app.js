@@ -39,7 +39,7 @@
     }
   }
 
-  const IC = {
+    const IC = {
     grid: 'M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z',
     pulse: 'M3 12h4l2-7 4 14 2-7h6',
     clock: 'M12 8v4l3 3M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z',
@@ -57,7 +57,8 @@
     burger: 'M4 7h16M4 12h16M4 17h16',
     plus: 'M12 5v14M5 12h14',
     copy: 'M8 8h12v12H8zM4 16V4h12',
-    chev: 'M9 6l6 6-6 6'
+    chev: 'M9 6l6 6-6 6',
+    panelLeft: 'M3 3h18v18H3zM3 3v18M8 7h5M8 11h8M8 15h6'
   };
   const svg = (d, cls) => '<svg viewBox="0 0 24 24" class="' + (cls || '') + '"><path d="' + d + '"/></svg>';
   const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -136,7 +137,7 @@
       + '<span class="app-logo">' + (N.lang === 'ar' ? 'نبض' : 'N') + '</span>'
       + '<span class="app-brand-name" data-i18n="brand">' + L('brand') + '</span>'
       + '</a>'
-      + '<button class="collapse-btn" id="sideCollapse" aria-label="' + (N.lang === 'ar' ? 'طي الشريط الجانبي' : 'Collapse sidebar') + '">‹</button>'
+      + '<button class="collapse-btn" id="sideCollapse" aria-label="' + (N.lang === 'ar' ? 'طي الشريط الجانبي' : 'Collapse sidebar') + '">' + svg(IC.panelLeft) + '</button>'
       + '</div>'
       + '<nav class="app-nav">' + navHtml + '</nav>'
       + '<div class="app-side-foot">'
@@ -145,11 +146,10 @@
       + '</div>'
       + '</aside>'
       + '<div class="side-backdrop" id="sideBackdrop"></div>'
-      + '<header class="app-top">'
+      + '<header class="app-top" id="appTop">'
       + '<button class="mobile-menu-btn" id="sideBurger" aria-label="' + (N.lang === 'ar' ? 'القائمة' : 'Menu') + '" aria-expanded="false" aria-controls="appSide">' + svg(IC.burger) + '</button>'
       + '<div class="app-top-left">'
       + '<span class="app-top-title" data-i18n="app.title.' + page + '">' + L('app.title.' + page) + '</span>'
-      + '<span class="app-top-crumb"><span data-i18n="app.crumb.app"></span> / <span data-i18n="app.title.' + page + '"></span></span>'
       + '</div>'
       + '<div class="app-top-actions">'
       + '<div class="lang-seg" id="topLang" role="group" aria-label="Language">'
@@ -157,6 +157,10 @@
       + '<button type="button" class="lang-seg-btn" data-lang="ar" aria-label="العربية">عربي</button>'
       + '</div>'
       + '<button class="icon-btn" id="topTheme" aria-label="theme">' + svg(IC.sun) + '</button>'
+      + '<div class="notif-bell-wrap" id="notifBellWrap">'
+      + '<button class="icon-btn notif-bell" id="notifBell" aria-label="' + (N.lang === 'ar' ? 'الإشعارات' : 'Notifications') + '" aria-expanded="false" aria-controls="notifDropdown">' + svg(IC.bell) + '<span class="notif-bell-dot" id="notifBellDot" hidden></span></button>'
+      + '<div class="notif-dropdown" id="notifDropdown" role="menu"><div class="notif-dropdown-list" id="notifDropdownList"></div><a class="notif-dropdown-footer" href="notifications.html" data-page="notifications.html">' + (N.lang === 'ar' ? 'عرض كل الإشعارات' : 'View all notifications') + ' →</a></div>'
+      + '</div>'
       + '<button class="avatar-btn" id="userMenuBtn" aria-label="' + (N.lang === 'ar' ? 'قائمة المستخدم' : 'Open user menu') + '" aria-haspopup="menu" aria-expanded="false" aria-controls="userMenu"><span class="avatar">' + initials() + '</span></button>'
       + '<div class="user-menu" id="userMenu">' + menuHtml
       + '<div class="menu-sep"></div>'
@@ -275,6 +279,72 @@
       seg.querySelectorAll('.lang-seg-btn').forEach((b) => {
         b.addEventListener('click', () => setLang(b.dataset.lang));
       });
+    }
+    /* ---------- notification bell dropdown ---------- */
+    const notifBell = $('notifBell');
+    const notifDrop = $('notifDropdown');
+    const notifList = $('notifDropdownList');
+    const notifDot = $('notifBellDot');
+    function paintNotifBell() {
+      const count = unreadCount();
+      if (notifDot) notifDot.hidden = count === 0;
+    }
+    function paintNotifDropdown() {
+      if (!notifList) return;
+      const notifs = N.notifGet ? N.notifGet() : [];
+      const read = new Set();
+      try {
+        const raw = JSON.parse(localStorage.getItem(userKey('nabd-read')) || '[]');
+        if (Array.isArray(raw)) raw.forEach((id) => read.add(id));
+      } catch (e) {}
+      const recent = notifs.slice(0, 5);
+      if (!recent.length) {
+        notifList.innerHTML = '<div class="notif-dropdown-empty">' + (N.lang === 'ar' ? 'لا إشعارات جديدة' : 'No new notifications') + '</div>';
+        return;
+      }
+      const iconMap = { ai: '!', trend: '▲', system: '◷', reports: 'PDF', conn: 'f', export: 'CSV' };
+      const clsMap = { ai: 'danger', trend: 'pos', system: 'warn', reports: 'neu', conn: 'neu', export: 'pos' };
+      notifList.innerHTML = recent.map((n) => {
+        const unread = !read.has(n.id);
+        const cat = n.category || 'system';
+        return '<a class="notif-dropdown-item' + (unread ? ' unread' : '') + '" href="notifications.html" data-page="notifications.html">'
+          + '<span class="notif-dropdown-ic ' + (clsMap[cat] || 'neu') + '">' + (iconMap[cat] || '·') + '</span>'
+          + '<span class="notif-dropdown-body"><span class="notif-dropdown-title">' + (n.title || '') + '</span>'
+          + (n.time ? '<span class="notif-dropdown-time">' + n.time + '</span>' : '') + '</span>'
+          + (unread ? '<span class="notif-dropdown-dot"></span>' : '')
+          + '</a>';
+      }).join('');
+    }
+    if (notifBell && notifDrop) {
+      notifBell.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = notifDrop.classList.toggle('open');
+        notifBell.setAttribute('aria-expanded', String(open));
+        if (open) paintNotifDropdown();
+      });
+      document.addEventListener('click', (e) => {
+        if (!notifDrop.contains(e.target) && e.target !== notifBell && !notifBell.contains(e.target)) {
+          notifDrop.classList.remove('open');
+          notifBell.setAttribute('aria-expanded', 'false');
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { notifDrop.classList.remove('open'); notifBell.setAttribute('aria-expanded', 'false'); }
+      });
+    }
+    paintNotifBell();
+    document.addEventListener('app-unread', paintNotifBell);
+    /* ---------- header glass on scroll ---------- */
+    const appTop = $('appTop');
+    if (appTop) {
+      let lastY = 0;
+      const onScroll = () => {
+        const y = window.scrollY || 0;
+        appTop.classList.toggle('scrolled', y > 20);
+        lastY = y;
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
     }
     document.addEventListener('nabd-theme', updateThemeBtn);
     updateThemeBtn();
@@ -2496,6 +2566,21 @@
         N.navigate('../index.html');
       }
     });
+    /* ---- settings category navigation ---- */
+    const nav = document.getElementById('settingsNav');
+    const body = document.getElementById('settingsBody');
+    if (nav && body) {
+      const tabs = nav.querySelectorAll('.settings-nav-item');
+      const panels = body.querySelectorAll('.settings-section');
+      let activeCat = 'appearance';
+      function showPanel(cat) {
+        activeCat = cat;
+        tabs.forEach((t) => { const on = t.dataset.settingsCat === cat; t.classList.toggle('active', on); t.setAttribute('aria-selected', String(on)); });
+        panels.forEach((p) => { const on = p.dataset.settingsPanel === cat; p.classList.toggle('active', on); p.style.display = on ? '' : 'none'; });
+      }
+      tabs.forEach((t) => t.addEventListener('click', () => showPanel(t.dataset.settingsCat)));
+      showPanel(activeCat);
+    }
   }
 
   /* ---------------- connections ---------------- */

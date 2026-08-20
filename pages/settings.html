@@ -35,7 +35,35 @@
       </div>
     </div>
 
-    <div class="dash-grid">
+    <div class="settings-nav" id="settingsNav" role="tablist" aria-label="Settings categories">
+      <button class="settings-nav-item active" data-settings-cat="appearance" role="tab" aria-selected="true">
+        <span class="settings-nav-ic" data-i18n="set.appearance">Appearance</span>
+      </button>
+      <button class="settings-nav-item" data-settings-cat="analysis" role="tab" aria-selected="false">
+        <span class="settings-nav-ic" data-i18n="set.an.title">Analysis</span>
+      </button>
+      <button class="settings-nav-item" data-settings-cat="notifications" role="tab" aria-selected="false">
+        <span class="settings-nav-ic" data-i18n="set.notif">Notifications</span>
+      </button>
+      <button class="settings-nav-item" data-settings-cat="privacy" role="tab" aria-selected="false">
+        <span class="settings-nav-ic" data-i18n="set.privacy">Privacy</span>
+      </button>
+      <button class="settings-nav-item" data-settings-cat="security" role="tab" aria-selected="false">
+        <span class="settings-nav-ic" data-i18n="set.security">Security</span>
+      </button>
+      <button class="settings-nav-item" data-settings-cat="shortcuts" role="tab" aria-selected="false">
+        <span class="settings-nav-ic" data-i18n="set.shortcuts">Shortcuts</span>
+      </button>
+      <button class="settings-nav-item" data-settings-cat="experimental" role="tab" aria-selected="false">
+        <span class="settings-nav-ic" data-i18n="set.experimental">Experimental</span>
+      </button>
+      <button class="settings-nav-item danger" data-settings-cat="danger" role="tab" aria-selected="false">
+        <span class="settings-nav-ic" data-i18n="set.danger">Danger zone</span>
+      </button>
+    </div>
+
+    <div class="settings-body" id="settingsBody">
+      <div class="dash-grid settings-section active" data-settings-panel="appearance">
       <div class="ws-card sp-12 set-card">
         <div class="card-head"><span class="card-title" data-i18n="set.appearance">Appearance</span></div>
         <div class="card-body" style="display:flex;flex-direction:column;gap:16px">
@@ -56,8 +84,10 @@
           </div>
         </div>
       </div>
+      </div>
 
-      <div class="ws-card sp-6 set-card">
+      <div class="dash-grid settings-section" data-settings-panel="analysis">
+      <div class="ws-card sp-12 set-card">
         <div class="card-head"><span class="card-title" data-i18n="set.an.title">Analysis preferences</span></div>
         <div class="card-body" style="display:flex;flex-direction:column;gap:16px">
           <div class="set-row">
@@ -82,8 +112,10 @@
           </div>
         </div>
       </div>
+      </div>
 
-      <div class="ws-card sp-6 set-card">
+      <div class="dash-grid settings-section" data-settings-panel="notifications">
+      <div class="ws-card sp-12 set-card">
         <div class="card-head"><span class="card-title" data-i18n="set.notif">Notifications</span></div>
         <div class="card-body">
           <div class="set-row"><div><div class="st-title" data-i18n="set.n1.t">Breaking event alerts</div><div class="st-sub" data-i18n="set.n1.s">Push alerts for crisis detection</div></div><label class="switch" data-set="n1"><input type="checkbox"><span class="track"></span></label></div>
@@ -93,8 +125,10 @@
           <div class="set-row"><div><div class="st-title" data-i18n="set.n5.t">Weekly digest</div><div class="st-sub" data-i18n="set.n5.s">A Saturday summary of your week</div></div><label class="switch" data-set="n5"><input type="checkbox"><span class="track"></span></label></div>
         </div>
       </div>
+      </div>
 
-      <div class="ws-card sp-6 set-card">
+      <div class="dash-grid settings-section" data-settings-panel="privacy">
+      <div class="ws-card sp-12 set-card">
         <div class="card-head"><span class="card-title" data-i18n="set.privacy">Privacy</span></div>
         <div class="card-body">
           <div class="set-row"><div><div class="st-title" data-i18n="set.p1.t">Private by default</div><div class="st-sub" data-i18n="set.p1.s">New analyses are not shared with the team</div></div><label class="switch" data-set="p1"><input type="checkbox"><span class="track"></span></label></div>
@@ -106,16 +140,20 @@
           </div>
         </div>
       </div>
+      </div>
 
-      <div class="ws-card sp-6 set-card">
+      <div class="dash-grid settings-section" data-settings-panel="security">
+      <div class="ws-card sp-12 set-card">
         <div class="card-head"><span class="card-title" data-i18n="set.security">Security</span></div>
         <div class="card-body">
           <div class="set-row"><div><div class="st-title" data-i18n="set.sec1.t">Change password</div><div class="st-sub" data-i18n="set.sec1.s">Last changed 42 days ago</div></div><button class="btn btn-ghost btn-sm" data-i18n="set.sec1.b">Change</button></div>
           <div class="set-row"><div><div class="st-title" data-i18n="set.sec2.t">Two-factor authentication</div><div class="st-sub" data-i18n="set.sec2.s">Add an authenticator app</div></div><label class="switch" data-set="sec2"><input type="checkbox"><span class="track"></span></label></div>
         </div>
       </div>
+      </div>
 
-      <div class="ws-card sp-6 set-card">
+      <div class="dash-grid settings-section" data-settings-panel="shortcuts">
+      <div class="ws-card sp-12 set-card">
         <div class="card-head"><span class="card-title" data-i18n="set.shortcuts">Shortcuts</span></div>
         <div class="card-body">
           <div class="log-row head"><span data-i18n="set.k">Shortcut</span><span data-i18n="set.k.action">Action</span><span></span></div>
@@ -126,7 +164,9 @@
           <div class="log-row"><span class="key-prefix">T</span><span data-i18n="set.shk5">Toggle theme</span></div>
         </div>
       </div>
+      </div>
 
+      <div class="dash-grid settings-section" data-settings-panel="experimental">
       <div class="ws-card sp-12 set-card">
         <div class="card-head"><span class="card-title" data-i18n="set.experimental">Experimental features</span></div>
         <div class="card-body">
@@ -135,13 +175,16 @@
           <div class="set-row"><div><div class="st-title" data-i18n="set.exp3.t">Live collaborator cursors</div><div class="st-sub" data-i18n="set.exp3.s">Multi-seat realtime presence</div></div><label class="switch" data-set="e3"><input type="checkbox"><span class="track"></span></label></div>
         </div>
       </div>
+      </div>
 
+      <div class="dash-grid settings-section" data-settings-panel="danger">
       <div class="ws-card sp-12 set-card danger-zone">
         <div class="card-head"><span class="card-title" style="color:var(--danger)" data-i18n="set.danger">Danger zone</span></div>
         <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
           <div><div class="st-title" style="color:var(--text)" data-i18n="set.danger.sub">Delete your account, analyses and exports. This cannot be undone.</div></div>
           <button class="btn btn-sm" id="setDanger" style="background:var(--danger);color:#fff;border:none" data-i18n="set.danger.b">Delete account</button>
         </div>
+      </div>
       </div>
     </div>
   </main>
