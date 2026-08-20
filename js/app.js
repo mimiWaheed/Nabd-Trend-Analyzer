@@ -225,6 +225,29 @@
       });
       if (localStorage.getItem('nabd-side') === '1') side.classList.add('collapsed');
     }
+    /* ---------- sidebar hover-expand when collapsed ---------- */
+    (function () {
+      const brand = side ? side.querySelector('.app-brand-side') : null;
+      if (!brand || !side) return;
+      brand.addEventListener('click', (e) => {
+        if (side.classList.contains('collapsed')) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+      let hoverTimer = null;
+      side.addEventListener('mouseenter', () => {
+        if (!side.classList.contains('collapsed')) return;
+        clearTimeout(hoverTimer);
+        side.classList.add('hover-expand');
+      });
+      side.addEventListener('mouseleave', () => {
+        clearTimeout(hoverTimer);
+        hoverTimer = setTimeout(() => {
+          side.classList.remove('hover-expand');
+        }, 120);
+      });
+    })();
     const burger = $('sideBurger');
     const backdrop = $('sideBackdrop');
     if (burger && backdrop) {
@@ -281,6 +304,7 @@
       });
     }
     /* ---------- notification bell dropdown ---------- */
+    function escHtml(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
     const notifBell = $('notifBell');
     const notifDrop = $('notifDropdown');
     const notifList = $('notifDropdownList');
@@ -306,11 +330,15 @@
       const clsMap = { ai: 'danger', trend: 'pos', system: 'warn', reports: 'neu', conn: 'neu', export: 'pos' };
       notifList.innerHTML = recent.map((n) => {
         const unread = !read.has(n.id);
-        const cat = n.category || 'system';
+        const cat = n.cat || 'system';
+        const title = n.title ? N.fmt(n.title, n.params) : '';
+        const sub = n.sub ? N.fmt(n.sub, n.params) : '';
+        const when = N.formatRelativeTime ? N.formatRelativeTime(n.ts, N.lang) : '';
         return '<a class="notif-dropdown-item' + (unread ? ' unread' : '') + '" href="notifications.html" data-page="notifications.html">'
           + '<span class="notif-dropdown-ic ' + (clsMap[cat] || 'neu') + '">' + (iconMap[cat] || '·') + '</span>'
-          + '<span class="notif-dropdown-body"><span class="notif-dropdown-title">' + (n.title || '') + '</span>'
-          + (n.time ? '<span class="notif-dropdown-time">' + n.time + '</span>' : '') + '</span>'
+          + '<span class="notif-dropdown-body"><span class="notif-dropdown-title">' + escHtml(title) + '</span>'
+          + (sub ? '<span class="notif-dropdown-sub">' + escHtml(sub) + '</span>' : '')
+          + (when ? '<span class="notif-dropdown-time">' + when + '</span>' : '') + '</span>'
           + (unread ? '<span class="notif-dropdown-dot"></span>' : '')
           + '</a>';
       }).join('');
