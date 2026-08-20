@@ -1778,6 +1778,39 @@
       resetTrend();
       initTrend();
       renderWidgets();
+      initFeedScroll();
+    }
+
+    /* ---------- feed scroll controls ---------- */
+    let feedAutoScroll = true, feedScrollRaf = null;
+    function initFeedScroll() {
+      const feed = document.querySelector('.feed');
+      const track = $('dbFeedTrack');
+      const pauseBtn = $('feedPauseBtn');
+      const upBtn = $('feedUpBtn');
+      const downBtn = $('feedDownBtn');
+      if (!feed || !track) return;
+      feedAutoScroll = true;
+      if (pauseBtn) pauseBtn.classList.add('active');
+      let scrollDir = 1;
+      function feedTick() {
+        if (feedAutoScroll && track.children.length > 1) {
+          feed.scrollTop += scrollDir * 0.5;
+          if (feed.scrollTop + feed.clientHeight >= feed.scrollHeight - 2) scrollDir = -1;
+          if (feed.scrollTop <= 0) scrollDir = 1;
+        }
+        feedScrollRaf = requestAnimationFrame(feedTick);
+      }
+      if (feedScrollRaf) cancelAnimationFrame(feedScrollRaf);
+      feedScrollRaf = requestAnimationFrame(feedTick);
+      feed.addEventListener('mouseenter', () => { feedAutoScroll = false; });
+      feed.addEventListener('mouseleave', () => { feedAutoScroll = true; });
+      if (pauseBtn) pauseBtn.addEventListener('click', () => {
+        feedAutoScroll = !feedAutoScroll;
+        pauseBtn.classList.toggle('active', feedAutoScroll);
+      });
+      if (upBtn) upBtn.addEventListener('click', () => { feed.scrollTop -= 60; });
+      if (downBtn) downBtn.addEventListener('click', () => { feed.scrollTop += 60; });
     }
     /* keep dynamic widgets in sync when the language or theme changes */
     document.addEventListener('app-render', () => {
