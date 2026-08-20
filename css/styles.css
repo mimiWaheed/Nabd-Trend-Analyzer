@@ -1530,14 +1530,14 @@ html[dir="rtl"] .auth-back svg { transform: scaleX(-1); }
   align-items: start;
 }
 
-.ws-mid-bottom {
+.ws-mid-kw-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
   align-items: stretch;
 }
-.ws-mid-bottom .src-card { min-height: 0; }
-.ws-mid-bottom .ph-card { min-height: 0; }
+.ws-mid-kw-row .kw-card,
+.ws-mid-kw-row .src-card { min-height: 0; }
 
 /* --- AI Intelligence card (brief only — highlights are in hl-section-card) --- */
 .ai-intel-card {
@@ -2338,7 +2338,7 @@ html[dir="rtl"] .field select {
   .dash-grid .sp-4, .dash-grid .sp-3 { grid-column: span 6; }
   .ws-main-grid { grid-template-columns: 1fr 1fr; }
   .ws-main-grid .ws-col-right { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  .ws-mid-bottom { grid-template-columns: 1fr; }
+  .ws-mid-kw-row { grid-template-columns: 1fr; }
   .ws-feed-health-grid { grid-template-columns: 1fr; }
   .hl-section-card .hl-list { grid-template-columns: repeat(2, 1fr); }
   .app-head h1 { font-size: 1.9rem; }
@@ -2435,7 +2435,7 @@ html[dir="rtl"] .field select {
   .ws-kpi-row { grid-template-columns: repeat(2, 1fr); }
   .ws-main-grid { grid-template-columns: 1fr; }
   .ws-main-grid .ws-col-right { grid-template-columns: 1fr; display: flex; flex-direction: column; gap: 14px; }
-  .ws-mid-bottom { grid-template-columns: 1fr; }
+  .ws-mid-kw-row { grid-template-columns: 1fr; }
   .ws-feed-health-grid { grid-template-columns: 1fr; }
   .hl-section-card .hl-list { grid-template-columns: 1fr; }
   .card { padding: 14px 14px 12px; }
@@ -5647,7 +5647,7 @@ html[dir="rtl"] .app-window { text-align: right; }
   .ws-kpi-row { grid-template-columns: repeat(2, 1fr); }
   .ws-main-grid { grid-template-columns: 1fr; }
   .ws-main-grid .ws-col-right { display: flex; flex-direction: column; gap: 14px; }
-  .ws-mid-bottom { grid-template-columns: 1fr; }
+  .ws-mid-kw-row { grid-template-columns: 1fr; }
   .ws-feed-health-grid { grid-template-columns: 1fr; }
   .dash-grid .sp-8, .dash-grid .sp-7, .dash-grid .sp-6, .dash-grid .sp-5 { grid-column: span 12; }
   .dash-grid .sp-4, .dash-grid .sp-3 { grid-column: span 12; }

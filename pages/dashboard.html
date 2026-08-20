@@ -311,7 +311,7 @@
               </div>
             </div>
 
-            <!-- Col 2: Topics + Keywords + Sources -->
+            <!-- Col 2: Topics + Keywords/Sources + Hashtags -->
             <div class="ws-col ws-col-mid">
               <div class="ws-card card topics-card">
                 <div class="card-head">
@@ -324,38 +324,16 @@
                 <div class="empty-state" id="dbEmptyTopics" hidden><p data-i18n="ws.nodata">No data available</p></div>
               </div>
 
-              <div class="ws-card card kw-card">
-                <div class="card-head">
-                  <div>
-                    <h3 class="card-title" data-i18n="ws.kw.t">Top keywords</h3>
-                    <p class="card-sub" data-i18n="ws.kw.s">DETERMINISTIC · COMPUTED FROM AGGREGATION</p>
-                  </div>
-                </div>
-                <div class="vbar-chart" id="dbKwList"></div>
-                <div class="empty-state" id="dbEmptyKeywords" hidden><p data-i18n="ws.nodata">No data available</p></div>
-              </div>
-
-              <div class="ws-card card ht-card">
-                <div class="card-head">
-                  <div>
-                    <h3 class="card-title" data-i18n="ws.ht.t">Hashtags</h3>
-                    <p class="card-sub" data-i18n="ws.ht.s">EXTRACTED FROM SIGNALS</p>
-                  </div>
-                </div>
-                <div class="ht-wrap" id="dbHtList"></div>
-                <div class="empty-state" id="dbEmptyHashtags" hidden><p data-i18n="ws.nodata">No data available</p></div>
-              </div>
-
-              <div class="ws-mid-bottom">
-                <div class="ws-card card ph-card">
+              <div class="ws-mid-kw-row">
+                <div class="ws-card card kw-card">
                   <div class="card-head">
                     <div>
-                      <h3 class="card-title" data-i18n="ws.ph.t">Top phrases</h3>
-                      <p class="card-sub" data-i18n="ws.ph.s">EMERGING 2–3 WORD PHRASES</p>
+                      <h3 class="card-title" data-i18n="ws.kw.t">Top keywords</h3>
+                      <p class="card-sub" data-i18n="ws.kw.s">DETERMINISTIC · COMPUTED FROM AGGREGATION</p>
                     </div>
                   </div>
-                  <div class="heat-grid" id="dbPhList"></div>
-                  <div class="empty-state" id="dbEmptyPhrases" hidden><p data-i18n="ws.nodata">No data available</p></div>
+                  <div class="vbar-chart" id="dbKwList"></div>
+                  <div class="empty-state" id="dbEmptyKeywords" hidden><p data-i18n="ws.nodata">No data available</p></div>
                 </div>
                 <div class="ws-card card src-card">
                   <div class="card-head">
@@ -368,6 +346,17 @@
                   <div class="empty-state" id="dbEmptySources" hidden><p data-i18n="ws.src.na">No source data available for this analysis.</p></div>
                   <div id="dbSrcFoot"></div>
                 </div>
+              </div>
+
+              <div class="ws-card card ht-card">
+                <div class="card-head">
+                  <div>
+                    <h3 class="card-title" data-i18n="ws.ht.t">Hashtags</h3>
+                    <p class="card-sub" data-i18n="ws.ht.s">EXTRACTED FROM SIGNALS</p>
+                  </div>
+                </div>
+                <div class="ht-wrap" id="dbHtList"></div>
+                <div class="empty-state" id="dbEmptyHashtags" hidden><p data-i18n="ws.nodata">No data available</p></div>
               </div>
             </div>
             <div class="ws-col ws-col-right">
@@ -425,6 +414,18 @@
             <div class="total-summary" id="dbTotalSummary" hidden></div>
             <div class="hl-list" id="dbHlList"></div>
             <div class="empty-state" id="dbEmptyHighlights" hidden><p data-i18n="ws.hl.na">No AI highlights generated for this query.</p></div>
+          </div>
+
+          <!-- Top phrases (below highlights, same weight as keywords) -->
+          <div class="ws-card card ph-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title" data-i18n="ws.ph.t">Top phrases</h3>
+                <p class="card-sub" data-i18n="ws.ph.s">EMERGING 2–3 WORD PHRASES</p>
+              </div>
+            </div>
+            <div class="heat-grid" id="dbPhList"></div>
+            <div class="empty-state" id="dbEmptyPhrases" hidden><p data-i18n="ws.nodata">No data available</p></div>
           </div>
 
           <!-- Feed + Signal Health (side by side) -->
