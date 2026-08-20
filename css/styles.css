@@ -2640,7 +2640,7 @@ html[dir="rtl"] .field select {
 .app-side.collapsed.hover-expand .side-status { justify-content: flex-start; }
 .app-side.collapsed.hover-expand .nav-badge { display: inline-flex; }
 .app-side.collapsed.hover-expand ~ .app-top { inset-inline-start: var(--side-w); }
-.app-side.collapsed.hover-expand ~ .app-main { margin-inline-start: var(--side-w); }
+.app-side.collapsed.hover-expand ~ .app-main { margin-left: var(--side-w); width: calc(100% - var(--side-w)); }
 
 .app-nav {
   flex: 1;
@@ -3065,14 +3065,26 @@ html[dir="rtl"] .field select {
 
 /* ---------- main ---------- */
 .app-main {
-  margin-inline-start: var(--side-w);
-  margin-inline-end: auto;
+  margin-left: var(--side-w);
+  margin-right: 0;
   padding: calc(var(--top-h) + 24px) 32px 60px;
   max-width: 1400px;
-  width: 100%;
-  transition: margin-inline-start .32s var(--ease);
+  width: calc(100% - var(--side-w));
+  transition: width .32s var(--ease), margin-left .32s var(--ease);
+  box-sizing: border-box;
 }
-.app-side.collapsed ~ .app-main { margin-inline-start: var(--side-w-collapsed); }
+html[dir="rtl"] .app-main {
+  margin-left: 0;
+  margin-right: var(--side-w);
+}
+.app-side.collapsed ~ .app-main {
+  width: calc(100% - var(--side-w-collapsed));
+  margin-left: var(--side-w-collapsed);
+}
+html[dir="rtl"] .app-side.collapsed ~ .app-main {
+  margin-left: 0;
+  margin-right: var(--side-w-collapsed);
+}
 
 /* Subtle page transitions on data-page navigation */
 .page-enter { animation: pageIn .35s var(--ease) both; }
@@ -3674,7 +3686,7 @@ html[dir="rtl"] .db-results .summary-body .empty-state { text-align: right; }
   .app-side-head:hover .app-brand-side,
   .app-side-head:focus-within .app-brand-side { opacity: 1; pointer-events: auto; }
   .app-top { inset-inline-start: var(--side-w-collapsed); }
-  .app-main { margin-inline-start: var(--side-w-collapsed); }
+  .app-main { margin-left: var(--side-w-collapsed); width: calc(100% - var(--side-w-collapsed)); }
 }
 @media (max-width: 720px) {
   .app-side {
@@ -3684,7 +3696,7 @@ html[dir="rtl"] .db-results .summary-body .empty-state { text-align: right; }
   }
   .app-side.mobile-open { transform: translateX(0); }
   .app-top { inset-inline-start: 0; }
-  .app-main { margin-inline-start: 0; padding: calc(var(--top-h) + 16px) 14px 44px; }
+  .app-main { margin-left: 0; width: 100%; padding: calc(var(--top-h) + 16px) 14px 44px; }
   .side-backdrop {
     position: fixed;
     inset: 0;
@@ -3707,7 +3719,7 @@ html[dir="rtl"] .db-results .summary-body .empty-state { text-align: right; }
   }
   html[dir="rtl"] .app-side.mobile-open { transform: translateX(0); }
   html[dir="rtl"] .app-top { inset-inline-start: 0; }
-  html[dir="rtl"] .app-main { margin-inline-start: 0; }
+  html[dir="rtl"] .app-main { margin-left: 0; }
 }
 
 /* ============================================================
