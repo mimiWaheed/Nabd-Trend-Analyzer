@@ -221,9 +221,15 @@
     if (collapse) {
       collapse.addEventListener('click', () => {
         const on = side.classList.toggle('collapsed');
+        const main = document.querySelector('.app-main');
+        if (main) main.classList.toggle('sidebar-collapsed', on);
         try { localStorage.setItem('nabd-side', on ? '1' : '0'); } catch (e) {}
       });
-      if (localStorage.getItem('nabd-side') === '1') side.classList.add('collapsed');
+      if (localStorage.getItem('nabd-side') === '1') {
+        side.classList.add('collapsed');
+        const main = document.querySelector('.app-main');
+        if (main) main.classList.add('sidebar-collapsed');
+      }
     }
     /* ---------- sidebar hover-expand when collapsed ---------- */
     (function () {
@@ -240,11 +246,15 @@
         if (!side.classList.contains('collapsed')) return;
         clearTimeout(hoverTimer);
         side.classList.add('hover-expand');
+        const main = document.querySelector('.app-main');
+        if (main) main.classList.add('sidebar-hover-expand');
       });
       side.addEventListener('mouseleave', () => {
         clearTimeout(hoverTimer);
         hoverTimer = setTimeout(() => {
           side.classList.remove('hover-expand');
+          const main = document.querySelector('.app-main');
+          if (main) main.classList.remove('sidebar-hover-expand');
         }, 120);
       });
     })();
@@ -1778,40 +1788,8 @@
       resetTrend();
       initTrend();
       renderWidgets();
-      initFeedScroll();
     }
 
-    /* ---------- feed scroll controls ---------- */
-    let feedAutoScroll = true, feedScrollRaf = null;
-    function initFeedScroll() {
-      const feed = document.querySelector('.feed');
-      const track = $('dbFeedTrack');
-      const pauseBtn = $('feedPauseBtn');
-      const upBtn = $('feedUpBtn');
-      const downBtn = $('feedDownBtn');
-      if (!feed || !track) return;
-      feedAutoScroll = true;
-      if (pauseBtn) pauseBtn.classList.add('active');
-      let scrollDir = 1;
-      function feedTick() {
-        if (feedAutoScroll && track.children.length > 1) {
-          feed.scrollTop += scrollDir * 0.5;
-          if (feed.scrollTop + feed.clientHeight >= feed.scrollHeight - 2) scrollDir = -1;
-          if (feed.scrollTop <= 0) scrollDir = 1;
-        }
-        feedScrollRaf = requestAnimationFrame(feedTick);
-      }
-      if (feedScrollRaf) cancelAnimationFrame(feedScrollRaf);
-      feedScrollRaf = requestAnimationFrame(feedTick);
-      feed.addEventListener('mouseenter', () => { feedAutoScroll = false; });
-      feed.addEventListener('mouseleave', () => { feedAutoScroll = true; });
-      if (pauseBtn) pauseBtn.addEventListener('click', () => {
-        feedAutoScroll = !feedAutoScroll;
-        pauseBtn.classList.toggle('active', feedAutoScroll);
-      });
-      if (upBtn) upBtn.addEventListener('click', () => { feed.scrollTop -= 60; });
-      if (downBtn) downBtn.addEventListener('click', () => { feed.scrollTop += 60; });
-    }
     /* keep dynamic widgets in sync when the language or theme changes */
     document.addEventListener('app-render', () => {
       if (analysisState === 'success' && lastResult) {

@@ -251,6 +251,28 @@
             </div>
           </div>
 
+          <!-- Actions row (above main grid) -->
+          <div class="ws-card card actions-row-card">
+            <div class="act-list" id="dbActList">
+              <button type="button" class="act-btn act-primary" data-act="send">
+                <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg></span>
+                <span data-i18n="ws.actions.send">Send report to facility</span>
+              </button>
+              <button type="button" class="act-btn" data-act="save">
+                <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg></span>
+                <span data-i18n="ws.actions.save">Save report for later</span>
+              </button>
+              <button type="button" class="act-btn" data-act="share">
+                <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></span>
+                <span data-i18n="ws.actions.share">Export / share report</span>
+              </button>
+              <button type="button" class="act-btn" data-act="remind">
+                <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+                <span data-i18n="ws.reminder.set">Set reminder</span>
+              </button>
+            </div>
+          </div>
+
           <!-- 3-column main area -->
           <div class="ws-main-grid">
 
@@ -286,29 +308,6 @@
                 <p class="summary-scope-note mono" id="dbScopeNote" hidden></p>
                 <div class="empty-state" id="dbEmptySummary" hidden><p data-i18n="ws.sum.na">No AI brief returned for this query — signals are still displayed below.</p></div>
                 <div class="summary-chips" id="dbChips" hidden></div>
-                <div class="ai-intel-divider"></div>
-                <div class="total-summary" id="dbTotalSummary" hidden></div>
-                <div class="hl-list" id="dbHlList"></div>
-                <div class="empty-state" id="dbEmptyHighlights" hidden><p data-i18n="ws.hl.na">No AI highlights generated for this query.</p></div>
-                <div class="ai-intel-divider"></div>
-                <div class="act-list" id="dbActList">
-                  <button type="button" class="act-btn act-primary" data-act="send">
-                    <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg></span>
-                    <span data-i18n="ws.actions.send">Send report to facility</span>
-                  </button>
-                  <button type="button" class="act-btn" data-act="save">
-                    <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg></span>
-                    <span data-i18n="ws.actions.save">Save report for later</span>
-                  </button>
-                  <button type="button" class="act-btn" data-act="share">
-                    <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98"/></svg></span>
-                    <span data-i18n="ws.actions.share">Export / share report</span>
-                  </button>
-                  <button type="button" class="act-btn" data-act="remind">
-                    <span class="act-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
-                    <span data-i18n="ws.reminder.set">Set reminder</span>
-                  </button>
-                </div>
               </div>
             </div>
 
@@ -415,34 +414,36 @@
             </div>
           </div>
 
-          <!-- Live feed (full width, scrollable) -->
-          <div class="ws-card card feed-card">
+          <!-- AI Highlights (separate full-width card) -->
+          <div class="ws-card card hl-section-card">
             <div class="card-head">
               <div>
-                <h3 class="card-title" data-i18n="ws.feed.t">Live feed</h3>
-                <p class="card-sub" data-i18n="ws.feed.s2">REAL SOURCES · CLICK TO OPEN</p>
+                <h3 class="card-title" data-i18n="ws.hl.t2">AI highlights</h3>
+                <p class="card-sub" data-i18n="ws.hl.s">GENERATED THIS CYCLE</p>
               </div>
-              <div class="feed-ctrl" id="feedCtrl">
-                <button class="feed-ctrl-btn" id="feedPauseBtn" type="button" title="Pause auto-scroll">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-                </button>
-                <button class="feed-ctrl-btn" id="feedUpBtn" type="button" title="Scroll up">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
-                </button>
-                <button class="feed-ctrl-btn" id="feedDownBtn" type="button" title="Scroll down">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                </button>
-              </div>
+              <span class="live-badge mono"><span class="live-dot"></span> AI</span>
             </div>
-            <span class="live-badge mono" style="margin-top:-2px"><span class="live-dot"></span> LIVE</span>
-            <div class="feed">
-              <div class="feed-track" id="dbFeedTrack"></div>
-              <div class="empty-state" id="dbEmptyFeed" hidden><p data-i18n="ws.feed.na">No live signals returned for this query.</p></div>
-            </div>
+            <div class="total-summary" id="dbTotalSummary" hidden></div>
+            <div class="hl-list" id="dbHlList"></div>
+            <div class="empty-state" id="dbEmptyHighlights" hidden><p data-i18n="ws.hl.na">No AI highlights generated for this query.</p></div>
           </div>
 
-          <!-- Bottom: Health + signal intelligence -->
-          <div class="ws-bottom-grid">
+          <!-- Feed + Signal Health (side by side) -->
+          <div class="ws-feed-health-grid">
+            <div class="ws-card card feed-card">
+              <div class="card-head">
+                <div>
+                  <h3 class="card-title" data-i18n="ws.feed.t">Live feed</h3>
+                  <p class="card-sub" data-i18n="ws.feed.s2">REAL SOURCES · CLICK TO OPEN</p>
+                </div>
+              </div>
+              <span class="live-badge mono" style="margin-top:-2px"><span class="live-dot"></span> LIVE</span>
+              <div class="feed">
+                <div class="feed-track" id="dbFeedTrack"></div>
+                <div class="empty-state" id="dbEmptyFeed" hidden><p data-i18n="ws.feed.na">No live signals returned for this query.</p></div>
+              </div>
+            </div>
+
             <div class="ws-card card health-card">
               <div class="card-head">
                 <div>
@@ -454,8 +455,6 @@
               <div class="health-grid" id="dbHealthGrid"></div>
               <div class="empty-state" id="dbEmptyHealth" hidden><p data-i18n="ws.nodata">No data available</p></div>
             </div>
-
-            <!-- Historical trend strength removed from bottom — now in col1 above -->
           </div>
 
         </div>
