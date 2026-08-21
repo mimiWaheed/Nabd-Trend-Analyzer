@@ -1222,38 +1222,36 @@
     }
     buildRotatingSuggestions();
 
-    /* ---------- greeting message above query box ---------- */
+    /* ---------- greeting message beside the brand logo ----------
+       Time-of-day aware (visitor's local clock), Egyptian Arabic when the
+       app language is Arabic. */
     function paintGreeting() {
       const el = $('dbGreet');
       if (!el) return;
       const u = N.getUser();
       const fn = u ? ((u.firstName || u.first || '').trim() || (u.name || '').trim().split(/\s+/)[0] || '') : '';
-      const name = fn || '';
-      const greetings = N.lang === 'ar'
-        ? (name
-          ? [
-              '\u0645\u0631\u062D\u0628\u0627\u064B <span class="db-greet-name">' + esc(name) + '</span> \u0641\u064A \u0646\u0628\u0636\u060C \u0645\u0627 \u0627\u0644\u0630\u064A \u062A\u0628\u062D\u062B \u0639\u0646\u0647 \u0627\u0644\u064A\u0648\u0645\u061F',
-              '\u0623\u0647\u0644\u0627\u064B <span class="db-greet-name">' + esc(name) + '</span>! \u0647\u0644 \u062A\u0631\u064A\u062F \u0627\u0633\u062A\u0643\u0634\u0641 \u0634\u062E\u0635 \u0645\u0635\u0631 \u0627\u0644\u064A\u0648\u0645\u061F',
-              '\u064A\u0627 <span class="db-greet-name">' + esc(name) + '</span>! \u0627\u0644\u0648\u0642\u062A \u0627\u0644\u0623\u062E\u064A\u0631 \u0645\u0639\u0643 \u0627\u0644\u064A\u0648\u0645\u060C \u0645\u0646 \u0641\u0636\u0644 \u0645\u0635\u0631.'
-            ]
-          : [
-              '\u0645\u0627 \u0627\u0644\u0630\u064A \u062A\u0628\u062D\u062B \u0639\u0646\u0647 \u0627\u0644\u064A\u0648\u0645\u061F',
-              '\u0627\u0633\u0623\u0644 \u0646\u0628\u0636 \u0639\u0646 \u0623\u064A \u0634\u0624\u0648\u0646 \u0645\u0635\u0631\u061F'
-            ])
-        : (name
-          ? [
-              'Welcome back, <span class="db-greet-name">' + esc(name) + '</span>. What are we looking into today?',
-              'Hey <span class="db-greet-name">' + esc(name) + '</span>! Ready to explore what\'s happening in Egypt?',
-              'Good to see you, <span class="db-greet-name">' + esc(name) + '</span>. Let\'s uncover some insights.'
-            ]
-          : [
-              'What would you like to explore today?',
-              'Ask NABD anything about Egypt.'
-            ]);
-      const idx = Math.floor(Math.random() * greetings.length);
-      el.innerHTML = greetings[idx];
+      const name = fn;
+      const h = new Date().getHours();
+      const arName = name ? ' يا <span class="db-greet-name">' + esc(name) + '</span>' : '';
+      const enName = name ? ', <span class="db-greet-name">' + esc(name) + '</span>' : '';
+      let ar, en;
+      if (h >= 5 && h < 12) {
+        ar = 'صباح الخير' + arName + '! مصر صاحية — نشوف إيه اللي بيحصل النهارده؟';
+        en = 'Good morning' + enName + '! Egypt is awake — let\'s see what\'s happening today.';
+      } else if (h >= 12 && h < 17) {
+        ar = 'إزيك' + arName + '! مصر في وسط النهار — عايز تستكشف إيه؟';
+        en = 'Good afternoon' + enName + '! Egypt is in full swing — what shall we explore?';
+      } else if (h >= 17 && h < 22) {
+        ar = 'مساء الخير' + arName + '! ليلة مناسبة للإشارات — إيه الجديد؟';
+        en = 'Good evening' + enName + '! A fine night for signals — what\'s new?';
+      } else {
+        ar = 'ليلة مبارحة' + arName + '! لسه صاحي؟ نبض شغال — اسألني عن أي حاجة.';
+        en = 'Working late' + enName + '? NABD never sleeps — ask me anything.';
+      }
+      el.innerHTML = N.lang === 'ar' ? ar : en;
     }
     document.addEventListener('app-render', paintGreeting);
+    document.addEventListener('nabd-lang', paintGreeting);
     paintGreeting();
 
     /* ---------- sentiment donut (real response → existing component) ---------- */
@@ -2106,26 +2104,14 @@
       }
     }
 
-    /* ---------- admin stats (visible only to nabd_admin / superadmin) ---------- */
+    /* ---------- admin quick-access (visible only to nabd_admin / superadmin).
+       Dashboard stat tiles were removed — the Admin Panel navigation card in
+       the "Navigate to your NABD application" section is the admin entry. */
     const u = N.getUser();
     const userRole = (u && u.role) || 'analyst';
     if (userRole === 'nabd_admin' || userRole === 'superadmin') {
-      const adminStatsEl = $('dbAdminStats');
-      if (adminStatsEl) adminStatsEl.hidden = false;
       const adminQa = $('dbQaAdmin');
       if (adminQa) adminQa.hidden = false;
-      fetch('/api/users?action=admin-stats', { headers: { Accept: 'application/json' }, credentials: 'include' })
-        .then((r) => r.json())
-        .then((d) => {
-          if (!d.ok || !d.stats) return;
-          const s = d.stats;
-          const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
-          set('dbAdminUsers', s.totalUsers.toLocaleString());
-          set('dbAdminReports', s.totalSearches.toLocaleString());
-          set('dbAdminExports', s.totalDownloads.toLocaleString());
-          set('dbAdminRPM', s.estimatedRPM.toLocaleString());
-        })
-        .catch(() => {});
     }
   }
 

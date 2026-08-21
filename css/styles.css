@@ -4421,10 +4421,12 @@ html[dir="rtl"] .db-load-orb span { font-size: 12px; }
    20b. DASHBOARD HOME — AI-first landing redesign
    ============================================================ */
 
-/* --- Hero brand logo --- */
+/* --- Hero brand: logo beside the greeting, gentle pulse --- */
 .db-hero-brand {
   display: flex;
+  align-items: center;
   justify-content: center;
+  gap: 14px;
   padding: 10px 0 2px;
 }
 @keyframes dbHeroLogoIn {
@@ -4432,12 +4434,25 @@ html[dir="rtl"] .db-load-orb span { font-size: 12px; }
   to { opacity: 1; transform: none; }
 }
 .db-hero-logo {
-  width: 44px; height: 44px;
+  width: 46px; height: 46px;
   border-radius: 14px;
   background: color-mix(in srgb, var(--accent) 14%, transparent);
   display: grid; place-items: center;
   box-shadow: inset 0 0 0 1px rgba(59, 130, 246, .18);
   flex-shrink: 0;
+  animation: dbLogoPulse 2.4s var(--ease) infinite;
+}
+@keyframes dbLogoPulse {
+  0%, 100% {
+    box-shadow:
+      inset 0 0 0 1px rgba(59, 130, 246, .18),
+      0 0 0 0 rgba(59, 130, 246, .35);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 0 1px rgba(59, 130, 246, .30),
+      0 0 0 11px rgba(59, 130, 246, 0);
+  }
 }
 .db-hero-logo-core {
   width: 12px; height: 12px; border-radius: 50%;
@@ -4447,14 +4462,20 @@ html[dir="rtl"] .db-load-orb span { font-size: 12px; }
 
 /* --- Enhanced greeting --- */
 .db-greet {
-  font-size: .95rem;
-  font-weight: 500;
-  padding: 6px 0 2px;
+  font-size: 1.18rem;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  padding: 2px 0;
 }
 .db-greet-name {
-  font-weight: 700;
-  font-size: 1rem;
+  font-weight: 800;
+  font-size: 1.28rem;
   letter-spacing: -.02em;
+  background: linear-gradient(90deg, #dbeafe, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 /* --- Hero search box --- */
@@ -4668,9 +4689,9 @@ html[dir="rtl"] .clarify-item svg { transform: scaleX(-1); }
 @media (max-width: 640px) {
   .db-hero-logo { width: 38px; height: 38px; border-radius: 10px; }
   .db-hero-logo-core { width: 10px; height: 10px; }
-  .db-hero-brand { padding: 8px 0 2px; }
-  .db-greet { font-size: .88rem; }
-  .db-greet-name { font-size: .92rem; }
+  .db-hero-brand { padding: 8px 0 2px; gap: 11px; }
+  .db-greet { font-size: 1rem; }
+  .db-greet-name { font-size: 1.08rem; }
   .db-search-hero { padding: 8px 8px 8px 16px; border-radius: 12px; }
   .db-search-hero .search-input-wrap textarea { font-size: .9rem; }
   .btn-search-hero { padding: 10px 18px; font-size: .84rem; border-radius: 10px; }
@@ -4683,6 +4704,7 @@ html[dir="rtl"] .clarify-item svg { transform: scaleX(-1); }
 
 @media (prefers-reduced-motion: reduce) {
   .db-hero-brand { animation: none !important; }
+  .db-hero-logo { animation: none !important; }
   .db-rotate-suggest span { transition: none !important; }
 }
 .db-results .ws-card .trend-name,

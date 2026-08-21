@@ -35,38 +35,17 @@
       </div>
     </div>
 
-    <!-- Admin Stats (hidden by default, shown for nabd_admin/superadmin) -->
-    <div class="stats-grid" id="dbAdminStats" style="margin-bottom:22px" hidden>
-      <div class="stat">
-        <div class="stat-val" id="dbAdminUsers">—</div>
-        <div class="stat-label" data-i18n="admin.stat.users">Total Users</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val" id="dbAdminReports">—</div>
-        <div class="stat-label" data-i18n="admin.stat.reports">Total Reports</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val" id="dbAdminExports">—</div>
-        <div class="stat-label" data-i18n="admin.stat.exports">Total Exports</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val" id="dbAdminRPM">—</div>
-        <div class="stat-label" data-i18n="admin.stat.rpm">Est. Reports/Min</div>
-      </div>
-    </div>
-
     <!-- ============================================================
          EMBEDDED ANALYSIS WORKSPACE (single in-app experience)
          ============================================================ -->
     <div class="db-dock" id="dbDock">
 
-      <!-- Brand hero -->
+      <!-- Brand hero: logo beside the greeting -->
       <div class="db-hero-brand">
         <span class="db-hero-logo" aria-hidden="true"><span class="db-hero-logo-core"></span></span>
+        <!-- Greeting -->
+        <div class="db-greet" id="dbGreet"></div>
       </div>
-
-      <!-- Greeting -->
-      <div class="db-greet" id="dbGreet"></div>
 
       <!-- Analysis query box — AI assistant style -->
       <div class="db-query db-query-hero">
