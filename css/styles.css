@@ -399,6 +399,26 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
 }
 .lang-toggle:hover { color: var(--text); border-color: var(--border-strong); transform: translateY(-1px); }
 
+/* Landing theme toggle — sun in dark mode, moon in light mode */
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 999px;
+  color: var(--text-soft);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all .3s var(--ease);
+}
+.theme-toggle:hover { color: var(--text); border-color: var(--border-strong); transform: translateY(-1px); }
+.theme-toggle svg { width: 17px; height: 17px; }
+.theme-toggle .ic-moon { display: none; }
+html[data-theme="light"] .theme-toggle .ic-sun { display: none; }
+html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
+
 .nav-burger { display: none; flex-direction: column; gap: 5px; padding: 10px; }
 .nav-burger span { width: 20px; height: 2px; background: var(--text-soft); border-radius: 2px; transition: transform .3s var(--ease), opacity .3s; }
 .nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
@@ -426,7 +446,7 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
   position: absolute; inset: 0; z-index: 1;
   background:
     linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.70) 100%),
-    rgba(0,0,0,0.30);
+    rgba(0,0,0,0.35);
   pointer-events: none;
   will-change: opacity;
 }
@@ -485,7 +505,14 @@ html[data-theme="light"] .icon-btn .ic-sun { display: none; }
   margin: 22px 0 24px;
   text-wrap: balance;
 }
+/* Hero sits on a photo in both themes — keep the copy light-on-dark
+   regardless of the active theme (a dark sheer layer guarantees contrast) */
+.hero-copy h1 { color: #fff; }
+.hero-copy .eyebrow { color: rgba(203, 213, 230, .75); }
 .hero-sub { color: rgba(200, 210, 230, .80); font-size: 1.13rem; max-width: 520px; margin-bottom: 36px; }
+.hero .hero-trust p { color: rgba(203, 213, 230, .68); }
+.hero .hero-note { color: rgba(203, 213, 230, .60); }
+.hero .note-line { background: rgba(255, 255, 255, .22); }
 .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
 
 .hero-trust { display: flex; align-items: center; gap: 16px; margin-top: 44px; }

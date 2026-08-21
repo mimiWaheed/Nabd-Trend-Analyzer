@@ -1993,7 +1993,8 @@
         const progress = Math.max(0, Math.min(1, -rect.top / (h - window.innerHeight || h)));
         heroImg.style.transform = 'scale(' + (1.08 + progress * 0.04) + ')';
         heroImg.style.filter = 'blur(' + (progress * 3) + 'px)';
-        heroOv.style.background = 'rgba(0,0,0,' + (0.30 + progress * 0.50) + ')';
+        heroImg.style.opacity = String(1 - progress * 0.85);
+        heroOv.style.background = 'rgba(0,0,0,' + (0.35 + progress * 0.45) + ')';
         heroCnt.style.opacity = 1 - progress;
         heroCnt.style.transform = 'translateY(' + (-progress * 20) + 'px)';
         heroTicking = false;
