@@ -48,48 +48,69 @@
       <p data-i18n="rep.saved.empty">No saved reports yet — save one from the dashboard.</p>
     </div>
 
+    <div class="rep-div" role="separator"></div>
+
     <div class="app-head-row">
       <span class="card-title" style="font-size:1rem" data-i18n="rep.scheduled">Scheduled reports</span>
+      <button class="btn btn-primary btn-sm" id="repSchedAdd" data-i18n="rep.sched.add">Schedule a report</button>
     </div>
+
+    <!-- Schedule form: three guided cards + submit -->
+    <div class="sched-form" id="repSchedForm" hidden>
+      <p class="sched-guide" data-i18n="rep.sched.guide">Pick a saved report, choose the exact date and time, and NABD will email you a reminder once — at that moment only. No repeats, no spam.</p>
+      <div class="sched-cards">
+        <div class="sched-card">
+          <span class="sched-ic">🔎</span>
+          <div class="sched-card-t" data-i18n="rep.sched.cq">What's the report about?</div>
+          <div class="field sched-field">
+            <label for="repSchedQuery" data-i18n="rep.sched.ql">Report query</label>
+            <input type="text" id="repSchedQuery" list="repSchedQueries" autocomplete="off" data-i18n-ph="rep.sched.qph" placeholder="e.g. Suez Canal shipping updates">
+            <datalist id="repSchedQueries"></datalist>
+          </div>
+          <p class="sched-hint" data-i18n="rep.sched.qh">Start typing to pick from your saved reports.</p>
+        </div>
+        <div class="sched-card">
+          <span class="sched-ic">🗓</span>
+          <div class="sched-card-t" data-i18n="rep.sched.ct">When should we remind you?</div>
+          <div class="field sched-field">
+            <label for="repSchedWhen" data-i18n="rep.sched.tl">Date and time</label>
+            <input type="datetime-local" id="repSchedWhen">
+          </div>
+          <p class="sched-hint" data-i18n="rep.sched.th">One-time only — sent exactly at the moment you set.</p>
+        </div>
+        <div class="sched-card">
+          <span class="sched-ic">✉️</span>
+          <div class="sched-card-t" data-i18n="rep.sched.cd">Where do we send it?</div>
+          <div class="field sched-field">
+            <label for="repSchedEmail" data-i18n="rep.sched.dl">Deliver to</label>
+            <input type="email" id="repSchedEmail" readonly>
+          </div>
+          <p class="sched-hint" data-i18n="rep.sched.dh">Your account email — change it anytime from settings.</p>
+        </div>
+      </div>
+      <div class="sched-actions">
+        <button class="btn btn-primary" id="repSchedSubmit" data-i18n="rep.sched.submit">Schedule report</button>
+      </div>
+    </div>
+
     <div style="margin-bottom:28px">
-      <div class="app-row">
-        <span class="row-icon" style="color:var(--accent)">◷</span>
-        <div class="grow"><div class="row-title" data-i18n="rep.s1">Daily morning brief</div><div class="row-sub">Every day · 07:00 · PDF + CSV</div></div>
-        <span class="status-chip ok"><span class="d"></span><span data-i18n="app.st.running">Running</span></span>
-        <div class="row-actions"><button class="icon-btn sm" data-rep="delete">✕</button></div>
-      </div>
-      <div class="app-row">
-        <span class="row-icon" style="color:var(--accent)">◷</span>
-        <div class="grow"><div class="row-title" data-i18n="rep.s2">Weekly governorate digest</div><div class="row-sub">Every Saturday · 09:00 · PDF</div></div>
-        <span class="status-chip ok"><span class="d"></span><span data-i18n="app.st.running">Running</span></span>
-        <div class="row-actions"><button class="icon-btn sm" data-rep="delete">✕</button></div>
-      </div>
-      <div class="app-row">
-        <span class="row-icon" style="color:var(--accent)">◷</span>
-        <div class="grow"><div class="row-title" data-i18n="rep.s3">Monthly export pack</div><div class="row-sub">1st of month · 06:00 · CSV</div></div>
-        <span class="status-chip warn"><span class="d"></span>PAUSED</span>
-        <div class="row-actions"><button class="icon-btn sm" data-rep="delete">✕</button></div>
+      <div id="repSchedList"></div>
+      <div class="empty-state" id="repSchedEmpty" hidden>
+        <span class="e-ic">◷</span>
+        <p data-i18n="rep.sched.empty">No scheduled reports — schedule one to get an email reminder at the exact time you pick.</p>
       </div>
     </div>
+
+    <div class="rep-div" role="separator"></div>
 
     <div class="app-head-row">
       <span class="card-title" style="font-size:1rem" data-i18n="rep.exports">Exports</span>
     </div>
-    <div>
-      <div class="app-row">
-        <span class="row-icon">CSV</span>
-        <div class="grow"><div class="row-title" data-i18n="rep.e1">Suez Canal dataset</div><div class="row-sub">1.8 MB · Yesterday</div></div>
-        <button class="btn btn-ghost btn-sm" data-rep="download" data-i18n="rep.download">Download</button>
-      </div>
-      <div class="app-row">
-        <span class="row-icon">CSV</span>
-        <div class="grow"><div class="row-title" data-i18n="rep.e2">Sentiment export — Cairo</div><div class="row-sub">900 KB · Mon</div></div>
-        <button class="btn btn-ghost btn-sm" data-rep="download" data-i18n="rep.download">Download</button>
-      </div>
-      <div class="app-row">
-        <span class="row-icon" style="color:var(--danger)">!</span>
-        <div class="grow"><div class="row-title" data-i18n="rep.e3">Crisis event log</div><div class="row-sub">300 KB · Jul 30</div></div>
-        <button class="btn btn-ghost btn-sm" data-rep="download" data-i18n="rep.download">Download</button>
+    <div style="margin-bottom:28px">
+      <div id="repExportsList"></div>
+      <div class="empty-state" id="repExportsEmpty" hidden>
+        <span class="e-ic">⬇</span>
+        <p data-i18n="rep.exp.empty">No exports yet — exports you make from a report appear here.</p>
       </div>
     </div>
   </main>

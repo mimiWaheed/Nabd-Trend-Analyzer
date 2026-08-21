@@ -19,15 +19,25 @@ module.exports = async function handler(req, res) {
     if (Number.isNaN(limit) || limit < 1) limit = 20;
     if (limit > 100) limit = 100;
     const rows = await store.listDownloads(auth.user.id, { limit });
-    return ok(res, {
-      downloads: rows.map((d) => ({
+    /* attach the search query so the reports page can show a real label */
+    const enriched = await Promise.all(rows.map(async (d) => {
+      let q = null;
+      if (d.searchId) {
+        try {
+          const s = await store.getSearch(d.searchId);
+          if (s && s.userId === auth.user.id) q = s.query || null;
+        } catch (e) { /* label is best-effort */ }
+      }
+      return {
         id: d.id,
         searchId: d.searchId || null,
         analysisId: d.analysisId || null,
         fileType: d.fileType,
+        query: q,
         createdAt: d.createdAt
-      }))
-    });
+      };
+    }));
+    return ok(res, { downloads: enriched });
   }
 
   if (req.method === 'POST') {

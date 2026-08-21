@@ -2296,6 +2296,11 @@
     function writeSaved(list) {
       try { localStorage.setItem(userKey('nabd-saved-reports'), JSON.stringify(list.slice(0, 20))); } catch (e) {}
     }
+    function fmtWhen(v) {
+      const d = new Date(v);
+      if (!v || isNaN(d.getTime())) return '—';
+      return d.toLocaleString(N.lang === 'ar' ? 'ar-EG' : 'en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    }
     function renderGrid() {
       if (!grid) return;
       const list = savedReports();
@@ -2321,46 +2326,156 @@
           + '</div></div>';
       }).join('');
     }
+
+    /* ---- scheduled reports (server-side, one-time email reminder) ---- */
+    let schedState = [];
+    const schedList = $('repSchedList');
+    const schedEmpty = $('repSchedEmpty');
+    const schedForm = $('repSchedForm');
+    function renderSchedules() {
+      if (!schedList) return;
+      if (schedEmpty) schedEmpty.hidden = schedState.length > 0;
+      schedList.innerHTML = schedState.map((s) => {
+        const sent = !!s.sentAt;
+        return '<div class="app-row">'
+          + '<span class="row-icon" style="color:' + (sent ? 'var(--text-muted)' : 'var(--accent)') + '">◷</span>'
+          + '<div class="grow"><div class="row-title">' + escH(s.query) + '</div>'
+          + '<div class="row-sub">' + escH(fmtWhen(s.dueAt)) + '</div></div>'
+          + '<span class="status-chip ' + (sent ? 'neu' : 'ok') + '"><span class="d"></span><span>' + escH(L(sent ? 'rep.sched.sent' : 'rep.sched.pending')) + '</span></span>'
+          + (sent ? '' : '<div class="row-actions"><button class="icon-btn sm" data-sched-cancel="' + escH(s.id) + '">✕</button></div>')
+          + '</div>';
+      }).join('');
+    }
+    function loadSchedules() {
+      if (!schedList) return Promise.resolve();
+      /* sweep anything already due first so statuses are fresh */
+      return N.api('/api/schedules?action=dispatch', { method: 'POST' })
+        .then(() => N.api('/api/schedules'))
+        .then((d) => { schedState = (d && d.schedules) || []; renderSchedules(); })
+        .catch(() => { if (schedEmpty) schedEmpty.hidden = false; });
+    }
+    function openSchedForm() {
+      if (!schedForm) return;
+      const dl = $('repSchedQueries');
+      if (dl) dl.innerHTML = savedReports().map((d) => {
+        const q = String((d && d.q) || '').trim();
+        return q ? '<option value="' + escH(q) + '"></option>' : '';
+      }).join('');
+      const emailEl = $('repSchedEmail');
+      if (emailEl && !emailEl.value) {
+        const u = N.getUser();
+        emailEl.value = (u && u.email) || '';
+      }
+      const whenEl = $('repSchedWhen');
+      if (whenEl && !whenEl.value) {
+        const pad = (n) => (n < 10 ? '0' + n : '' + n);
+        const d = new Date(Date.now() + 60 * 60000);
+        whenEl.min = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+      }
+      schedForm.hidden = false;
+      const q = $('repSchedQuery');
+      if (q) q.focus();
+    }
+    function submitSchedule() {
+      const qEl = $('repSchedQuery');
+      const wEl = $('repSchedWhen');
+      const query = qEl ? qEl.value.trim() : '';
+      const whenVal = wEl ? wEl.value : '';
+      if (!query) { T('rep.sched.noq'); if (qEl) qEl.focus(); return; }
+      const dueMs = whenVal ? new Date(whenVal).getTime() : NaN;
+      if (Number.isNaN(dueMs) || dueMs <= Date.now()) { T('rep.sched.past'); if (wEl) wEl.focus(); return; }
+      const btn = $('repSchedSubmit');
+      if (btn) btn.disabled = true;
+      N.api('/api/schedules', { method: 'POST', body: { query, dueAt: new Date(dueMs).toISOString() } })
+        .then((d) => {
+          if (d && d.schedule) { schedState.unshift(d.schedule); renderSchedules(); }
+          if (schedForm) schedForm.hidden = true;
+          if (qEl) qEl.value = '';
+          if (wEl) wEl.value = '';
+          T('app.toast.scheduled');
+        })
+        .catch(() => T('rep.sched.fail'))
+        .finally(() => { if (btn) btn.disabled = false; });
+    }
+    const addBtn = $('repSchedAdd');
+    if (addBtn) addBtn.addEventListener('click', () => {
+      if (schedForm && schedForm.hidden) openSchedForm();
+      else if (schedForm) schedForm.hidden = true;
+    });
+    const submitBtn = $('repSchedSubmit');
+    if (submitBtn) submitBtn.addEventListener('click', submitSchedule);
+    if (schedList) schedList.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-sched-cancel]');
+      if (!b) return;
+      const id = b.dataset.schedCancel;
+      N.api('/api/schedules?id=' + encodeURIComponent(id), { method: 'DELETE' })
+        .then(() => {
+          schedState = schedState.filter((s) => s.id !== id);
+          renderSchedules();
+          T('app.toast.del');
+        })
+        .catch(() => {});
+    });
+
+    /* ---- exports (real recorded downloads) ---- */
+    const expList = $('repExportsList');
+    const expEmpty = $('repExportsEmpty');
+    function renderExports(rows) {
+      if (!expList) return;
+      if (expEmpty) expEmpty.hidden = rows.length > 0;
+      expList.innerHTML = rows.map((d) => {
+        const label = d.query || L('rep.exp.fallback');
+        return '<div class="app-row">'
+          + '<span class="row-icon">' + escH(String(d.fileType || 'file').toUpperCase().slice(0, 4)) + '</span>'
+          + '<div class="grow"><div class="row-title">' + escH(label) + '</div>'
+          + '<div class="row-sub">' + escH(fmtWhen(d.createdAt)) + '</div></div>'
+          + '</div>';
+      }).join('');
+    }
+    function loadExports() {
+      if (!expList) return Promise.resolve();
+      return N.api('/api/downloads?limit=20')
+        .then((d) => renderExports((d && d.downloads) || []))
+        .catch(() => { if (expEmpty) expEmpty.hidden = false; });
+    }
+
     renderGrid();
+    loadSchedules();
+    loadExports();
     document.addEventListener('click', (e) => {
       const b = e.target.closest('[data-rep]');
       if (!b) return;
       const act = b.dataset.rep;
       const idx = b.dataset.idx != null ? Number(b.dataset.idx) : -1;
-      if (idx >= 0) {
-        const list = savedReports();
-        const d = list[idx];
-        if (act === 'delete') {
-          list.splice(idx, 1);
-          writeSaved(list);
-          renderGrid();
-          T('app.toast.del');
-          return;
-        }
-        if (!d) return;
-        if (act === 'preview' || act === 'download') {
-          const q = String(d.q || (d.r && d.r.query) || '');
-          if (N.notifAdd) N.notifAdd({ title: 'notif.saved.t', sub: 'notif.saved.s', params: { q: q }, cat: 'reports', ts: Date.now() });
-          if (act === 'download') {
-            if (N.recordDownload) N.recordDownload('report', lastSearchId);
-            if (N.activityAdd) N.activityAdd('export', { q: q });
-            T('rep.downloaded');
-          } else {
-            T('app.toast.savedNotif');
-          }
-          return;
-        }
-        if (act === 'share') {
-          const q = String(d.q || (d.r && d.r.query) || '');
-          const url = window.location.origin + window.location.pathname.replace('reports.html', 'dashboard.html') + '?q=' + encodeURIComponent(q);
-          try { window.navigator.clipboard.writeText(url); T('app.toast.shared'); } catch (err) { T('app.toast.exported'); }
-          return;
-        }
+      if (idx < 0) return;
+      const list = savedReports();
+      const d = list[idx];
+      if (act === 'delete') {
+        list.splice(idx, 1);
+        writeSaved(list);
+        renderGrid();
+        T('app.toast.del');
+        return;
       }
-      if (act === 'share') T('app.toast.shared');
-      else if (act === 'download') { if (N.recordDownload) N.recordDownload('report', lastSearchId); T('rep.downloaded'); }
-      else if (act === 'delete') T('app.toast.del');
-      else if (act === 'preview') T('app.toast.created');
+      if (!d) return;
+      if (act === 'preview' || act === 'download') {
+        const q = String(d.q || (d.r && d.r.query) || '');
+        if (N.notifAdd) N.notifAdd({ title: 'notif.saved.t', sub: 'notif.saved.s', params: { q: q }, cat: 'reports', ts: Date.now() });
+        if (act === 'download') {
+          if (N.recordDownload) N.recordDownload('report', lastSearchId);
+          if (N.activityAdd) N.activityAdd('export', { q: q });
+          loadExports();
+          T('rep.downloaded');
+        } else {
+          T('app.toast.savedNotif');
+        }
+        return;
+      }
+      if (act === 'share') {
+        const q = String(d.q || (d.r && d.r.query) || '');
+        const url = window.location.origin + window.location.pathname.replace('reports.html', 'dashboard.html') + '?q=' + encodeURIComponent(q);
+        try { window.navigator.clipboard.writeText(url); T('app.toast.shared'); } catch (err) { T('app.toast.exported'); }
+      }
     });
   }
 

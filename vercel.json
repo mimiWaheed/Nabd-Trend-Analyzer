@@ -1,6 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
+  "crons": [
+    {
+      "path": "/api/schedules?action=dispatch",
+      "schedule": "0 * * * *"
+    }
+  ],
   "functions": {
     "api/meta/callback.js": { "maxDuration": 30 }
   }
