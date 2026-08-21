@@ -522,6 +522,163 @@ async function actionResetPassword(req, res) {
   return ok(res, { passwordChanged: true });
 }
 
+/* POST change-password — two-step flow. Step 1 ({currentPassword}) re-checks
+   the current password and emails a 6-digit code. Step 2 (adds {newPassword,
+   otp}) consumes the code and swaps the hash. The reset-OTP store provides
+   expiry, resend cooldown and a shared attempt budget. */
+async function actionChangePassword(req, res) {
+  if (req.method !== 'POST') return fail(res, 405, 'METHOD_NOT_ALLOWED');
+
+  const auth = await requireAuth(req, res);
+  if (!auth) return;
+
+  let body;
+  try { body = await asyncBody(req); } catch (e) { return fail(res, 400, e.code || 'BAD_REQUEST'); }
+
+  const current = String((body && body.currentPassword) || '');
+  const next = String((body && body.newPassword) || '');
+  const otp = String((body && body.otp) || '').trim();
+
+  const store = storeApi.makeStore();
+  try { await store._ensureSchema && store._ensureSchema(); } catch (e) {}
+
+  const user = await store.findUserById(auth.user.id);
+  if (!user) return fail(res, 404, 'NOT_FOUND', 'User not found');
+  if (!verifyPassword(current, user.passwordHash)) {
+    return fail(res, 403, 'WRONG_PASSWORD', 'Current password is incorrect');
+  }
+
+  /* step 2 — verify the emailed code, then update */
+  if (next || otp) {
+    if (!isPassword(next)) return fail(res, 422, 'VALIDATION_ERROR', 'Password must be at least 8 characters');
+    if (!/^\d{6}$/.test(otp)) return fail(res, 422, 'VALIDATION_ERROR', 'OTP must be 6 digits');
+    const check = await verifyResetOtpRecord(store, user, user.email, otp);
+    if (!check.ok) return fail(res, check.fail.status, check.fail.code, check.fail.message);
+    await store.markPasswordResetUsed(check.reset.id);
+    await store.updateUser(user.id, { passwordHash: hashPassword(next) });
+    await events.logActivity(user.id, 'PASSWORD_CHANGED', {});
+    await events.createNotification(user.id, 'system', 'Password changed', 'Your password was updated successfully.');
+    return ok(res, { passwordChanged: true });
+  }
+
+  /* step 1 — issue a code to the account's current email */
+  const resendAfterSeconds = RESEND_COOLDOWN_MS / 1000;
+  let reset = await store.findLatestPasswordResetByUser(user.id);
+  if (reset && reset.resendAt && new Date(reset.resendAt) > new Date()) {
+    return ok(res, { otpSent: true, emailStatus: 'cooldown', resendAfterSeconds });
+  }
+  const code = generateOtp();
+  const patch = {
+    otpHash: hashOtp(code, user.email),
+    expiresAt: new Date(Date.now() + OTP_TTL_MS).toISOString(),
+    resendAt: new Date(Date.now() + RESEND_COOLDOWN_MS).toISOString(),
+    userId: user.id
+  };
+  if (reset) {
+    await store.replacePasswordReset(reset.id, patch);
+  } else {
+    await store.createPasswordReset({
+      id: randomToken(16),
+      userId: user.id,
+      otpHash: patch.otpHash,
+      expiresAt: patch.expiresAt,
+      resendAt: patch.resendAt,
+      attempts: 0,
+      maxAttempts: 5,
+      usedAt: null,
+      createdAt: new Date().toISOString()
+    });
+  }
+
+  let emailStatus = 'pending';
+  try {
+    const out = await mailer.sendOtpEmail(user.email, code, user.lang || 'en');
+    emailStatus = out.mode;
+  } catch (e) {
+    emailStatus = 'failed';
+    logMailError('change-password', user.email, e);
+  }
+
+  await events.logActivity(user.id, 'PASSWORD_CHANGE_REQUESTED', {});
+
+  return ok(res, { otpSent: true, emailStatus, resendAfterSeconds });
+}
+
+/* POST change-email — move the account to a new address after re-checking the
+   password. The new address starts unverified and receives a fresh OTP through
+   the existing verify-email flow; the old address is released immediately. */
+async function actionChangeEmail(req, res) {
+  if (req.method !== 'POST') return fail(res, 405, 'METHOD_NOT_ALLOWED');
+
+  const auth = await requireAuth(req, res);
+  if (!auth) return;
+
+  let body;
+  try { body = await asyncBody(req); } catch (e) { return fail(res, 400, e.code || 'BAD_REQUEST'); }
+
+  const password = String((body && body.password) || '');
+  const email = String((body && body.email) || '').trim().toLowerCase();
+
+  if (!isEmail(email)) return fail(res, 422, 'VALIDATION_ERROR', 'Email is invalid');
+
+  const store = storeApi.makeStore();
+  try { await store._ensureSchema && store._ensureSchema(); } catch (e) {}
+
+  const user = await store.findUserById(auth.user.id);
+  if (!user) return fail(res, 404, 'NOT_FOUND', 'User not found');
+  if (!verifyPassword(password, user.passwordHash)) {
+    return fail(res, 403, 'WRONG_PASSWORD', 'Password is incorrect');
+  }
+  if (email === String(user.email || '').toLowerCase()) {
+    return fail(res, 409, 'EMAIL_IN_USE', 'This is already your email');
+  }
+  const taken = await store.findUserByEmail(email);
+  if (taken) return fail(res, 409, 'EMAIL_IN_USE', 'An account with this email already exists');
+  const pending = await store.findPendingSignupByEmail(email);
+  if (pending) {
+    await store.deletePendingSignup(pending.id);
+  }
+
+  const otp = generateOtp();
+  let verification = await store.findLatestVerificationByUser(user.id);
+  const patch = {
+    otpHash: hashOtp(otp, email),
+    expiresAt: new Date(Date.now() + OTP_TTL_MS).toISOString(),
+    resendAt: new Date(Date.now() + RESEND_COOLDOWN_MS).toISOString(),
+    userId: user.id
+  };
+  if (verification) {
+    await store.replaceVerification(verification.id, patch);
+  } else {
+    await store.createVerification({
+      id: randomToken(16),
+      userId: user.id,
+      otpHash: patch.otpHash,
+      expiresAt: patch.expiresAt,
+      resendAt: patch.resendAt,
+      attempts: 0,
+      maxAttempts: 5,
+      usedAt: null,
+      createdAt: new Date().toISOString()
+    });
+  }
+
+  await store.updateUser(user.id, { email, emailVerified: false });
+
+  let emailStatus = 'pending';
+  try {
+    const out = await mailer.sendOtpEmail(email, otp, user.lang || 'en');
+    emailStatus = out.mode;
+  } catch (e) {
+    emailStatus = 'failed';
+    logMailError('change-email', email, e);
+  }
+
+  await events.logActivity(user.id, 'EMAIL_CHANGED', { email });
+
+  return ok(res, { emailChanged: true, email, emailStatus });
+}
+
 /* POST verify-reset-otp — confirm a reset OTP WITHOUT consuming it so the UI
    reveals the new-password fields only after the backend validates the code.
    Consumption stays in reset-password (single-use, sessions destroyed). */
@@ -678,6 +835,8 @@ module.exports = async function handler(req, res) {
     case 'forgot-password': return actionForgotPassword(req, res);
     case 'verify-reset-otp': return actionVerifyResetOtp(req, res);
     case 'reset-password': return actionResetPassword(req, res);
+  case 'change-password': return actionChangePassword(req, res);
+  case 'change-email': return actionChangeEmail(req, res);
     case 'login-otp': return actionLoginOtp(req, res);
     case 'login-otp-verify': return actionLoginOtpVerify(req, res);
     default: return fail(res, 404, 'NOT_FOUND', 'Unknown auth action: ' + (action || '(none)'));

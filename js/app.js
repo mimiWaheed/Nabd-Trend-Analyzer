@@ -498,7 +498,15 @@
         arts.forEach((a) => { if (a && a.category) counts[a.category] = (counts[a.category] || 0) + 1; });
         let topCat = null, topN = 0;
         Object.keys(counts).forEach((k) => { if (counts[k] > topN) { topN = counts[k]; topCat = k; } });
-        N.historyAdd({ query: query, status: 'done', vis: privMode === 'private' ? 'private' : 'public', cat: topCat, src: arts.length, ts: Date.now() });
+        /* dashboard statistics snapshot for the profile mini-dashboard */
+        const ss = lastResult && lastResult.signalStrength && typeof lastResult.signalStrength === 'object' ? lastResult.signalStrength : null;
+        const st = lastResult && ((lastResult.stats) || (lastResult.raw && lastResult.raw.stats)) || {};
+        N.historyAdd({
+          query: query, status: 'done', vis: privMode === 'private' ? 'private' : 'public',
+          cat: topCat, src: arts.length, ts: Date.now(),
+          sig: ss && ss.score != null ? Number(ss.score) : null,
+          emg: N.isAvailable(st.emergencyAlerts) ? Number(st.emergencyAlerts) : null
+        });
         N.notifAdd({ title: 'notif.run.t', sub: 'notif.run.s', params: { q: query }, cat: 'ai', ts: Date.now() });
         notifyUnread();
       }
@@ -2565,7 +2573,7 @@
       const feed = N.activityGet ? N.activityGet() : [];
       if (feed.length) {
         if (empty) empty.hidden = true;
-        tl.innerHTML = feed.map((a) => {
+        tl.innerHTML = feed.slice(0, 5).map((a) => {
           const key = actKey[a.type] || 'act.analysis';
           const raw = L(key);
           const text = a.q ? raw.split('{q}').join(a.q) : raw.split('{n}').join(a.n);
@@ -2576,7 +2584,7 @@
         return;
       }
       N.api('/api/users?action=recent-researches').then((d) => {
-        const items = (d && d.researches) || [];
+        const items = ((d && d.researches) || []).slice(0, 5);
         if (empty) empty.hidden = items.length > 0;
         if (!items.length) return;
         tl.innerHTML = items.map((r) => {
@@ -2589,6 +2597,180 @@
       }).catch(() => {});
     }
     renderActivity();
+
+    /* ---- signal dashboard (built from recorded analysis statistics) ---- */
+    function renderSignalDash() {
+      const hist = N.historyGet ? N.historyGet() : [];
+      const done = hist.filter((h) => h && h.status === 'done' && h.query);
+      /* latest score per topic, then rank by signal health */
+      const seen = {};
+      const uniq = [];
+      done.forEach((h) => {
+        const k = String(h.query).trim().toLowerCase();
+        if (!seen[k]) { seen[k] = 1; uniq.push(h); }
+      });
+      const topList = $('profTopList');
+      const topEmpty = $('profTopEmpty');
+      const scored = uniq.filter((h) => h.sig != null).sort((a, b) => b.sig - a.sig).slice(0, 5);
+      if (topList) {
+        topList.innerHTML = scored.map((h, i) => {
+          const pct = Math.max(6, Math.min(100, Math.round(Number(h.sig))));
+          return '<div class="sig-row">'
+            + '<span class="sig-rank">' + (i + 1) + '</span>'
+            + '<div class="grow"><div class="row-title">' + escH(String(h.query)) + '</div>'
+            + '<div class="sig-bar"><span style="width:' + pct + '%"></span></div></div>'
+            + '<span class="sig-score">' + Math.round(Number(h.sig)) + '</span>'
+            + '</div>';
+        }).join('');
+      }
+      if (topEmpty) topEmpty.hidden = scored.length > 0;
+
+      const emgRuns = done.filter((h) => h.emg != null && Number(h.emg) > 0);
+      set('profEmgTotal', emgRuns.reduce((s, h) => s + Number(h.emg || 0), 0));
+      set('profEmgRuns', emgRuns.length);
+      const emgList = $('profEmgList');
+      const emgEmpty = $('profEmgEmpty');
+      if (emgList) {
+        emgList.innerHTML = emgRuns.slice(0, 3).map((h) =>
+          '<div class="app-row"><span class="row-icon warn">!</span>'
+          + '<div class="grow"><div class="row-title">' + escH(String(h.query)) + '</div>'
+          + '<div class="row-sub">' + escH(N.formatRelativeTime(h.ts, N.lang)) + '</div></div>'
+          + '</div>').join('');
+      }
+      if (emgEmpty) emgEmpty.hidden = emgRuns.length > 0;
+    }
+    renderSignalDash();
+
+    /* ---- account & security (two-step, OTP-verified) ---- */
+    function secMsg(id, text) { const el = $(id); if (el) el.textContent = text || ''; }
+    function secShowStep(form, step) {
+      const s1 = $(form + 'Step1');
+      const s2 = $(form + 'Step2');
+      if (s1) s1.hidden = step !== 1;
+      if (s2) s2.hidden = step !== 2;
+    }
+
+    let emailPending = null;
+    let emailStep = 1;
+    const secEmailForm = $('secEmailForm');
+    if (secEmailForm) secEmailForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      secMsg('secEmailMsg');
+      const btn = $('secEmailBtn');
+      const passEl = $('secEmailPass');
+      const newEl = $('secEmailNew');
+      const otpEl = $('secEmailOtp');
+
+      if (emailStep === 1) {
+        const pass = passEl ? passEl.value : '';
+        const email = newEl ? newEl.value.trim() : '';
+        if (!pass) { secMsg('secEmailMsg', L('prof.sec.err.pass')); return; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { secMsg('secEmailMsg', L('auth.err.email')); return; }
+        if (btn) btn.disabled = true;
+        N.api('/api/auth?action=change-email', { method: 'POST', body: { password: pass, email: email } })
+          .then(() => {
+            emailPending = email;
+            emailStep = 2;
+            secShowStep('secEmail', 2);
+            const note = $('secEmailNote');
+            if (note) note.textContent = L('prof.sec.note.email').split('{e}').join(email);
+            if (btn) btn.textContent = L('prof.sec.verifyBtn');
+            if (otpEl) otpEl.focus();
+          })
+          .catch((err) => secMsg('secEmailMsg', (err && err.message) || L('prof.sec.err')))
+          .then(() => { if (btn) btn.disabled = false; });
+        return;
+      }
+
+      /* step 2 — confirm the code sent to the new address */
+      const otp = otpEl ? otpEl.value.trim() : '';
+      if (!/^\d{6}$/.test(otp)) { secMsg('secEmailMsg', L('prof.sec.err.otp')); return; }
+      if (btn) btn.disabled = true;
+      let emailDone = false;
+      N.api('/api/auth?action=verify-email', { method: 'POST', body: { email: emailPending, otp: otp } })
+        .then(() => {
+          emailDone = true;
+          T('prof.sec.toast.verified');
+          return N.api('/api/auth?action=me').then((d) => {
+            if (d && d.user) { N.persistUser(d.user); renderProfile(d.user); fillUser(); }
+          });
+        })
+        .catch((err) => secMsg('secEmailMsg', (err && err.message) || L('prof.sec.err')))
+        .then(() => {
+          if (btn) btn.disabled = false;
+          if (!emailDone) return;
+          emailStep = 1;
+          emailPending = null;
+          secShowStep('secEmail', 1);
+          if (passEl) passEl.value = '';
+          if (newEl) newEl.value = '';
+          if (otpEl) otpEl.value = '';
+          if (btn) btn.textContent = L('prof.sec.emailBtn');
+        });
+    });
+
+    let passCurrent = null;
+    let passNext = null;
+    let passStep = 1;
+    const secPassForm = $('secPassForm');
+    if (secPassForm) secPassForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      secMsg('secPassMsg');
+      const btn = $('secPassBtn');
+      const curEl = $('secPassCur');
+      const otpEl = $('secPassOtp');
+      const newEl = $('secPassNew');
+      const confEl = $('secPassConf');
+
+      if (passStep === 1) {
+        const cur = curEl ? curEl.value : '';
+        const next = newEl ? newEl.value : '';
+        const conf = confEl ? confEl.value : '';
+        if (!cur) { secMsg('secPassMsg', L('prof.sec.err.pass')); return; }
+        if (next.length < 8) { secMsg('secPassMsg', L('auth.err.pass')); return; }
+        if (next !== conf) { secMsg('secPassMsg', L('auth.err.match')); return; }
+        if (btn) btn.disabled = true;
+        N.api('/api/auth?action=change-password', { method: 'POST', body: { currentPassword: cur } })
+          .then((d) => {
+            if (d && d.otpSent) {
+              passCurrent = cur;
+              passNext = next;
+              passStep = 2;
+              secShowStep('secPass', 2);
+              if (curEl) curEl.value = '';
+              if (newEl) newEl.value = '';
+              if (confEl) confEl.value = '';
+              const note = $('secPassNote');
+              if (note) note.textContent = L('prof.sec.note.pass');
+              if (btn) btn.textContent = L('prof.sec.verifyBtn');
+              if (otpEl) otpEl.focus();
+            }
+          })
+          .catch((err) => secMsg('secPassMsg', (err && err.message) || L('prof.sec.err')))
+          .then(() => { if (btn) btn.disabled = false; });
+        return;
+      }
+
+      /* step 2 — confirm the emailed code */
+      const otp = otpEl ? otpEl.value.trim() : '';
+      if (!/^\d{6}$/.test(otp)) { secMsg('secPassMsg', L('prof.sec.err.otp')); return; }
+      if (btn) btn.disabled = true;
+      N.api('/api/auth?action=change-password', { method: 'POST', body: { currentPassword: passCurrent, newPassword: passNext, otp: otp } })
+        .then(() => {
+          T('prof.sec.toast.pass');
+          passStep = 1;
+          passCurrent = null;
+          passNext = null;
+          secShowStep('secPass', 1);
+          if (newEl) newEl.value = '';
+          if (confEl) confEl.value = '';
+          if (curEl) curEl.value = '';
+          if (otpEl) otpEl.value = '';
+          if (btn) btn.textContent = L('prof.sec.sendBtn');
+        })
+        .catch((err) => secMsg('secPassMsg', (err && err.message) || L('prof.sec.err')))
+        .then(() => { if (btn) btn.disabled = false; });
+    });
 
     const modal = $('profModal');
     const openModal = () => {

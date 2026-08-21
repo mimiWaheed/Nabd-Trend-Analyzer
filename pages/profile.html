@@ -96,6 +96,99 @@
         </div>
       </div>
 
+      <!-- Account & security -->
+      <div class="ws-card sp-12">
+        <div class="card-head">
+          <span class="card-title" data-i18n="prof.sec.title">Account &amp; security</span>
+        </div>
+        <div class="prof-sec-body">
+          <form class="prof-sec-panel" id="secEmailForm" novalidate>
+            <div class="prof-sec-head">
+              <span class="prof-sec-ic"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg></span>
+              <div>
+                <div class="prof-sec-t" data-i18n="prof.sec.email">Change email</div>
+                <p class="prof-sec-s" data-i18n="prof.sec.email.s">We will send a verification code to your new address.</p>
+              </div>
+            </div>
+            <div class="prof-sec-step" id="secEmailStep1">
+              <label class="sr-only" for="secEmailPass" data-i18n="prof.sec.curpass">Current password</label>
+              <input type="password" id="secEmailPass" autocomplete="current-password" maxlength="100" data-i18n-ph="prof.sec.ph.pass" placeholder="Current password">
+              <label class="sr-only" for="secEmailNew" data-i18n="prof.sec.newemail">New email</label>
+              <input type="email" id="secEmailNew" autocomplete="email" maxlength="200" data-i18n-ph="prof.sec.ph.email" placeholder="New email address">
+            </div>
+            <div class="prof-sec-step" id="secEmailStep2" hidden>
+              <p class="prof-sec-note" id="secEmailNote"></p>
+              <label class="sr-only" for="secEmailOtp" data-i18n="prof.sec.ph.otp">6-digit code</label>
+              <input type="text" id="secEmailOtp" inputmode="numeric" maxlength="6" data-i18n-ph="prof.sec.ph.otp" placeholder="6-digit code">
+            </div>
+            <p class="field-msg" id="secEmailMsg" role="alert"></p>
+            <button type="submit" class="btn btn-primary btn-sm" id="secEmailBtn" data-i18n="prof.sec.emailBtn">Update email</button>
+          </form>
+
+          <form class="prof-sec-panel" id="secPassForm" novalidate>
+            <div class="prof-sec-head">
+              <span class="prof-sec-ic"><svg viewBox="0 0 24 24"><path d="M6 11V8a6 6 0 0 1 12 0v3"/><rect x="5" y="11" width="14" height="10" rx="2"/></svg></span>
+              <div>
+                <div class="prof-sec-t" data-i18n="prof.sec.pass">Change password</div>
+                <p class="prof-sec-s" data-i18n="prof.sec.pass.s">Use at least 8 characters.</p>
+              </div>
+            </div>
+            <div class="prof-sec-step" id="secPassStep1">
+              <label class="sr-only" for="secPassCur" data-i18n="prof.sec.curpass">Current password</label>
+              <input type="password" id="secPassCur" autocomplete="current-password" maxlength="100" data-i18n-ph="prof.sec.ph.pass" placeholder="Current password">
+              <label class="sr-only" for="secPassNew" data-i18n="prof.sec.newpass">New password</label>
+              <input type="password" id="secPassNew" autocomplete="new-password" maxlength="100" data-i18n-ph="prof.sec.ph.new" placeholder="New password">
+              <label class="sr-only" for="secPassConf" data-i18n="prof.sec.conf">Confirm new password</label>
+              <input type="password" id="secPassConf" autocomplete="new-password" maxlength="100" data-i18n-ph="prof.sec.ph.conf" placeholder="Confirm new password">
+            </div>
+            <div class="prof-sec-step" id="secPassStep2" hidden>
+              <p class="prof-sec-note" id="secPassNote"></p>
+              <label class="sr-only" for="secPassOtp" data-i18n="prof.sec.ph.otp">6-digit code</label>
+              <input type="text" id="secPassOtp" inputmode="numeric" maxlength="6" data-i18n-ph="prof.sec.ph.otp" placeholder="6-digit code">
+            </div>
+            <p class="field-msg" id="secPassMsg" role="alert"></p>
+            <button type="submit" class="btn btn-primary btn-sm" id="secPassBtn" data-i18n="prof.sec.sendBtn">Send code</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Signal dashboard -->
+      <div class="ws-card sp-12">
+        <div class="card-head">
+          <span class="card-title" data-i18n="prof.dash.title">Your signal pulse</span>
+          <span class="chip"><span class="chip-pulse" aria-hidden="true"></span> <span data-i18n="prof.dash.live">updates with every analysis</span></span>
+        </div>
+        <div class="prof-dash-body">
+          <div class="prof-dash-col">
+            <div class="prof-dash-sub" data-i18n="prof.dash.top">Top researches by signal health</div>
+            <div class="sig-list" id="profTopList"></div>
+            <div class="prof-empty sm" id="profTopEmpty" hidden>
+              <span class="prof-empty-ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span>
+              <p data-i18n="prof.dash.empty">Run an analysis on the dashboard to build your signal pulse.</p>
+            </div>
+          </div>
+          <div class="prof-dash-col">
+            <div class="prof-dash-sub" data-i18n="prof.dash.emg">Emergency signals</div>
+            <div class="prof-emg-grid">
+              <div class="prof-stat">
+                <span class="prof-stat-ic warn"><svg viewBox="0 0 24 24"><path d="M12 3l10 18H2zM12 10v4M12 17.5v.5"/></svg></span>
+                <span class="prof-stat-label" data-i18n="prof.dash.emg.total">Alerts detected</span>
+                <span class="prof-stat-value" id="profEmgTotal">—</span>
+              </div>
+              <div class="prof-stat">
+                <span class="prof-stat-ic"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/></svg></span>
+                <span class="prof-stat-label" data-i18n="prof.dash.emg.runs">Runs with alerts</span>
+                <span class="prof-stat-value" id="profEmgRuns">—</span>
+              </div>
+            </div>
+            <div class="sig-list" id="profEmgList"></div>
+            <div class="prof-empty sm" id="profEmgEmpty" hidden>
+              <p data-i18n="prof.dash.emg.none">No emergency signals in your recent analyses.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Looking for something? -->
       <div class="ws-card sp-12">
         <div class="card-head"><span class="card-title" data-i18n="prof.nav.title">Looking for something?</span></div>
