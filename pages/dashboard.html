@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="NABD (نبض) - user dashboard: live Egyptian intelligence, analysis launcher, trends, sentiment and AI briefs.">
-  <title>Dashboard - NABD (نبض)</title>
+  <meta name="description" content="NABD (Ù†Ø¨Ø¶) - user dashboard: live Egyptian intelligence, analysis launcher, trends, sentiment and AI briefs.">
+  <title>Dashboard - NABD (Ù†Ø¨Ø¶)</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%235EA2FF'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%23070B14'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -151,7 +151,7 @@
         <div class="db-glow" aria-hidden="true"><i></i><i></i></div>
         <div class="db-load-query" id="dbLoadQuery" aria-live="polite"></div>
         <div class="db-load-center">
-          <div class="db-load-orb"><span>◉</span></div>
+          <div class="db-load-orb"><span id="dbLoadLogo">N</span></div>
           <div class="db-scan mono" id="dbScanText" data-i18n="db.loading.1" aria-live="polite">Scanning news sources…</div>
           <div class="db-scan-steps" id="dbScanSteps">
             <span class="step" data-i18n="db.loading.1">Scanning news sources</span>
@@ -273,163 +273,157 @@
             </div>
           </div>
 
-          <!-- 3-column main area -->
-          <div class="ws-main-grid">
+          <!-- Main analysis area: reference handoff layout (1.45fr | 1fr | 326px) -->
+          <div class="dc-main-grid">
 
-            <!-- Col 1: Chart + AI Intelligence -->
-            <div class="ws-col ws-col-left">
-              <div class="ws-card chart-card timeline-card">
-                <div class="card-head">
-                  <div>
-                    <h3 class="card-title" data-i18n="ws.timeline.t">Historical trend strength</h3>
-                    <p class="card-sub" data-i18n="ws.timeline.s">WEEKLY TREND INDEX · SIGNAL VOLUME</p>
-                  </div>
-                </div>
-                <div class="chart-body">
-                  <canvas id="trendChart"></canvas>
-                  <div class="chart-tip" id="trendTip"></div>
-                  <div class="empty-state" id="dbEmptyTrend" hidden><p data-i18n="ws.timeline.na">No timestamped historical trend data available for this query.</p></div>
+            <div class="dc-col dc-col-a">
+
+            <div class="ws-card chart-card timeline-card">
+              <div class="card-head">
+                <div>
+                  <h3 class="card-title" data-i18n="ws.timeline.t">Historical trend strength</h3>
+                  <p class="card-sub" data-i18n="ws.timeline.s">WEEKLY TREND INDEX · SIGNAL VOLUME</p>
                 </div>
               </div>
-
-              <div class="ws-card ai-intel-card">
-                <div class="card-head">
-                  <div>
-                    <h3 class="card-title" data-i18n="ws.hl.t">AI Intelligence</h3>
-                    <p class="card-sub" data-i18n="ws.hl.s">GENERATED THIS CYCLE</p>
-                  </div>
-                  <span class="live-badge mono"><span class="live-dot"></span> <span data-i18n="ws.brief">AI BRIEF</span></span>
-                </div>
-                <h2 class="card-title ai-intel-title" id="dbBriefTitle">Egypt — live brief</h2>
-                <div class="summary-meta mono">
-                  <span class="gen-note" id="dbGenNote" hidden></span>
-                </div>
-                <div class="summary-text" id="dbSummaryText"></div>
-                <p class="summary-scope-note mono" id="dbScopeNote" hidden></p>
-                <div class="empty-state" id="dbEmptySummary" hidden><p data-i18n="ws.sum.na">No AI brief returned for this query — signals are still displayed below.</p></div>
-                <div class="summary-chips" id="dbChips" hidden></div>
+              <div class="chart-body">
+                <canvas id="trendChart"></canvas>
+                <div class="chart-tip" id="trendTip"></div>
+                <div class="empty-state" id="dbEmptyTrend" hidden><p data-i18n="ws.timeline.na">No timestamped historical trend data available for this query.</p></div>
               </div>
             </div>
 
-            <!-- Col 2: Topics + Keywords/Sources + Hashtags -->
-            <div class="ws-col ws-col-mid">
-              <div class="ws-card card topics-card">
-                <div class="card-head">
-                  <div>
-                    <h3 class="card-title" data-i18n="ws.topics.t">Trending topics</h3>
-                    <p class="card-sub" data-i18n="ws.topics.s2">RANKED BY SEVERITY</p>
-                  </div>
+            <div class="ws-card ai-intel-card">
+              <div class="card-head">
+                <div>
+                  <h3 class="card-title" data-i18n="ws.hl.t">AI Intelligence</h3>
+                  <p class="card-sub" data-i18n="ws.hl.s">GENERATED THIS CYCLE</p>
                 </div>
-                <div class="trend-list" id="dbTrendList"></div>
-                <div class="empty-state" id="dbEmptyTopics" hidden><p data-i18n="ws.nodata">No data available</p></div>
+                <span class="live-badge mono"><span class="live-dot"></span> <span data-i18n="ws.brief">AI BRIEF</span></span>
               </div>
+              <h2 class="card-title ai-intel-title" id="dbBriefTitle">Egypt — live brief</h2>
+              <div class="summary-meta mono">
+                <span class="gen-note" id="dbGenNote" hidden></span>
+              </div>
+              <div class="summary-text" id="dbSummaryText"></div>
+              <p class="summary-scope-note mono" id="dbScopeNote" hidden></p>
+              <div class="empty-state" id="dbEmptySummary" hidden><p data-i18n="ws.sum.na">No AI brief returned for this query — signals are still displayed below.</p></div>
+              <div class="summary-chips" id="dbChips" hidden></div>
+            </div>
 
-              <div class="ws-mid-kw-row">
-                <div class="ws-card card kw-card">
-                  <div class="card-head">
-                    <div>
-                      <h3 class="card-title" data-i18n="ws.kw.t">Top keywords</h3>
-                      <p class="card-sub" data-i18n="ws.kw.s">DETERMINISTIC · COMPUTED FROM AGGREGATION</p>
-                    </div>
-                  </div>
-                  <div class="vbar-chart" id="dbKwList"></div>
-                  <div class="empty-state" id="dbEmptyKeywords" hidden><p data-i18n="ws.nodata">No data available</p></div>
+            <!-- AI Highlights -->
+            <div class="ws-card card hl-section-card">
+              <div class="card-head">
+                <div>
+                  <h3 class="card-title" data-i18n="ws.hl.t2">AI highlights</h3>
+                  <p class="card-sub" data-i18n="ws.hl.s">GENERATED THIS CYCLE</p>
                 </div>
-                <div class="ws-card card src-card">
-                  <div class="card-head">
-                    <div>
-                      <h3 class="card-title" data-i18n="ws.src.t">Sources</h3>
-                      <p class="card-sub" data-i18n="ws.src.s2">PUBLISHERS FROM THIS ANALYSIS</p>
-                    </div>
-                  </div>
-                  <div class="vbar-chart" id="dbSrcList"></div>
-                  <div class="empty-state" id="dbEmptySources" hidden><p data-i18n="ws.src.na">No source data available for this analysis.</p></div>
-                  <div id="dbSrcFoot"></div>
+                <span class="live-badge mono"><span class="live-dot"></span> AI</span>
+              </div>
+              <div class="total-summary" id="dbTotalSummary" hidden></div>
+              <div class="hl-list" id="dbHlList"></div>
+              <div class="empty-state" id="dbEmptyHighlights" hidden><p data-i18n="ws.hl.na">No AI highlights generated for this query.</p></div>
+            </div>
+
+            </div>
+
+            <div class="dc-right-span">
+
+            <div class="dc-top-duo">
+
+            <div class="ws-card card topics-card">
+              <div class="card-head">
+                <div>
+                  <h3 class="card-title" data-i18n="ws.topics.t">Trending topics</h3>
+                  <p class="card-sub" data-i18n="ws.topics.s2">RANKED BY SEVERITY</p>
                 </div>
               </div>
+              <div class="trend-list" id="dbTrendList"></div>
+              <div class="empty-state" id="dbEmptyTopics" hidden><p data-i18n="ws.nodata">No data available</p></div>
+            </div>
 
-              <div class="ws-card card ht-card">
-                <div class="card-head">
-                  <div>
-                    <h3 class="card-title" data-i18n="ws.ht.t">Hashtags</h3>
-                    <p class="card-sub" data-i18n="ws.ht.s">EXTRACTED FROM SIGNALS</p>
-                  </div>
+            <div class="dc-col dc-col-c">
+
+            <div class="ws-card card donut-card">
+              <div class="card-head">
+                <div>
+                  <h3 class="card-title" data-i18n="ws.donut.t">Sentiment split</h3>
+                  <p class="card-sub mono" id="dbSentSub" data-i18n="ws.sent.sub"></p>
                 </div>
-                <div class="ht-wrap" id="dbHtList"></div>
-                <div class="empty-state" id="dbEmptyHashtags" hidden><p data-i18n="ws.nodata">No data available</p></div>
+              </div>
+              <div class="donut-wrap">
+                <div class="donut" id="sentimentDonut"></div>
+                <div class="donut-legend">
+                  <div class="legend-row"><span class="legend-dot" style="--c:#35D07F"></span> <span data-i18n="ws.donut.pos">Positive</span> <b>—</b></div>
+                  <div class="legend-row"><span class="legend-dot" style="--c:#7A8BB5"></span> <span data-i18n="ws.donut.neu">Neutral</span> <b>—</b></div>
+                  <div class="legend-row"><span class="legend-dot" style="--c:#F45D5D"></span> <span data-i18n="ws.donut.neg">Negative</span> <b>—</b></div>
+                </div>
+                <div class="empty-state" id="dbEmptySentiment" hidden><p data-i18n="ws.sent.na">Sentiment data unavailable</p></div>
+                <div class="sparsity-note" id="dbSparsityNote" hidden><p></p></div>
               </div>
             </div>
-            <div class="ws-col ws-col-right">
-              <div class="ws-card card donut-card">
+
+            <div class="ws-card card ht-card">
+              <div class="card-head">
+                <div>
+                  <h3 class="card-title" data-i18n="ws.ht.t">Hashtags</h3>
+                  <p class="card-sub" data-i18n="ws.ht.s">EXTRACTED FROM SIGNALS</p>
+                </div>
+              </div>
+              <div class="ht-wrap" id="dbHtList"></div>
+              <div class="empty-state" id="dbEmptyHashtags" hidden><p data-i18n="ws.nodata">No data available</p></div>
+            </div>
+
+            <div class="ws-card card inf-card">
+              <div class="card-head">
+                <div>
+                  <h3 class="card-title" data-i18n="ws.inf.t">Influencers</h3>
+                  <p class="card-sub" data-i18n="ws.inf.s">TOP VOICES THIS HOUR</p>
+                </div>
+              </div>
+              <div class="rank-list" id="dbRankList"></div>
+              <div class="empty-state" id="dbEmptyInfluencers" hidden><p data-i18n="ws.influencers.na">No influencers identified in this analysis.</p></div>
+            </div>
+
+            </div>
+
+            </div>
+
+            <!-- Regional intelligence: wide row beneath trending topics + sentiment split -->
+            <div class="ws-card card gov-card">
+              <div class="card-head">
+                <div>
+                  <h3 class="card-title" data-i18n="ws.regional.t">Regional intelligence</h3>
+                  <p class="card-sub mono" data-i18n="ws.regional.s">DETECTED LOCATIONS FROM THIS ANALYSIS</p>
+                </div>
+              </div>
+              <div class="region-heat-wrap" id="regionGrid"></div>
+            </div>
+
+            <!-- Keywords + phrases pair: beneath regional intelligence, across from AI highlights -->
+            <div class="dc-kw-ph-row">
+              <div class="ws-card card kw-card">
                 <div class="card-head">
                   <div>
-                    <h3 class="card-title" data-i18n="ws.donut.t">Sentiment split</h3>
-                    <p class="card-sub mono" id="dbSentSub" data-i18n="ws.sent.sub"></p>
+                    <h3 class="card-title" data-i18n="ws.kw.t">Top keywords</h3>
+                    <p class="card-sub" data-i18n="ws.kw.s">DETERMINISTIC · COMPUTED FROM AGGREGATION</p>
                   </div>
                 </div>
-                <div class="donut-wrap">
-                  <div class="donut" id="sentimentDonut"></div>
-                  <div class="donut-legend">
-                    <div class="legend-row"><span class="legend-dot" style="--c:#35D07F"></span> <span data-i18n="ws.donut.pos">Positive</span> <b>—</b></div>
-                    <div class="legend-row"><span class="legend-dot" style="--c:#7A8BB5"></span> <span data-i18n="ws.donut.neu">Neutral</span> <b>—</b></div>
-                    <div class="legend-row"><span class="legend-dot" style="--c:#F45D5D"></span> <span data-i18n="ws.donut.neg">Negative</span> <b>—</b></div>
-                  </div>
-                  <div class="empty-state" id="dbEmptySentiment" hidden><p data-i18n="ws.sent.na">Sentiment data unavailable</p></div>
-                  <div class="sparsity-note" id="dbSparsityNote" hidden><p></p></div>
-                </div>
+                <div class="vbar-chart" id="dbKwList"></div>
+                <div class="empty-state" id="dbEmptyKeywords" hidden><p data-i18n="ws.nodata">No data available</p></div>
               </div>
-
-              <div class="ws-card card gov-card">
+              <div class="ws-card card ph-card">
                 <div class="card-head">
                   <div>
-                    <h3 class="card-title" data-i18n="ws.regional.t">Regional intelligence</h3>
-                    <p class="card-sub mono" data-i18n="ws.regional.s">DETECTED LOCATIONS FROM THIS ANALYSIS</p>
+                    <h3 class="card-title" data-i18n="ws.ph.t">Top phrases</h3>
+                    <p class="card-sub" data-i18n="ws.ph.s">EMERGING 2–3 WORD PHRASES</p>
                   </div>
                 </div>
-                <div class="region-heat-wrap" id="regionGrid"></div>
-              </div>
-
-              <div class="ws-card card inf-card">
-                <div class="card-head">
-                  <div>
-                    <h3 class="card-title" data-i18n="ws.inf.t">Influencers</h3>
-                    <p class="card-sub" data-i18n="ws.inf.s">TOP VOICES THIS HOUR</p>
-                  </div>
-                </div>
-                <div class="rank-list" id="dbRankList"></div>
-                <div class="empty-state" id="dbEmptyInfluencers" hidden><p data-i18n="ws.influencers.na">No influencers identified in this analysis.</p></div>
+                <div class="heat-grid" id="dbPhList"></div>
+                <div class="empty-state" id="dbEmptyPhrases" hidden><p data-i18n="ws.nodata">No data available</p></div>
               </div>
             </div>
-          </div>
 
-          <!-- AI Highlights (separate full-width card) -->
-          <div class="ws-card card hl-section-card">
-            <div class="card-head">
-              <div>
-                <h3 class="card-title" data-i18n="ws.hl.t2">AI highlights</h3>
-                <p class="card-sub" data-i18n="ws.hl.s">GENERATED THIS CYCLE</p>
-              </div>
-              <span class="live-badge mono"><span class="live-dot"></span> AI</span>
-            </div>
-            <div class="total-summary" id="dbTotalSummary" hidden></div>
-            <div class="hl-list" id="dbHlList"></div>
-            <div class="empty-state" id="dbEmptyHighlights" hidden><p data-i18n="ws.hl.na">No AI highlights generated for this query.</p></div>
-          </div>
-
-          <!-- Top phrases (below highlights, same weight as keywords) -->
-          <div class="ws-card card ph-card">
-            <div class="card-head">
-              <div>
-                <h3 class="card-title" data-i18n="ws.ph.t">Top phrases</h3>
-                <p class="card-sub" data-i18n="ws.ph.s">EMERGING 2–3 WORD PHRASES</p>
-              </div>
-            </div>
-            <div class="heat-grid" id="dbPhList"></div>
-            <div class="empty-state" id="dbEmptyPhrases" hidden><p data-i18n="ws.nodata">No data available</p></div>
-          </div>
-
-          <!-- Feed + Signal Health (side by side) -->
-          <div class="ws-feed-health-grid">
+            <!-- Live feed: full-width row beneath keywords + phrases -->
             <div class="ws-card card feed-card">
               <div class="card-head">
                 <div>
@@ -442,6 +436,23 @@
                 <div class="feed-track" id="dbFeedTrack"></div>
                 <div class="empty-state" id="dbEmptyFeed" hidden><p data-i18n="ws.feed.na">No live signals returned for this query.</p></div>
               </div>
+            </div>
+
+            </div>
+          </div>
+
+          <!-- Sources + Signal Health (side by side) -->
+          <div class="ws-feed-health-grid">
+            <div class="ws-card card src-card">
+              <div class="card-head">
+                <div>
+                  <h3 class="card-title" data-i18n="ws.src.t">Sources</h3>
+                  <p class="card-sub" data-i18n="ws.src.s2">PUBLISHERS FROM THIS ANALYSIS</p>
+                </div>
+              </div>
+              <div class="vbar-chart" id="dbSrcList"></div>
+              <div class="empty-state" id="dbEmptySources" hidden><p data-i18n="ws.src.na">No source data available for this analysis.</p></div>
+              <div id="dbSrcFoot"></div>
             </div>
 
             <div class="ws-card card health-card">
@@ -473,3 +484,5 @@
   <script>NabdAssistant.init({ context: { page: 'dashboard' } });</script>
 </body>
 </html>
+
+

@@ -212,7 +212,9 @@
         b.setAttribute('aria-pressed', String(on));
       });
     }
-    document.querySelectorAll('.app-logo').forEach((el) => { el.textContent = N.lang === 'ar' ? 'نبض' : 'N'; });
+      document.querySelectorAll('.app-logo').forEach((el) => { el.textContent = N.lang === 'ar' ? 'نبض' : 'N'; });
+      const dbLoadLogo = $('dbLoadLogo');
+      if (dbLoadLogo) dbLoadLogo.textContent = N.lang === 'ar' ? 'نبض' : 'N';
   }
 
   function bindShell() {
@@ -231,33 +233,8 @@
         if (main) main.classList.add('sidebar-collapsed');
       }
     }
-    /* ---------- sidebar hover-expand when collapsed ---------- */
-    (function () {
-      const brand = side ? side.querySelector('.app-brand-side') : null;
-      if (!brand || !side) return;
-      brand.addEventListener('click', (e) => {
-        if (side.classList.contains('collapsed')) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      });
-      let hoverTimer = null;
-      side.addEventListener('mouseenter', () => {
-        if (!side.classList.contains('collapsed')) return;
-        clearTimeout(hoverTimer);
-        side.classList.add('hover-expand');
-        const main = document.querySelector('.app-main');
-        if (main) main.classList.add('sidebar-hover-expand');
-      });
-      side.addEventListener('mouseleave', () => {
-        clearTimeout(hoverTimer);
-        hoverTimer = setTimeout(() => {
-          side.classList.remove('hover-expand');
-          const main = document.querySelector('.app-main');
-          if (main) main.classList.remove('sidebar-hover-expand');
-        }, 120);
-      });
-    })();
+    /* Sidebar expand/collapse is fully manual via the toggle button
+       next to the logo — no hover auto-expand. */
     const burger = $('sideBurger');
     const backdrop = $('sideBackdrop');
     if (burger && backdrop) {
@@ -1487,12 +1464,29 @@
         renderHealthChart(null);
         return;
       }
-      const kws = Array.isArray(D.keywords) ? D.keywords : [];
+      const kwsRaw = Array.isArray(D.keywords) ? D.keywords : [];
+      /* Keep top 5, skipping repetitive entries (same tokens or subsets
+         of an already-picked keyword, case-insensitive, AR+EN aware) */
+      const kwTok = (s) => String(s || '').toLowerCase().split(/[^a-z0-9\u0600-\u06FF]+/).filter(Boolean);
+      const kwSeen = [];
+      const kws = [];
+      for (const k of kwsRaw) {
+        const toks = kwTok(k && k.keyword);
+        if (!toks.length) continue;
+        const dup = kwSeen.some((seen) => {
+          const hits = toks.filter((t) => seen.indexOf(t) !== -1).length;
+          return hits === toks.length || hits === seen.length;
+        });
+        if (dup) continue;
+        kwSeen.push(toks);
+        kws.push(k);
+        if (kws.length >= 5) break;
+      }
       const phs = Array.isArray(D.phrases) ? D.phrases : [];
       const hts = Array.isArray(D.hashtags) ? D.hashtags : [];
       const kwMax = kws.reduce((m, k) => Math.max(m, num(k.count) || 0), 0);
       const phMax = phs.reduce((m, p) => Math.max(m, num(p.count) || 0), 0);
-      listWidget($('dbKwList'), $('dbEmptyKeywords'), kws.slice(0, 10).map((k) => vbarRow(k.keyword, k.count, kwMax, k.percentage)));
+      listWidget($('dbKwList'), $('dbEmptyKeywords'), kws.map((k) => vbarRow(k.keyword, k.count, kwMax, k.percentage)));
       listWidget($('dbPhList'), $('dbEmptyPhrases'), phs.slice(0, 8).map((p) => heatTile(p.phrase, p.count, phMax)));
       const htHtml = hts.slice(0, 16).map((h) => {
         const n = num(h.count);

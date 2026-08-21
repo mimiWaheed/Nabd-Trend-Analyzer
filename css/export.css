@@ -86,7 +86,7 @@ html[dir="rtl"] .exp-back svg { transform: scaleX(-1); }
   display: grid;
   place-items: center;
   color: var(--accent);
-  background: rgba(94, 162, 255, .12);
+  background: rgba(59, 130, 246, .12);
   margin-bottom: 6px;
 }
 .exp-empty-ic svg { width: 28px; height: 28px; }
@@ -189,9 +189,9 @@ html[dir="rtl"] .rep-query-line { justify-content: flex-start; }
 
   .health-chart { gap: 10px; }
   .radar-chart { width: 190px; height: 190px; }
-  .radar-grid { fill: rgba(94, 162, 255, .1); stroke: rgba(11, 18, 32, .55); }
+  .radar-grid { fill: rgba(59, 130, 246, .1); stroke: rgba(11, 18, 32, .55); }
   .radar-ring, .radar-axis { stroke: rgba(11, 18, 32, .14); }
-  .radar-dot { fill: #2B7DE0; }
+  .radar-dot { fill: #3b82f6; }
 
   .vbar-chart { overflow: hidden; }
   .gen-note:hover { box-shadow: none; }
