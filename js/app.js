@@ -240,10 +240,12 @@
     if (burger && backdrop) {
       const closeSide = () => { side.classList.remove('mobile-open'); backdrop.classList.remove('show'); burger.setAttribute('aria-expanded', 'false'); };
       burger.addEventListener('click', () => {
-        side.classList.add('mobile-open');
-        backdrop.classList.add('show');
-        burger.setAttribute('aria-expanded', 'true');
+        const open = !side.classList.contains('mobile-open');
+        side.classList.toggle('mobile-open', open);
+        backdrop.classList.toggle('show', open);
+        burger.setAttribute('aria-expanded', String(open));
       });
+      side.querySelectorAll('.app-nav-item').forEach((a) => a.addEventListener('click', closeSide));
       backdrop.addEventListener('click', closeSide);
     }
     const btn = $('userMenuBtn');
@@ -710,7 +712,7 @@
         const body = buildComplaintTemplate(draft);
         wrap.innerHTML =
           '<div class="c-modal-mask"></div>'
-          + '<div class="c-modal-card c-modal-card-scroll" role="dialog" aria-modal="true">'
+          + '<div class="c-modal-card c-modal-card-scroll c-modal-wide" role="dialog" aria-modal="true">'
           + '<div class="c-modal-t">' + esc(L('ws.actions.pick')) + '</div>'
           + '<div class="c-modal-s selectable">'
           + '<p class="fac-desc">' + esc(L('ws.actions.pick.s')) + '</p>'

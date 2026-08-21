@@ -2116,7 +2116,7 @@
     const total = segs.reduce((s, x) => s + x.v, 0);
     let acc = 0;
     segs.forEach((seg) => {
-      const len = (seg.v / total) * C - 7;
+      const len = (seg.v / total) * C;
       const c = document.createElementNS(ns, 'circle');
       c.setAttribute('class', 'd-seg');
       c.setAttribute('cx', cx); c.setAttribute('cy', cy); c.setAttribute('r', r);
