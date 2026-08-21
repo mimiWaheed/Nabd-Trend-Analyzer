@@ -450,6 +450,8 @@
       if (quickWrap) quickWrap.hidden = !preview;
       if (suggestRow) suggestRow.hidden = !preview;
       if (heroBrand) heroBrand.hidden = !preview;
+      const dock = document.getElementById('dbDock');
+      if (dock) dock.classList.toggle('db-hero-center', !!preview);
       if (appHead) appHead.hidden = !preview;
       if (rotateSugg) {
         if (preview && (!input || input.value.trim().length === 0)) {
@@ -1222,9 +1224,9 @@
     }
     buildRotatingSuggestions();
 
-    /* ---------- greeting message beside the brand logo ----------
-       Time-of-day aware (visitor's local clock), Egyptian Arabic when the
-       app language is Arabic. */
+    /* ---------- greeting beside the brand logo ----------
+       Time-of-day aware (visitor's local clock) + evergreen openers,
+       picked randomly. Casual Egyptian Arabic / friendly English. */
     function paintGreeting() {
       const el = $('dbGreet');
       if (!el) return;
@@ -1234,21 +1236,36 @@
       const h = new Date().getHours();
       const arName = name ? ' يا <span class="db-greet-name">' + esc(name) + '</span>' : '';
       const enName = name ? ', <span class="db-greet-name">' + esc(name) + '</span>' : '';
-      let ar, en;
+      let pool;
       if (h >= 5 && h < 12) {
-        ar = 'صباح الخير' + arName + '! مصر صاحية — نشوف إيه اللي بيحصل النهارده؟';
-        en = 'Good morning' + enName + '! Egypt is awake — let\'s see what\'s happening today.';
+        pool = [
+          ['صباح الخير' + arName + '! مصر صاحية، نشوف إيه اللي بيحصل.', 'Good morning' + enName + '! Egypt is awake — let\'s see what\'s happening.'],
+          ['صباح الترندات' + arName + '! نبدأ بإيه النهارده؟', 'Morning trends' + enName + '! Where do we start today?']
+        ];
       } else if (h >= 12 && h < 17) {
-        ar = 'إزيك' + arName + '! مصر في وسط النهار — عايز تستكشف إيه؟';
-        en = 'Good afternoon' + enName + '! Egypt is in full swing — what shall we explore?';
+        pool = [
+          ['إزيك' + arName + '؟ النهار لسه طويل.. ندوّر على إيه؟', 'Hey there' + enName + '! Long day ahead — what should we dig into?'],
+          ['وسط كل الضوضاء، فيه حاجة محدش شايفها. يلا نكتشفها.', 'Amid all the noise, there\'s one thing nobody\'s seeing yet. Let\'s find it.']
+        ];
       } else if (h >= 17 && h < 22) {
-        ar = 'مساء الخير' + arName + '! ليلة مناسبة للإشارات — إيه الجديد؟';
-        en = 'Good evening' + enName + '! A fine night for signals — what\'s new?';
+        pool = [
+          ['مساء الخير! إيه الجديد؟', 'Good evening! What\'s new?'],
+          ['مساء الخير' + arName + '! قعدة ترندات الليلة؟', 'Evening' + enName + '! Fancy a trend session tonight?']
+        ];
       } else {
-        ar = 'ليلة مبارحة' + arName + '! لسه صاحي؟ نبض شغال — اسألني عن أي حاجة.';
-        en = 'Working late' + enName + '? NABD never sleeps — ask me anything.';
+        pool = [
+          ['لسه صاحي' + arName + '؟ نبض شغال زيك.', 'Still up' + enName + '? NABD is too.'],
+          ['ليلة مبارحة! اسألني عن أي حاجة.', 'Late night, sharp mind — ask away.']
+        ];
       }
-      el.innerHTML = N.lang === 'ar' ? ar : en;
+      /* evergreen openers — can appear at any hour */
+      pool.push(
+        ['أهلا' + arName + '! جاهز تعرف الترند؟', 'Hey' + enName + '! Ready to catch the trend?'],
+        ['إيه الجديد؟ اسأل نبض.. بيعرف قبل الكل.', 'What\'s new? Ask NABD — it knows before everyone else.'],
+        ['نبض جاهز.. تحب نبدأ منين؟', 'NABD is ready — where shall we begin?']
+      );
+      const pick = pool[Math.floor(Math.random() * pool.length)];
+      el.innerHTML = N.lang === 'ar' ? pick[0] : pick[1];
     }
     document.addEventListener('app-render', paintGreeting);
     document.addEventListener('nabd-lang', paintGreeting);
