@@ -922,7 +922,7 @@
       renderClarifyLoading();
       try {
         const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 6000);
+        const timer = setTimeout(() => ctrl.abort(), 9000);
         const res = await fetch('/api/nabd', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -932,17 +932,20 @@
         });
         clearTimeout(timer);
         if (token !== clarifyToken) return;
-        const data = await res.json();
+        const data = await res.json().catch(() => null);
         const c = data && data.ok && data.clarification;
         if (c && c.needs_clarification && Array.isArray(c.suggestions) && c.suggestions.length) {
           renderClarify(q, c.suggestions);
         } else {
+          if (typeof console !== 'undefined' && console.info) {
+            console.info('[nabd] clarification pass-through:', data && data.ok ? 'query deemed clear' : 'unusable response', res.ok ? '' : '(http ' + res.status + ')');
+          }
           closeClarify();
           runAnalysis(q);
         }
       } catch (e) {
         if (token === clarifyToken) {
-          if (typeof console !== 'undefined' && console.info) console.info('[nabd] clarification unavailable — running direct search');
+          if (typeof console !== 'undefined' && console.info) console.info('[nabd] clarification unavailable — running direct search:', e && e.name === 'AbortError' ? 'timeout' : (e && e.message) || e);
           closeClarify();
           runAnalysis(q);
         }

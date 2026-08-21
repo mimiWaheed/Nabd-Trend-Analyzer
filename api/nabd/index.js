@@ -135,7 +135,7 @@ module.exports = async function handler(req, res) {
             { role: 'system', content: CLARIFICATION_SYSTEM_PROMPT },
             { role: 'user', content: message }
           ],
-          max_tokens: 300,
+          max_tokens: 700,
           temperature: 0.2
         })
       });
