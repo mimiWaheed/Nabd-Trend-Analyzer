@@ -19,6 +19,19 @@ if (!process.env.NABD_DATA) process.env.NABD_DATA = 'memory';
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT || process.env.NABD_PORT || 3000);
 
+/* Load .env (gitignored) so local runs can use the same AI keys as Vercel */
+(function loadDotEnv() {
+  const envPath = path.join(ROOT, '.env');
+  if (!fs.existsSync(envPath)) return;
+  for (const line of fs.readFileSync(envPath, 'utf8').split(/\r?\n/)) {
+    const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+    if (!m) continue;
+    let val = m[2];
+    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) val = val.slice(1, -1);
+    if (!(m[1] in process.env)) process.env[m[1]] = val;
+  }
+})();
+
 const MIME = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',

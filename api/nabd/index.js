@@ -67,6 +67,31 @@ The query should be a clean search term, not a question. Examples:
 
 IMPORTANT: The action block must be the LAST thing in your response. Do not add any text after it. The block is hidden from the user — they only see your friendly reply and a button.`;
 
+/* ---------- search query clarification (task: "query_clarification") ----------
+   Dedicated prompt for the smart-search clarity layer. Reuses the same AI
+   provider as the assistant but is logically separate (spec §35). */
+const CLARIFICATION_SYSTEM_PROMPT = `You are the search-query clarity layer of NABD (نبض), a trend-intelligence search engine for Egypt. Your ONLY job: decide whether a search query is specific enough to run as-is, and if not, offer a few distinct search intents the user might mean.
+
+You are NOT the search engine. You never answer the query. You never fabricate facts, events, prices, or announcements.
+
+## Decision rule
+- "needs_clarification": false → the query already contains entity + intent/context (e.g. "حريق بي تك طنطا", "قطع الكهرباء اليوم في طنطا", "أسعار الذهب اليوم", "قضية محمد حسين", "إنجازات وزارة الاتصالات"). Suggestions array MUST be empty.
+- "needs_clarification": true → the query is a bare entity or generic topic with no intent attached (e.g. "فلوس", "كهرباء", "تعليم", "بي تك", "طنطا", "وزارة الاتصالات", "محمد حسين", "الإسكندرية", "البورصة").
+- When in doubt, prefer false (do not interrupt clear searches).
+
+## Suggestions (only when needs_clarification is true)
+- Exactly 3 to 5 suggestions, each a meaningfully DIFFERENT intent. Never near-duplicates.
+- Entity-aware: adapt to what the query is (person / company / government body / place / topic / service). A place suggests local news, incidents, services; a ministry suggests news, decisions, projects; a person suggests news, statements — stay neutral when the name is ambiguous.
+- Natural Egyptian-Arabic search phrasing (or English if the query was English). Short, like real search queries.
+- Intent-level only: never assume facts not present in the query.
+- Each suggestion's "query" field is what the search engine should receive (may be slightly more complete than "label").
+
+## Output format
+Respond with STRICT JSON only — no markdown fences, no commentary:
+{"needs_clarification": false, "suggestions": []}
+or
+{"needs_clarification": true, "suggestions": [{"label": "...", "query": "..."}, ...]}`;
+
 const MAX_INPUT = 2000;
 const MAX_HISTORY = 20;
 const MAX_OUTPUT_TOKENS = 800;
@@ -92,6 +117,46 @@ module.exports = async function handler(req, res) {
 
   const history = Array.isArray(body.history) ? body.history.slice(-MAX_HISTORY) : [];
   const context = body.context || {};
+
+  /* ---------- query-clarification task (smart search layer) ---------- */
+  if (body.task === 'query_clarification') {
+    const config = getProviderConfig();
+    if (!config.apiKey) return fail(res, 503, 'AI_NOT_CONFIGURED', 'AI assistant is not configured');
+    try {
+      const response = await fetch(config.baseUrl + '/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + config.apiKey
+        },
+        body: JSON.stringify({
+          model: config.model,
+          messages: [
+            { role: 'system', content: CLARIFICATION_SYSTEM_PROMPT },
+            { role: 'user', content: message }
+          ],
+          max_tokens: 300,
+          temperature: 0.2
+        })
+      });
+      if (!response.ok) return fail(res, 502, 'AI_PROVIDER_ERROR', 'The AI service returned an error');
+      const data = await response.json();
+      const raw = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+      const match = raw.match(/\{[\s\S]*\}/);
+      if (!match) return fail(res, 502, 'AI_BAD_RESPONSE', 'Clarification returned no JSON');
+      let parsed;
+      try { parsed = JSON.parse(match[0]); } catch (e) { return fail(res, 502, 'AI_BAD_RESPONSE', 'Clarification JSON invalid'); }
+      const suggestions = Array.isArray(parsed.suggestions)
+        ? parsed.suggestions
+            .map((s) => ({ label: String((s && s.label) || '').trim(), query: String((s && s.query) || '').trim() }))
+            .filter((s) => s.label && s.query)
+            .slice(0, 5)
+        : [];
+      return ok(res, { clarification: { needs_clarification: !!parsed.needs_clarification && suggestions.length > 0, suggestions } });
+    } catch (e) {
+      return fail(res, 502, 'AI_PROVIDER_ERROR', e.message || 'Could not reach the AI service');
+    }
+  }
 
   const config = getProviderConfig();
   if (!config.apiKey) return fail(res, 503, 'AI_NOT_CONFIGURED', 'AI assistant is not configured');

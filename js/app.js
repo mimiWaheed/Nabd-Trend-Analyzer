@@ -828,16 +828,163 @@
       else if (act === 'remind') setReminder();
     });
 
+    /* ---------- smart search clarification layer ----------
+       Broad/entity-only queries get AI-generated intent suggestions before
+       the n8n pipeline runs. Clear queries pass straight through (the AI
+       decides — no hardcoded topic lists). Any failure falls back to the
+       normal search so the AI is never a point of failure. */
+    const searchBox = $('dbSearchBox');
+    const cesc = (s) => String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    let clarifyToken = 0;
+    let clarifyItems = [];
+    let clarifyActive = -1;
+
+    function clarifyPanel() { return document.getElementById('dbClarify'); }
+    function closeClarify() {
+      const p = clarifyPanel();
+      if (p) p.hidden = true;
+      clarifyItems = [];
+      clarifyActive = -1;
+    }
+    function ensureClarifyPanel() {
+      let p = clarifyPanel();
+      if (p || !searchBox) return p;
+      p = document.createElement('div');
+      p.className = 'clarify-panel';
+      p.id = 'dbClarify';
+      p.hidden = true;
+      p.innerHTML =
+        '<div class="clarify-head"><span class="clarify-spark" aria-hidden="true"></span><span class="clarify-title" id="dbClarifyTitle"></span></div>'
+        + '<div class="clarify-list" id="dbClarifyList"></div>'
+        + '<button type="button" class="clarify-anyway" id="dbClarifyAnyway"></button>';
+      searchBox.parentNode.appendChild(p);
+      p.addEventListener('click', (e) => {
+        const item = e.target.closest('.clarify-item');
+        if (item) { pickClarify(item.dataset.q); return; }
+        if (e.target.closest('#dbClarifyAnyway')) {
+          const q = p.dataset.original || '';
+          closeClarify();
+          runAnalysis(q);
+        }
+      });
+      return p;
+    }
+    function paintClarifyActive() {
+      clarifyItems.forEach((el, i) => el.classList.toggle('active', i === clarifyActive));
+    }
+    function clarifyMove(dir) {
+      if (!clarifyItems.length) return;
+      clarifyActive = (clarifyActive + dir + clarifyItems.length) % clarifyItems.length;
+      paintClarifyActive();
+    }
+    function renderClarifyLoading() {
+      const p = ensureClarifyPanel();
+      if (!p) return;
+      p.querySelector('#dbClarifyTitle').textContent = L('db.clarify.thinking');
+      p.querySelector('#dbClarifyList').innerHTML = '<div class="clarify-thinking"><span class="clarify-spinner" aria-hidden="true"></span></div>';
+      p.querySelector('#dbClarifyAnyway').hidden = true;
+      clarifyItems = [];
+      clarifyActive = -1;
+      p.hidden = false;
+    }
+    function renderClarify(originalQ, suggestions) {
+      const p = ensureClarifyPanel();
+      if (!p) { runAnalysis(originalQ); return; }
+      p.dataset.original = originalQ;
+      p.querySelector('#dbClarifyTitle').textContent = L('db.clarify.t');
+      const list = p.querySelector('#dbClarifyList');
+      list.innerHTML = suggestions.map((s) =>
+        '<button type="button" class="clarify-item" data-q="' + cesc(s.query) + '">'
+        + '<span>' + cesc(s.label) + '</span>'
+        + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>'
+        + '</button>').join('');
+      const anyway = p.querySelector('#dbClarifyAnyway');
+      anyway.textContent = N.fmt('db.clarify.anyway', { q: originalQ });
+      anyway.hidden = false;
+      clarifyItems = [].slice.call(list.querySelectorAll('.clarify-item'));
+      clarifyActive = 0;
+      paintClarifyActive();
+      p.hidden = false;
+    }
+    function pickClarify(q) {
+      closeClarify();
+      if (!q) return;
+      if (input) {
+        input.value = q;
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 110) + 'px';
+      }
+      runAnalysis(q);
+    }
+    async function evaluateQuery(q) {
+      const token = ++clarifyToken;
+      renderClarifyLoading();
+      try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 6000);
+        const res = await fetch('/api/nabd', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ task: 'query_clarification', message: q }),
+          signal: ctrl.signal
+        });
+        clearTimeout(timer);
+        if (token !== clarifyToken) return;
+        const data = await res.json();
+        const c = data && data.ok && data.clarification;
+        if (c && c.needs_clarification && Array.isArray(c.suggestions) && c.suggestions.length) {
+          renderClarify(q, c.suggestions);
+        } else {
+          closeClarify();
+          runAnalysis(q);
+        }
+      } catch (e) {
+        if (token === clarifyToken) {
+          if (typeof console !== 'undefined' && console.info) console.info('[nabd] clarification unavailable — running direct search');
+          closeClarify();
+          runAnalysis(q);
+        }
+      }
+    }
+    if (searchBox) {
+      document.addEventListener('click', (e) => {
+        const p = clarifyPanel();
+        if (p && !p.hidden && !p.contains(e.target) && !searchBox.contains(e.target)) closeClarify();
+      });
+    }
+
     function submit() {
       if (running) return;
       const q = (input ? input.value : '').trim();
       if (!q) { T('app.toast.empty'); if (input) input.focus(); return; }
+      if (q.length >= 3) { evaluateQuery(q); return; }
       runAnalysis(q);
     }
     if (runBtn) runBtn.addEventListener('click', submit);
     if (retryBtn) retryBtn.addEventListener('click', () => { if (query) beginRun(query); });
     if (input) {
       input.addEventListener('keydown', (e) => {
+        const p = clarifyPanel();
+        const open = !!(p && !p.hidden && clarifyItems.length);
+        if (open && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          clarifyMove(e.key === 'ArrowDown' ? 1 : -1);
+          return;
+        }
+        if (open && e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          const el = clarifyItems[clarifyActive];
+          pickClarify(el ? el.dataset.q : '');
+          return;
+        }
+        if (p && !p.hidden && e.key === 'Escape') {
+          closeClarify();
+          return;
+        }
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
           submit();
@@ -846,6 +993,7 @@
       input.addEventListener('input', () => {
         input.style.height = 'auto';
         input.style.height = Math.min(input.scrollHeight, 110) + 'px';
+        closeClarify();
       });
     }
     if (resetBtn) resetBtn.addEventListener('click', () => { resetToPreview(); T('ws.toast.new'); });

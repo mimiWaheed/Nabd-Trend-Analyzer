@@ -4459,10 +4459,98 @@ html[dir="rtl"] .db-load-orb span { font-size: 12px; }
 
 /* --- Hero search box --- */
 .db-query-hero {
+  position: relative;
   max-width: 68vw;
   width: 100%;
   margin: 0 auto;
 }
+
+/* --- Smart search clarification panel (AI intent suggestions) --- */
+.clarify-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  inset-inline: 0;
+  z-index: 40;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--card-surface, var(--bg-soft));
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: dbFadeIn .18s var(--ease) both;
+}
+.clarify-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .78rem;
+  color: var(--text-muted);
+  padding: 2px 4px 8px;
+}
+.clarify-spark {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--grad, var(--accent));
+  box-shadow: 0 0 10px rgba(59, 130, 246, .9);
+  flex: none;
+}
+.clarify-list { display: flex; flex-direction: column; gap: 4px; }
+.clarify-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: .9rem;
+  text-align: start;
+  cursor: pointer;
+  transition: all .16s var(--ease);
+}
+.clarify-item svg { width: 14px; height: 14px; opacity: 0; flex: none; transition: opacity .16s var(--ease); }
+html[dir="rtl"] .clarify-item svg { transform: scaleX(-1); }
+.clarify-item:hover,
+.clarify-item.active {
+  background: var(--surface-1);
+  border-color: var(--border);
+  color: var(--text);
+}
+.clarify-item:hover svg,
+.clarify-item.active svg { opacity: .7; }
+.clarify-thinking {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  color: var(--text-muted);
+  font-size: .85rem;
+}
+.clarify-spinner {
+  width: 14px; height: 14px; flex: none;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--accent);
+  animation: clarifySpin .7s linear infinite;
+}
+@keyframes clarifySpin { to { transform: rotate(360deg); } }
+.clarify-anyway {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: .78rem;
+  cursor: pointer;
+  text-align: start;
+  transition: color .16s var(--ease);
+}
+.clarify-anyway:hover { color: var(--accent); }
 @media (max-width: 1100px) {
   .db-query-hero { max-width: 82vw; }
 }
