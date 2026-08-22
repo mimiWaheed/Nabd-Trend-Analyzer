@@ -1,14 +1,42 @@
-/* /api/nabd — NABD AI assistant + config endpoint (Vercel serverless).
-   POST  /api/nabd              — AI chat (OpenAI-compatible).
-   GET   /api/nabd?action=config — serves the n8n webhook URL from env. */
+/* /api/nabd — NABD AI assistant + public config/demo endpoints (Vercel serverless).
+   POST  /api/nabd                  — AI chat (OpenAI-compatible).
+   GET   /api/nabd?action=config    — serves the n8n webhook URL from env.
+   GET   /api/nabd?action=trends    — live Egypt trending searches (landing demo).
+   GET   /api/nabd?action=signals&q=&lang= — live news signals for a query (demo). */
 
 const { asyncBody, fail, json, ok } = require('../../lib/respond');
+const demoFeed = require('../../lib/demoFeed');
 
 /* ---------- config action (GET /api/nabd?action=config) ---------- */
 function handleConfig(_req, res) {
   const url = process.env.NABD_WEBHOOK_URL;
   if (!url) return json(res, 200, { ok: false, error: 'NABD_WEBHOOK_URL_NOT_SET' });
   return json(res, 200, { ok: true, webhookUrl: url });
+}
+
+/* ---------- demo actions (GET /api/nabd?action=trends|signals) ---------- */
+async function handleDemo(action, query, res) {
+  try {
+    if (action === 'trends') {
+      const out = await demoFeed.trendsFeed();
+      return ok(res, Object.assign({ live: true, mode: 'trends' }, out));
+    }
+    if (action === 'signals') {
+      const lang = String((query && query.lang) || 'ar').toLowerCase() === 'en' ? 'en' : 'ar';
+      const q = String((query && query.q) || '').trim();
+      if (!q) return fail(res, 422, 'VALIDATION_ERROR', 'q is required');
+      const out = await demoFeed.signalsFeed(q, lang);
+      return ok(res, Object.assign({ live: true, mode: 'news', query: q }, out));
+    }
+    return fail(res, 404, 'NOT_FOUND');
+  } catch (e) {
+    /* serve the stale trends cache rather than failing the landing demo */
+    if (action === 'trends') {
+      const stale = demoFeed.trendsFeedStale();
+      if (stale) return ok(res, Object.assign({ live: true, mode: 'trends' }, stale));
+    }
+    return fail(res, 502, 'DEMO_FEED_UNAVAILABLE', e.message || 'Live feed unavailable');
+  }
 }
 
 /* ---------- chat action (POST /api/nabd) ---------- */
@@ -105,7 +133,11 @@ function getProviderConfig() {
 
 module.exports = async function handler(req, res) {
   const q = new URL(req.url || '/', 'http://localhost').searchParams;
-  if (req.method === 'GET' && q.get('action') === 'config') return handleConfig(req, res);
+  const action = q.get('action');
+  if (req.method === 'GET' && action === 'config') return handleConfig(req, res);
+  if (req.method === 'GET' && (action === 'trends' || action === 'signals')) {
+    return handleDemo(action, { q: q.get('q'), lang: q.get('lang') }, res);
+  }
   if (req.method !== 'POST') return fail(res, 405, 'METHOD_NOT_ALLOWED');
 
   let body;

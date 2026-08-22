@@ -2391,10 +2391,10 @@
 
   /* ----------------------------------------------------------
      LIVE DEMO — a miniature NABD workspace on real data.
-     Real Google Trends Egypt feed (/api/demo) + the same
-     search flow as the app: suggestions while typing, query
-     clarification for vague input, then results (trending
-     topics, sentiment split, related pulse) and next steps.
+     Real Google Trends Egypt feed (/api/nabd?action=trends)
+     + the same search flow as the app: suggestions while
+     typing, query clarification for vague input, then results
+     (signals, sentiment split, source mix) and next steps.
      ---------------------------------------------------------- */
   const demoShell = $('demoShell');
   if (demoShell) {
@@ -2628,7 +2628,7 @@
     }
 
     async function fetchSignals(query) {
-      const url = '/api/demo?q=' + encodeURIComponent(query.slice(0, 80)) + '&lang=' + lang;
+      const url = '/api/nabd?action=signals&q=' + encodeURIComponent(query.slice(0, 80)) + '&lang=' + lang;
       const res = await fetch(url, { headers: { Accept: 'application/json' } });
       const body = await res.json();
       if (!res.ok || !body.ok || !Array.isArray(body.items) || !body.items.length) {
@@ -2714,7 +2714,7 @@
 
     async function loadDemo() {
       try {
-        const res = await fetch('/api/demo', { headers: { Accept: 'application/json' } });
+        const res = await fetch('/api/nabd?action=trends', { headers: { Accept: 'application/json' } });
         const body = await res.json();
         if (!res.ok || !body.ok || !Array.isArray(body.items) || !body.items.length) throw new Error(body.error || 'DEMO_FEED_UNAVAILABLE');
         demoItems = body.items;
