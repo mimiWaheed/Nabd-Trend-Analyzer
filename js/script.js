@@ -37,6 +37,28 @@
       'q.capital': 'New Capital',
       'stat.1': 'Egyptian signals daily', 'stat.2': 'governorates monitored',
       'stat.3': 'median crisis detection', 'stat.4': 'signal classification accuracy',
+      'demo.eyebrow': 'TRY IT LIVE',
+      'demo.title': 'Ask about Egypt. <span class="grad">Get the signal.</span>',
+      'demo.sub': 'Type any topic — NABD pulls what Egypt is searching right now, runs its pipeline and answers in seconds.',
+      'demo.live': 'LIVE · EGYPT',
+      'demo.run': 'Analyze',
+      'demo.s1': 'Fetching live signals',
+      'demo.s2': 'Classifying & scoring topics',
+      'demo.s3': 'Composing the brief',
+      'demo.sig.t': 'LIVE SIGNALS', 'demo.sig.s': '{n} SIGNALS · GOOGLE NEWS · EGYPT',
+      'demo.sent.t': 'SENTIMENT SPLIT', 'demo.sent.s': 'ACROSS THESE SIGNALS',
+      'demo.src.t': 'SOURCE MIX', 'demo.src.s': 'PUBLISHERS IN THIS COVERAGE',
+      'demo.rel.none': 'No related keywords in the current feed.',
+      'demo.clarify': 'Refine your topic',
+      'demo.nosig': 'No live signal for "{q}" this minute — here is what Egypt is searching right now:',
+      'demo.guide.t': 'Take this further',
+      'demo.g.export': 'Export this analysis', 'demo.g.export.s': 'PDF, CSV or shareable link',
+      'demo.g.alert': 'Get a reminder on this topic', 'demo.g.alert.s': 'Alerts the moment it spikes',
+      'demo.g.deep': 'See deeper signals', 'demo.g.deep.s': 'Governorates, influencers, timeline',
+      'demo.g.open': 'Open in workspace', 'demo.g.open.s': 'Run it live with your own question',
+      'demo.updated': 'updated {m}',
+      'demo.now': 'just now',
+      'demo.offline': 'Live feed unreachable — showing a recent snapshot.',
       'why.eyebrow': 'WHY NABD',
       'why.title': 'From question to <span class="grad">insight</span>',
       'why.sub': 'One sentence in, a brief you can act on. This is the transformation behind every NABD analysis.',
@@ -828,6 +850,28 @@
       'q.capital': 'العاصمة الجديدة',
       'stat.1': 'إشارة مصرية يوميًا', 'stat.2': 'محافظة تحت المراقبة',
       'stat.3': 'متوسط رصد الأزمات', 'stat.4': 'دقة تصنيف الإشارات',
+      'demo.eyebrow': 'جرّبه مباشرة',
+      'demo.title': 'اسأل عن مصر. <span class="grad">احصل على الإشارة.</span>',
+      'demo.sub': 'اكتب أي موضوع — نبض يسحب ما يبحث عنه المصريون الآن، ويشغّل خط التحليل، ويجيبك في ثوانٍ.',
+      'demo.live': 'مباشر · مصر',
+      'demo.run': 'حلّل',
+      'demo.s1': 'جلب الإشارات الحية',
+      'demo.s2': 'تصنيف المواضيع وترتيبها',
+      'demo.s3': 'صياغة الموجز',
+      'demo.sig.t': 'إشارات حية', 'demo.sig.s': '{n} إشارة · جوجل نيوز · مصر',
+      'demo.sent.t': 'توزيع المشاعر', 'demo.sent.s': 'على هذه الإشارات',
+      'demo.src.t': 'مزيج المصادر', 'demo.src.s': 'الناشرون في هذه التغطية',
+      'demo.rel.none': 'لا توجد كلمات ذات صلة في التغذية الحالية.',
+      'demo.clarify': 'حدّد موضوعك',
+      'demo.nosig': 'لا توجد إشارة حية لـ«{q}» في هذه اللحظة — هذا ما يبحث عنه المصريون الآن:',
+      'demo.guide.t': 'خُذ هذا أبعد',
+      'demo.g.export': 'صدّر هذا التحليل', 'demo.g.export.s': 'PDF أو CSV أو رابط قابل للمشاركة',
+      'demo.g.alert': 'ذكّرني بهذا الموضوع', 'demo.g.alert.s': 'تنبيه لحظة ارتفاع الاهتمام',
+      'demo.g.deep': 'إشارات أعمق', 'demo.g.deep.s': 'المحافظات والمؤثرون والخط الزمني',
+      'demo.g.open': 'افتحه في مساحة العمل', 'demo.g.open.s': 'شغّله حيًا بسؤالك أنت',
+      'demo.updated': 'محدَّث {m}',
+      'demo.now': 'الآن للتو',
+      'demo.offline': 'تعذّر الوصول للبث الحي — نعرض لقطة حديثة.',
       'why.eyebrow': 'لماذا نبض',
       'why.title': 'من السؤال إلى <span class="grad">الرؤية</span>',
       'why.sub': 'جملة واحدة مدخلًا، وموجز يمكنك التصرف بناءً عليه مخرجًا. هذا هو التحوّل خلف كل تحليل من نبض.',
@@ -2344,6 +2388,412 @@
     });
   }, { threshold: 0.4 });
   counters.forEach((c) => counterObserver.observe(c));
+
+  /* ----------------------------------------------------------
+     LIVE DEMO — a miniature NABD workspace on real data.
+     Real Google Trends Egypt feed (/api/demo) + the same
+     search flow as the app: suggestions while typing, query
+     clarification for vague input, then results (trending
+     topics, sentiment split, related pulse) and next steps.
+     ---------------------------------------------------------- */
+  const demoShell = $('demoShell');
+  if (demoShell) {
+    const STEP_MS = reduceMotion ? 60 : 620;
+    let demoItems = [];
+    let demoFetchedAt = 0;
+    let demoLive = false;
+    let demoRunning = false;
+    let demoSuggIdx = -1;
+    let demoClarifyBusy = false;
+    const dInput = $('demoInput');
+    const dRun = $('demoRunBtn');
+    const dSteps = $('demoSteps');
+    const dResults = $('demoResults');
+    const dSugg = $('demoSugg');
+    const dUpdated = $('demoUpdated');
+
+    /* last-resort snapshot (a recent real day's trends) so the section
+       never renders empty when the feed is unreachable */
+    const SNAPSHOT = [
+      { title: 'مباراة الأهلي اليوم', traffic: 200000, ts: 0 },
+      { title: 'أسعار الذهب في مصر', traffic: 100000, ts: 0 },
+      { title: 'الطقس في مصر غدا', traffic: 50000, ts: 0 },
+      { title: 'نتيجة الثانوية العامة', traffic: 50000, ts: 0 },
+      { title: 'Egypt vs Egypt football', traffic: 20000, ts: 0 },
+      { title: 'سعر الدولار مقابل الجنيه', traffic: 20000, ts: 0 }
+    ];
+
+    const STOPWORDS = new Set(('the a an and or of in on for to from at by with is are was were be been it its this that' +
+      ' من في على عن الي اليى الى مع هذا هذه ذلك التي الذي ما لا لم لن ان أن إن أو ثم قد كل بعد قبل يوم اليوم غدا امس أمس' +
+      ' price prices today news egypt egyptian cairo vs match matchday live result results video photo').split(' '));
+
+    /* small EN/AR lexicon to score headline sentiment of live topics */
+    const SENT_POS = /(فوز|فاز|بطول|احتفال|إنجاز|نجاح|ناجح|أمل|امل|نمو|تحسن|تطوير|جائزة|تتويج|رقم قياسي|عودة|استقرار|دعم|إصلاح|win|wins|champion|celebrat|record|achiev|success|hope|growth|improv|recovery|award|return|stabl)/i;
+    const SENT_NEG = /(انهيار|أزمة|ازمه|حادث|حريق|انفجار|وفاة|مقتل|خسارة|خسر|اعتقال|احتجاج|فضيحة|إصابة|اصابة|سيول|زلزال|غرق|جريمة|سرقة|عرقل|تعطل|غالي|ارتفاع أسعار|crash|attack|death|kill|dead|crisis|accident|fire|flood|protest|arrest|corruptio|scandal|loss|injur|explosi|strike|shortage)/i;
+
+    function escHtml(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function tokensOf(s) {
+      return String(s).toLowerCase().split(/[^\u0600-\u06FFa-z0-9]+/).filter((w) => w.length >= 2 && !STOPWORDS.has(w) && !/^\d+$/.test(w));
+    }
+
+    function normOf(s) {
+      return String(s).toLowerCase().replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/\s+/g, ' ').trim();
+    }
+
+    /* score how well a raw user query matches one live trend title */
+    function matchScore(query, title) {
+      const q = normOf(query), ti = normOf(title);
+      if (!q) return 0;
+      if (q === ti) return 100;
+      if (ti.indexOf(q) !== -1 || q.indexOf(ti) !== -1) return 80;
+      const qt = tokensOf(q);
+      if (!qt.length) return 0;
+      const tt = new Set(tokensOf(title));
+      let hit = 0;
+      qt.forEach((w) => { if (tt.has(w)) hit++; });
+      return Math.round((hit / qt.length) * 70);
+    }
+
+    function bestMatch(query) {
+      let best = null, bestScore = 0, second = null;
+      demoItems.forEach((it) => {
+        const s = matchScore(query, it.title);
+        if (s > bestScore) { second = best; bestScore = s; best = it; }
+        else if (!second && s > 30 && it !== best) second = it;
+      });
+      return { item: bestScore >= 40 ? best : null, score: bestScore, near: best };
+    }
+
+    function localSuggestions(query, limit) {
+      return demoItems
+        .map((it) => ({ it, s: matchScore(query, it.title) }))
+        .filter((x) => x.s >= 20)
+        .sort((a, b) => b.s - a.s)
+        .slice(0, limit)
+        .map((x) => x.it);
+    }
+
+    /* NABD's smart-search layer: ask the AI clarity endpoint when the
+       local trend list has nothing close. Silent-fail to local chips. */
+    async function aiClarify(query) {
+      if (demoClarifyBusy) return null;
+      demoClarifyBusy = true;
+      try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 8000);
+        const res = await fetch('/api/nabd', {
+          method: 'POST',
+          headers: Object.assign({ 'Content-Type': 'application/json' }, { Accept: 'application/json' }),
+          body: JSON.stringify({ task: 'query_clarification', message: query }),
+          signal: ctrl.signal
+        });
+        clearTimeout(timer);
+        const body = await res.json();
+        const sug = body && body.ok && body.clarification && Array.isArray(body.clarification.suggestions)
+          ? body.clarification.suggestions.slice(0, 4).map((s) => ({ label: s.label, query: s.query }))
+          : null;
+        return sug && sug.length ? sug : null;
+      } catch (e) {
+        return null;
+      } finally {
+        setTimeout(() => { demoClarifyBusy = false; }, 4000);
+      }
+    }
+
+    function hideSugg() {
+      if (!dSugg) return;
+      dSugg.hidden = true;
+      dSugg.innerHTML = '';
+      demoSuggIdx = -1;
+    }
+
+    function paintSugg(rows, headingKey) {
+      if (!dSugg) return;
+      if (!rows.length) { hideSugg(); return; }
+      dSugg.innerHTML =
+        (headingKey ? '<p class="ds-head">' + escHtml(t(headingKey)) + '</p>' : '') +
+        rows.map((r, i) =>
+          '<button type="button" class="ds-item' + (i === demoSuggIdx ? ' sel' : '') + '" data-q="' + escHtml(r.query != null ? r.query : r.title) + '">' +
+          '<span class="ds-label">' + escHtml(r.label != null ? r.label : r.title) + '</span>' +
+          (r.traffic != null ? '<span class="ds-count mono">' + (formatNumber(r.traffic, true) || '') + '</span>' : '') +
+          '</button>'
+        ).join('');
+      dSugg.hidden = false;
+    }
+
+    async function updateSuggestions() {
+      if (!dInput || !dSugg || demoRunning) return;
+      const q = dInput.value.trim();
+      if (q.length < 2 || !demoItems.length) {
+        if (!q && demoItems.length) paintSugg(demoItems.slice(0, 5).map((it) => ({ label: it.title, query: it.title, traffic: it.traffic })));
+        else hideSugg();
+        return;
+      }
+      const loc = localSuggestions(q, 5);
+      if (loc.length >= 3) { paintSugg(loc.map((it) => ({ label: it.title, query: it.title, traffic: it.traffic }))); return; }
+      paintSugg(loc.map((it) => ({ label: it.title, query: it.title, traffic: it.traffic })));
+      const ai = await aiClarify(q);
+      if (ai && dInput.value.trim() === q) {
+        const merged = loc.map((it) => ({ label: it.title, query: it.title, traffic: it.traffic }));
+        ai.forEach((s) => { if (!merged.some((m) => normOf(m.query) === normOf(s.query))) merged.push(s); });
+        paintSugg(merged.slice(0, 6), loc.length ? null : 'demo.clarify');
+      }
+    }
+
+    function sentimentSplit(items) {
+      let pos = 0, neg = 0, totW = 0;
+      items.forEach((it) => {
+        const w = Math.max(it.traffic || 1, 1);
+        totW += w;
+        if (SENT_POS.test(it.title)) pos += w;
+        else if (SENT_NEG.test(it.title)) neg += w;
+      });
+      const p = totW ? Math.round((pos / totW) * 100) : 0;
+      const n = totW ? Math.round((neg / totW) * 100) : 0;
+      const neu = Math.max(0, 100 - p - n);
+      return { p, n, neu };
+    }
+
+    function paintDonut(split) {
+      const C = 100;
+      const setSeg = (id, val, off) => {
+        const el = $(id);
+        if (!el) return;
+        el.style.strokeDasharray = val.toFixed(2) + ' ' + C.toFixed(2);
+        el.style.strokeDashoffset = (25 - off).toFixed(2);
+      };
+      setSeg('demoSegPos', split.p, 0);
+      setSeg('demoSegNeu', split.neu, split.p);
+      setSeg('demoSegNeg', split.n, split.p + split.neu);
+      const valEl = $('demoDonutVal');
+      if (valEl) valEl.textContent = split.p + '%';
+      const lp = $('demoLegPos'), ln = $('demoLegNeu'), lg = $('demoLegNeg');
+      if (lp) lp.textContent = split.p + '%';
+      if (ln) ln.textContent = split.neu + '%';
+      if (lg) lg.textContent = split.n + '%';
+    }
+
+    function renderResults(items, query) {
+      /* card 1 — real live signals for this exact query */
+      const sigSub = $('demoSigSub');
+      if (sigSub) sigSub.textContent = fillTpl('demo.sig.s', { n: items.length });
+
+      const list = $('demoSignals');
+      list.innerHTML = items.slice(0, 8).map((it) => {
+        const src = it.source || '';
+        const initial = src ? src.trim().charAt(0) : 'N';
+        return '<div class="feed-item">' +
+          '<span class="feed-src feed-news" title="' + escHtml(src) + '">' + escHtml(initial) + '</span>' +
+          '<span class="feed-text" title="' + escHtml(it.title) + '">' + escHtml(it.title.length > 64 ? it.title.slice(0, 63) + '…' : it.title) + '</span>' +
+          (it.ts ? '<span class="feed-time">' + escHtml(formatRelativeTime(it.ts)) + '</span>' : '') +
+          '</div>';
+      }).join('');
+
+      paintDonut(sentimentSplit(items));
+
+      /* card 3 — real publisher mix */
+      const counts = new Map();
+      items.forEach((it) => {
+        const s = (it.source || '').trim();
+        if (!s) return;
+        counts.set(s, (counts.get(s) || 0) + 1);
+      });
+      const pubs = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+      const totPubs = pubs.reduce((s, x) => s + x[1], 0) || 1;
+      const maxShare = pubs.length ? pubs[0][1] / totPubs : 1;
+      $('demoSources').innerHTML = pubs.map(([name, cnt]) => {
+        const share = Math.round((cnt / totPubs) * 100);
+        const w = Math.max(10, Math.round((cnt / totPubs) / maxShare * 100));
+        const label = name.length > 22 ? name.slice(0, 21) + '…' : name;
+        return '<div class="hbar" title="' + escHtml(name) + '">' +
+          '<span class="hbar-label">' + escHtml(label) + '</span>' +
+          '<span class="hbar-track"><i class="hbar-fill" style="--w:' + w + '%"></i></span>' +
+          '<span class="hbar-count">' + share + '%</span></div>';
+      }).join('') || '<p class="rel-empty">' + escHtml(t('demo.rel.none')) + '</p>';
+    }
+
+    function paintNotice(query) {
+      const n = $('demoNotice'), nText = $('demoNoticeText'), nChips = $('demoNoticeChips');
+      if (!n || !nText || !nChips) return;
+      const near = localSuggestions(query, 3);
+      if (!near.length) near.push.apply(near, demoItems.slice(0, 3));
+      nText.textContent = fillTpl('demo.nosig', { q: query });
+      nChips.innerHTML = near.map((it) =>
+        '<button type="button" class="chip chip-sm dn-chip" data-q="' + escHtml(it.title) + '">' + escHtml(it.title) + '</button>'
+      ).join('');
+      n.hidden = false;
+    }
+
+    async function fetchSignals(query) {
+      const url = '/api/demo?q=' + encodeURIComponent(query.slice(0, 80)) + '&lang=' + lang;
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      const body = await res.json();
+      if (!res.ok || !body.ok || !Array.isArray(body.items) || !body.items.length) {
+        throw new Error(body.error || 'DEMO_FEED_UNAVAILABLE');
+      }
+      return body.items;
+    }
+
+    function runDemo(opts) {
+      if (demoRunning || !demoItems.length || !dInput) return;
+      opts = opts || {};
+      hideSugg();
+
+      let topic = opts.topic || null;
+      let query = dInput.value.trim();
+
+      if (!opts.initial && !topic) {
+        if (!query) {
+          topic = demoItems[0];         /* empty box on auto-run → lead trend */
+          dInput.value = topic.title;
+          query = topic.title;
+        }
+      } else if (topic) {
+        query = topic.title;
+      }
+      if (!query) query = demoItems[0].title;
+
+      demoRunning = true;
+      dRun.disabled = true;
+      $('demoNotice').hidden = true;
+
+      dSteps.hidden = false;
+      dResults.hidden = true;
+      const steps = dSteps.querySelectorAll('.dstep');
+      steps.forEach((s) => s.classList.remove('done', 'active'));
+      steps.forEach((s, i) => {
+        setTimeout(() => {
+          if (i > 0) { steps[i - 1].classList.remove('active'); steps[i - 1].classList.add('done'); }
+          s.classList.add('active');
+        }, i * STEP_MS);
+      });
+
+      const minAnim = new Promise((done) => setTimeout(done, STEP_MS * 3 + (reduceMotion ? 30 : 350)));
+      const signals = fetchSignals(query).catch(() => null);
+
+      Promise.all([signals, minAnim]).then(([items]) => {
+        dSteps.hidden = true;
+        steps.forEach((s) => s.classList.remove('done', 'active'));
+        demoRunning = false;
+        if (dRun) dRun.disabled = false;
+        if (items && items.length) {
+          renderResults(items, query);
+          dResults.hidden = false;
+        } else {
+          /* honest fallback: no live coverage found → guide to live topics */
+          paintNotice(query);
+          dResults.hidden = true;
+        }
+      });
+    }
+
+    function fillTpl(key, vars) {
+      return t(key).replace(/\{(\w+)\}/g, (_, k) => (vars[k] != null ? String(vars[k]) : '{' + k + '}'));
+    }
+
+    function paintUpdated() {
+      if (!dUpdated) return;
+      if (!demoItems.length) return;
+      if (!demoLive) { dUpdated.textContent = t('demo.offline'); return; }
+      if (!demoFetchedAt) return;
+      const mins = Math.floor((Date.now() - demoFetchedAt) / 60000);
+      const rel = mins < 1 ? t('demo.now') : formatRelativeTime(Date.now() - mins * 60000);
+      dUpdated.textContent = fillTpl('demo.updated', { m: rel });
+    }
+
+    /* rotating placeholder while empty — mirrors dashboard behaviour */
+    let phIdx = 0;
+    function rotatePlaceholder() {
+      if (!dInput || document.activeElement === dInput || dInput.value) return;
+      phIdx = (phIdx + 1) % Math.min(demoItems.length, 6);
+      dInput.setAttribute('placeholder', demoItems[phIdx].title);
+    }
+
+    async function loadDemo() {
+      try {
+        const res = await fetch('/api/demo', { headers: { Accept: 'application/json' } });
+        const body = await res.json();
+        if (!res.ok || !body.ok || !Array.isArray(body.items) || !body.items.length) throw new Error(body.error || 'DEMO_FEED_UNAVAILABLE');
+        demoItems = body.items;
+        demoFetchedAt = Number(body.fetchedAt) || Date.now();
+        demoLive = true;
+      } catch (e) {
+        demoItems = SNAPSHOT.slice();
+        demoFetchedAt = 0;
+        demoLive = false;
+      }
+      paintUpdated();
+      if (dInput) dInput.setAttribute('placeholder', demoItems[0].title);
+      runDemo({ initial: true });
+    }
+
+    if (dInput) {
+      dInput.addEventListener('focus', () => { updateSuggestions(); });
+      dInput.addEventListener('input', () => {
+        demoSuggIdx = -1;
+        /* typing a new search hides the previous analysis */
+        if (dResults) dResults.hidden = true;
+        updateSuggestions();
+      });
+      dInput.addEventListener('keydown', (e) => {
+        const rows = dSugg && !dSugg.hidden ? [...dSugg.querySelectorAll('.ds-item')] : [];
+        if (e.key === 'ArrowDown' && rows.length) {
+          e.preventDefault();
+          demoSuggIdx = (demoSuggIdx + 1) % rows.length;
+          rows.forEach((r, i) => r.classList.toggle('sel', i === demoSuggIdx));
+        } else if (e.key === 'ArrowUp' && rows.length) {
+          e.preventDefault();
+          demoSuggIdx = (demoSuggIdx - 1 + rows.length) % rows.length;
+          rows.forEach((r, i) => r.classList.toggle('sel', i === demoSuggIdx));
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          const chosen = rows[demoSuggIdx];
+          const q = chosen ? chosen.dataset.q : dInput.value;
+          if (chosen) dInput.value = q;
+          hideSugg();
+          dInput.blur();
+          runDemo();
+        } else if (e.key === 'Escape') {
+          hideSugg();
+        }
+      });
+      dInput.addEventListener('blur', () => { setTimeout(hideSugg, 150); });
+    }
+    if (dSugg) {
+      dSugg.addEventListener('mousedown', (e) => {
+        const btn = e.target.closest('.ds-item');
+        if (!btn) return;
+        e.preventDefault();
+        dInput.value = btn.dataset.q;
+        hideSugg();
+        runDemo();
+      });
+    }
+    if (dRun) dRun.addEventListener('click', () => runDemo());
+
+    const dNotice = $('demoNotice');
+    if (dNotice) {
+      dNotice.addEventListener('click', (e) => {
+        const chip = e.target.closest('.dn-chip');
+        if (!chip || demoRunning) return;
+        const q = chip.dataset.q;
+        dInput.value = q;
+        runDemo({ topic: bestMatch(q).item || demoItems[0] });
+      });
+    }
+
+    document.addEventListener('nabd-lang', () => {
+      paintUpdated();
+      if (dInput && !dInput.value && demoItems.length) dInput.setAttribute('placeholder', demoItems[phIdx].title);
+    });
+    window.addEventListener('focus', () => { paintUpdated(); });
+
+    viewObserver(demoShell, () => { loadDemo(); });
+  }
+
 
   /* ----------------------------------------------------------
      SPARKLINES (landing preview + workspace KPIs)

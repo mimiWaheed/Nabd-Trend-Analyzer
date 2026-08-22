@@ -127,6 +127,115 @@
       </div>
     </section>
 
+    <!-- ============ LIVE DEMO ============ -->
+    <section class="demo" id="demo">
+      <div class="container">
+        <div class="section-head center reveal">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> <span data-i18n="demo.eyebrow">TRY IT LIVE</span></div>
+          <h2 class="h2" data-i18n-html="demo.title">Ask about Egypt. <span class="grad">Get the signal.</span></h2>
+          <p class="sub" data-i18n="demo.sub">Type any topic — NABD pulls what Egypt is searching right now, runs its pipeline and answers in seconds.</p>
+        </div>
+
+        <div class="demo-shell reveal" id="demoShell" style="--d:.08s">
+          <div class="demo-top">
+            <span class="demo-live mono"><span class="live-dot" aria-hidden="true"></span> <span data-i18n="demo.live">LIVE · EGYPT</span></span>
+            <span class="demo-updated mono" id="demoUpdated"></span>
+          </div>
+
+          <div class="search-box demo-search">
+            <span class="search-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg></span>
+            <input type="text" id="demoInput" autocomplete="off" spellcheck="false" aria-label="Ask about any Egyptian topic">
+            <button class="btn-search btn-search-demo" id="demoRunBtn" type="button">
+              <span data-i18n="demo.run">Analyze</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+            <div class="demo-sugg" id="demoSugg" hidden></div>
+          </div>
+
+          <ol class="demo-steps" id="demoSteps" aria-hidden="true" hidden>
+            <li class="dstep" data-step="1"><span class="dstep-dot mono">01</span><span data-i18n="demo.s1">Fetching live signals</span></li>
+            <li class="dstep" data-step="2"><span class="dstep-dot mono">02</span><span data-i18n="demo.s2">Classifying &amp; scoring topics</span></li>
+            <li class="dstep" data-step="3"><span class="dstep-dot mono">03</span><span data-i18n="demo.s3">Composing the brief</span></li>
+          </ol>
+
+          <div class="demo-results" id="demoResults" hidden>
+            <div class="demo-notice" id="demoNotice" hidden>
+              <span id="demoNoticeText"></span>
+              <div class="demo-notice-chips" id="demoNoticeChips"></div>
+            </div>
+            <div class="demo-grid three">
+              <div class="ws-card chart-card">
+                <div class="card-head">
+                  <div>
+                    <h3 class="card-title" data-i18n="demo.sig.t">LIVE SIGNALS</h3>
+                    <p class="card-sub mono" id="demoSigSub"></p>
+                  </div>
+                </div>
+                <div class="feed-track demo-sig-track" id="demoSignals"></div>
+              </div>
+
+              <div class="ws-card chart-card">
+                <div class="card-head">
+                  <div>
+                    <h3 class="card-title" data-i18n="demo.sent.t">SENTIMENT SPLIT</h3>
+                    <p class="card-sub" data-i18n="demo.sent.s">ACROSS TODAY'S LIVE TOPICS</p>
+                  </div>
+                </div>
+                <div class="donut-wrap">
+                  <div class="donut demo-donut">
+                    <svg viewBox="0 0 42 42" aria-hidden="true">
+                      <circle class="d-bg" cx="21" cy="21" r="15.9155"/>
+                      <circle class="d-seg d-pos" id="demoSegPos" cx="21" cy="21" r="15.9155" stroke-dasharray="100 100" stroke-dashoffset="100"/>
+                      <circle class="d-seg d-neu" id="demoSegNeu" cx="21" cy="21" r="15.9155" stroke-dasharray="100 100" stroke-dashoffset="100"/>
+                      <circle class="d-seg d-neg" id="demoSegNeg" cx="21" cy="21" r="15.9155" stroke-dasharray="100 100" stroke-dashoffset="100"/>
+                    </svg>
+                    <div class="donut-center"><b id="demoDonutVal">–</b><span data-i18n="ws.donut.pos">positive</span></div>
+                  </div>
+                  <div class="donut-legend">
+                    <div class="legend-row"><i style="background:#35D07F"></i><span data-i18n="ws.donut.pos">positive</span><b id="demoLegPos">–</b></div>
+                    <div class="legend-row"><i style="background:#7A8BB5"></i><span data-i18n="ws.donut.neu">neutral</span><b id="demoLegNeu">–</b></div>
+                    <div class="legend-row"><i style="background:#F45D5D"></i><span data-i18n="ws.donut.neg">negative</span><b id="demoLegNeg">–</b></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="ws-card chart-card">
+                <div class="card-head">
+                  <div>
+                    <h3 class="card-title" data-i18n="demo.src.t">SOURCE MIX</h3>
+                    <p class="card-sub" data-i18n="demo.src.s">PUBLISHERS IN THIS COVERAGE</p>
+                  </div>
+                </div>
+                <div class="hbar-list" id="demoSources"></div>
+              </div>
+            </div>
+
+            <div class="demo-guide">
+              <p class="demo-guide-t" data-i18n="demo.guide.t">Take this further</p>
+              <div class="demo-guide-row">
+                <a class="dg-item" href="pages/signup.html" data-page="pages/signup.html">
+                  <span class="dg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></span>
+                  <span class="dg-tx"><b data-i18n="demo.g.export">Export this analysis</b><small data-i18n="demo.g.export.s">PDF, CSV or shareable link</small></span>
+                </a>
+                <a class="dg-item" href="pages/signup.html" data-page="pages/signup.html">
+                  <span class="dg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
+                  <span class="dg-tx"><b data-i18n="demo.g.alert">Get a reminder on this topic</b><small data-i18n="demo.g.alert.s">Alerts the moment it spikes</small></span>
+                </a>
+                <a class="dg-item" href="pages/signin.html" data-page="pages/signin.html">
+                  <span class="dg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17V7l8-4 8 4v10l-8 4z"/><path d="m12 22v-9"/><path d="M20 7l-8 6-8-6"/></svg></span>
+                  <span class="dg-tx"><b data-i18n="demo.g.deep">See deeper signals</b><small data-i18n="demo.g.deep.s">Governorates, influencers, timeline</small></span>
+                </a>
+                <a class="dg-item" href="pages/dashboard.html" data-page="pages/dashboard.html">
+                  <span class="dg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                  <span class="dg-tx"><b data-i18n="demo.g.open">Open in workspace</b><small data-i18n="demo.g.open.s">Run it live with your own question</small></span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ FROM QUESTION TO INSIGHT ============ -->
     <section class="why" id="why">
       <div class="container">
