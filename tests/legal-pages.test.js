@@ -41,7 +41,7 @@ function check(file) {
 
   // 2. i18n keys exist
   const en = N.I18N.en, ar = N.I18N.ar;
-  ['nav.legal.eyebrow', 'nav.legal.privacy', 'nav.legal.terms', 'auth.terms', 'auth.legal'].forEach((k) => {
+  ['nav.legal.eyebrow', 'nav.legal.privacy', 'nav.legal.terms', 'nav.legal.deletion', 'auth.terms', 'auth.legal'].forEach((k) => {
     if (en[k] === undefined) errors.push('missing EN key: ' + k);
     if (ar[k] === undefined) errors.push('missing AR key: ' + k);
   });
@@ -98,7 +98,7 @@ function check(file) {
 }
 
 let failed = false;
-['privacy-policy.html', 'terms.html'].forEach((f) => {
+['privacy-policy.html', 'terms.html', 'data-deletion.html'].forEach((f) => {
   const errs = check(f);
   if (errs.length) { failed = true; console.log('FAIL ' + f + ':'); errs.forEach((e) => console.log('  - ' + e)); }
   else console.log('PASS ' + f);

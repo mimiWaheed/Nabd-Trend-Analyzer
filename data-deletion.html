@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Nabd (نبض) User Data Deletion — how to disconnect Facebook/Instagram, delete your Nabd account, or request deletion of the data Nabd holds about you.">
+  <title>Data Deletion — NABD (نبض)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%235EA2FF'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%23070B14'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('nabd-theme') || 'dark';
+        if (t === 'system') t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+        var l = localStorage.getItem('nabd-lang') || 'en';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('lang', l);
+        document.documentElement.setAttribute('dir', l === 'ar' ? 'rtl' : 'ltr');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="legal-page">
+
+  <!-- ============================================================ -->
+  <!--  NAVIGATION (compact)                                        -->
+  <!-- ============================================================ -->
+  <header class="nav" id="nav">
+    <div class="container">
+      <div class="nav-inner">
+        <a class="brand" href="index.html" data-page="index.html" aria-label="NABD home">
+          <span class="brand-orb"><span class="brand-orb-core"></span></span>
+          <span class="brand-name" data-i18n="brand">NABD</span>
+        </a>
+        <div class="nav-actions">
+          <button class="icon-btn" data-action="theme" aria-label="Toggle theme">
+            <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+            <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          </button>
+          <button class="lang-toggle mono" data-action="lang">العربية</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="legal-hero" id="top">
+      <div class="container">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> <span data-i18n="nav.legal.eyebrow">NABD · LEGAL</span></div>
+        <h1 class="legal-title" data-i18n="nav.legal.deletion">User Data Deletion</h1>
+        <p class="legal-date"><span data-i18n="nav.legal.effective">Effective Date:</span> August 22, 2026</p>
+        <div class="legal-links">
+          <a class="btn btn-ghost btn-sm" href="index.html" data-page="index.html">
+            <span data-i18n="auth.back">Back to home</span>
+          </a>
+          <a class="btn btn-primary btn-sm" href="privacy-policy.html" data-page="privacy-policy.html">
+            <span data-i18n="nav.legal.privacy">Privacy Policy</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ INSTRUCTIONS ============ -->
+    <section class="legal-body">
+      <div class="container">
+        <div class="legal-wrap">
+          <div class="legal-card">
+
+            <div class="legal-en" lang="en">
+
+            <nav class="legal-toc" aria-label="Table of contents">
+              <div class="legal-toc-title">Contents</div>
+              <ol>
+                <li><a href="#scope">What this page covers</a></li>
+                <li><a href="#data">Data Nabd holds from Meta</a></li>
+                <li><a href="#disconnect">Option A — Disconnect inside Nabd</a></li>
+                <li><a href="#remove">Option B — Remove Nabd from Facebook</a></li>
+                <li><a href="#account">Option C — Delete your Nabd account</a></li>
+                <li><a href="#request">Option D — Send a deletion request</a></li>
+                <li><a href="#what">What gets deleted, and when</a></li>
+                <li><a href="#contact">Contact</a></li>
+              </ol>
+            </nav>
+
+            <h2 id="scope">1. What this page covers</h2>
+            <p>Nabd (نبض) lets you optionally connect a Facebook Page and an Instagram Business account through Meta Login so that Nabd can analyze your own audience privately. This page explains how to remove that connection and how to have the data Nabd holds about you deleted — whether you connected through Facebook or simply created a Nabd account.</p>
+            <p>These instructions are provided to satisfy Meta Platform Terms for user data deletion. The full description of what Nabd processes is in the <a href="privacy-policy.html" data-page="privacy-policy.html">Privacy Policy</a>.</p>
+
+            <h2 id="data">2. Data Nabd holds from Meta</h2>
+            <p>When you connect a Meta account, Nabd stores only what is needed to run private analysis for you:</p>
+            <ul>
+              <li>Your Facebook user ID and display name</li>
+              <li>The ID and name of the Facebook Page you chose to analyze</li>
+              <li>The ID of the linked Instagram Business account, if any</li>
+              <li>A Page access token, encrypted at rest, used only to read the Page's posts and engagement for analyses you run</li>
+            </ul>
+            <p>Nabd never receives your Facebook password, does not post on your behalf, and does not share Meta data with advertisers or data brokers.</p>
+
+            <h2 id="disconnect">3. Option A — Disconnect inside Nabd</h2>
+            <p>The fastest way to remove the Meta connection:</p>
+            <ol>
+              <li>Sign in to Nabd and open the <strong>Dashboard</strong>.</li>
+              <li>Go to <strong>Connections</strong> (or the <strong>Private analysis</strong> panel on the home page).</li>
+              <li>Click <strong>Disconnect</strong> next to your Facebook account and confirm.</li>
+            </ol>
+            <p>Disconnecting revokes Nabd's permissions with Meta, deletes the stored access token and Page identifiers from Nabd's servers, and clears the connection from your browser. Private analysis stops immediately; public trend analysis keeps working.</p>
+
+            <h2 id="remove">4. Option B — Remove Nabd from Facebook</h2>
+            <p>You can also revoke access from the Meta side, which works even if you can no longer sign in to Nabd:</p>
+            <ol>
+              <li>On Facebook, open <strong>Settings &amp; privacy → Settings</strong>.</li>
+              <li>Open <strong>Apps and websites</strong>.</li>
+              <li>Find <strong>Nabd</strong>, click <strong>Remove</strong>, and confirm.</li>
+            </ol>
+            <p>Once removed, the token Nabd holds stops working. Nabd automatically purges connection records whose tokens Meta reports as invalid; to have the record removed straight away, use Option A or Option D.</p>
+
+            <h2 id="account">5. Option C — Delete your Nabd account</h2>
+            <p>Deleting your Nabd account removes everything Nabd holds about you, including any Meta connection:</p>
+            <ol>
+              <li>Sign in and open <strong>Settings → Account settings</strong>.</li>
+              <li>Scroll to the <strong>Danger zone</strong> and click <strong>Delete account</strong>.</li>
+              <li>Confirm the deletion.</li>
+            </ol>
+            <p>This deletes your profile, research history, saved searches, notifications, schedules and Facebook connection, and revokes Nabd's Meta permissions on a best-effort basis.</p>
+
+            <h2 id="request">6. Option D — Send a deletion request</h2>
+            <p>If you cannot access the app, or you want written confirmation, email us from the address associated with your Nabd account (or any address, if you only ever used Meta Login) with the subject line <strong>"Data deletion request"</strong> and include:</p>
+            <ul>
+              <li>Your name as shown on Facebook</li>
+              <li>The name of the Facebook Page you connected (if any)</li>
+              <li>The email you used to sign up to Nabd (if any)</li>
+            </ul>
+            <p>Send the request to: <a href="mailto:eng.mhashim@gmail.com">eng.mhashim@gmail.com</a></p>
+            <p>We will acknowledge the request, verify that it comes from the account owner, delete the data, and reply with a confirmation within <strong>30 days</strong>. If Meta has issued you a confirmation code for a deletion callback, include it in the email and we will include it in our reply.</p>
+
+            <h2 id="what">7. What gets deleted, and when</h2>
+            <ul>
+              <li><strong>Meta connection (Options A, B, D):</strong> Facebook user ID, Page ID and name, Instagram account ID and the encrypted access token are deleted from Nabd's database at once (A, D) or on the next token check (B).</li>
+              <li><strong>Full account (Options C, D):</strong> profile, credentials, research history, analyses, saved searches, notifications, schedules, API keys and the Meta connection are deleted from the database.</li>
+              <li><strong>Analysis results:</strong> analyses generated from your connected Page's data are deleted together with your account. Analyses of public sources are not personal data and may be retained in anonymized form.</li>
+              <li><strong>Server logs and backups:</strong> transient request logs and routine database backups are rotated within <strong>30 days</strong>; deleted records are not restored from backups.</li>
+              <li><strong>Legal retention:</strong> we may keep a minimal record of the deletion request itself (date and request email) as evidence of compliance.</li>
+            </ul>
+            <p>Data stored in your own browser (theme, language, cached history) is under your control and can be cleared at any time through your browser's site-data settings.</p>
+
+            <h2 id="contact">8. Contact</h2>
+            <p>Questions about data deletion, or about how Nabd handles your information, can be sent to:</p>
+            <p><a href="mailto:eng.mhashim@gmail.com">eng.mhashim@gmail.com</a></p>
+
+            <div class="legal-note">
+              This page describes the Nabd application as currently built. It is provided for information only and does not constitute legal advice.
+            </div>
+
+            </div>
+
+            <div class="legal-ar" lang="ar">
+
+            <nav class="legal-toc" aria-label="جدول المحتويات">
+              <div class="legal-toc-title">المحتويات</div>
+              <ol>
+                <li><a href="#ar-scope">ما تغطيه هذه الصفحة</a></li>
+                <li><a href="#ar-data">البيانات التي تحتفظ بها نبض من ميتا</a></li>
+                <li><a href="#ar-disconnect">الخيار أ — فصل الحساب من داخل نبض</a></li>
+                <li><a href="#ar-remove">الخيار ب — إزالة نبض من فيسبوك</a></li>
+                <li><a href="#ar-account">الخيار ج — حذف حساب نبض</a></li>
+                <li><a href="#ar-request">الخيار د — إرسال طلب حذف</a></li>
+                <li><a href="#ar-what">ما الذي يُحذف ومتى</a></li>
+                <li><a href="#ar-contact">التواصل</a></li>
+              </ol>
+            </nav>
+
+            <h2 id="ar-scope">1. ما تغطيه هذه الصفحة</h2>
+            <p>تتيح نبض ربط صفحة فيسبوك وحساب إنستغرام للأعمال اختياريًا عبر تسجيل الدخول من ميتا، حتى تتمكن نبض من تحليل جمهورك الخاص بشكل خصوصي. توضح هذه الصفحة كيفية إزالة هذا الربط وكيفية حذف البيانات التي تحتفظ بها نبض عنك — سواء قمت بالربط عبر فيسبوك أو أنشأت حسابًا في نبض فقط.</p>
+            <p>هذه التعليمات مقدَّمة استيفاءً لشروط منصة ميتا بشأن حذف بيانات المستخدم. الوصف الكامل لما تعالجه نبض موجود في <a href="privacy-policy.html" data-page="privacy-policy.html">سياسة الخصوصية</a>.</p>
+
+            <h2 id="ar-data">2. البيانات التي تحتفظ بها نبض من ميتا</h2>
+            <p>عند ربط حساب ميتا، تخزّن نبض فقط ما يلزم لتشغيل التحليل الخاص لك:</p>
+            <ul>
+              <li>معرّف مستخدم فيسبوك واسم العرض</li>
+              <li>معرّف واسم صفحة فيسبوك التي اخترت تحليلها</li>
+              <li>معرّف حساب إنستغرام للأعمال المرتبط، إن وجد</li>
+              <li>رمز وصول للصفحة، مشفّر أثناء التخزين، يُستخدم فقط لقراءة منشورات الصفحة وتفاعلاتها في التحليلات التي تشغّلها</li>
+            </ul>
+            <p>لا تتلقى نبض كلمة مرور فيسبوك الخاصة بك مطلقًا، ولا تنشر نيابةً عنك، ولا تشارك بيانات ميتا مع المعلنين أو وسطاء البيانات.</p>
+
+            <h2 id="ar-disconnect">3. الخيار أ — فصل الحساب من داخل نبض</h2>
+            <p>أسرع طريقة لإزالة ربط ميتا:</p>
+            <ol>
+              <li>سجّل الدخول إلى نبض وافتح <strong>لوحة التحكم</strong>.</li>
+              <li>انتقل إلى <strong>الاتصالات</strong> (أو لوحة <strong>التحليل الخاص</strong> في الصفحة الرئيسية).</li>
+              <li>اضغط <strong>فصل الحساب</strong> بجوار حساب فيسبوك وأكّد.</li>
+            </ol>
+            <p>يؤدي الفصل إلى إلغاء صلاحيات نبض لدى ميتا، وحذف رمز الوصول المخزّن ومعرّفات الصفحة من خوادم نبض، ومسح الاتصال من متصفحك. يتوقف التحليل الخاص فورًا، بينما يستمر تحليل الاتجاهات العامة في العمل.</p>
+
+            <h2 id="ar-remove">4. الخيار ب — إزالة نبض من فيسبوك</h2>
+            <p>يمكنك أيضًا إلغاء الوصول من جهة ميتا، وهذا يعمل حتى لو لم تعد قادرًا على تسجيل الدخول إلى نبض:</p>
+            <ol>
+              <li>في فيسبوك، افتح <strong>الإعدادات والخصوصية ← الإعدادات</strong>.</li>
+              <li>افتح <strong>التطبيقات ومواقع الويب</strong>.</li>
+              <li>ابحث عن <strong>Nabd</strong>، واضغط <strong>إزالة</strong>، ثم أكّد.</li>
+            </ol>
+            <p>بعد الإزالة يتوقف الرمز الذي تحتفظ به نبض عن العمل. تقوم نبض تلقائيًا بحذف سجلات الاتصال التي تُبلغ ميتا عن بطلان رموزها؛ ولحذف السجل فورًا استخدم الخيار أ أو الخيار د.</p>
+
+            <h2 id="ar-account">5. الخيار ج — حذف حساب نبض</h2>
+            <p>يؤدي حذف حساب نبض إلى إزالة كل ما تحتفظ به نبض عنك، بما في ذلك أي ربط مع ميتا:</p>
+            <ol>
+              <li>سجّل الدخول وافتح <strong>الإعدادات ← إعدادات الحساب</strong>.</li>
+              <li>انتقل إلى <strong>منطقة الخطر</strong> واضغط <strong>حذف الحساب</strong>.</li>
+              <li>أكّد الحذف.</li>
+            </ol>
+            <p>يحذف هذا ملفك الشخصي، وسجل الأبحاث، وعمليات البحث المحفوظة، والإشعارات، والجداول، وربط فيسبوك، ويلغي صلاحيات نبض لدى ميتا قدر الإمكان.</p>
+
+            <h2 id="ar-request">6. الخيار د — إرسال طلب حذف</h2>
+            <p>إذا لم تتمكن من الوصول إلى التطبيق، أو أردت تأكيدًا كتابيًا، أرسل بريدًا إلكترونيًا من العنوان المرتبط بحسابك في نبض (أو أي عنوان إذا كنت قد استخدمت تسجيل الدخول من ميتا فقط) بعنوان <strong>"طلب حذف البيانات"</strong> مع ذكر:</p>
+            <ul>
+              <li>اسمك كما يظهر على فيسبوك</li>
+              <li>اسم صفحة فيسبوك التي ربطتها (إن وجدت)</li>
+              <li>البريد الإلكتروني الذي سجّلت به في نبض (إن وجد)</li>
+            </ul>
+            <p>أرسل الطلب إلى: <a href="mailto:eng.mhashim@gmail.com">eng.mhashim@gmail.com</a></p>
+            <p>سنؤكد استلام الطلب، ونتحقق من أنه صادر عن صاحب الحساب، ونحذف البيانات، ونرد بتأكيد خلال <strong>30 يومًا</strong>. إذا أصدرت لك ميتا رمز تأكيد لطلب الحذف، فأدرجه في البريد وسنضمّنه في ردنا.</p>
+
+            <h2 id="ar-what">7. ما الذي يُحذف ومتى</h2>
+            <ul>
+              <li><strong>ربط ميتا (الخيارات أ، ب، د):</strong> يُحذف معرّف مستخدم فيسبوك، ومعرّف الصفحة واسمها، ومعرّف حساب إنستغرام، ورمز الوصول المشفّر من قاعدة بيانات نبض فورًا (أ، د) أو عند فحص الرمز التالي (ب).</li>
+              <li><strong>الحساب الكامل (الخياران ج، د):</strong> يُحذف الملف الشخصي، وبيانات الدخول، وسجل الأبحاث، والتحليلات، وعمليات البحث المحفوظة، والإشعارات، والجداول، ومفاتيح الواجهة، وربط ميتا من قاعدة البيانات.</li>
+              <li><strong>نتائج التحليل:</strong> تُحذف التحليلات المولَّدة من بيانات صفحتك المرتبطة مع حسابك. أما تحليلات المصادر العامة فليست بيانات شخصية وقد يُحتفظ بها بشكل مجهول الهوية.</li>
+              <li><strong>سجلات الخادم والنسخ الاحتياطية:</strong> تُدوَّر سجلات الطلبات المؤقتة والنسخ الاحتياطية الروتينية خلال <strong>30 يومًا</strong>؛ ولا تُستعاد السجلات المحذوفة من النسخ الاحتياطية.</li>
+              <li><strong>الاحتفاظ القانوني:</strong> قد نحتفظ بسجل أدنى لطلب الحذف نفسه (التاريخ وبريد الطلب) كدليل على الامتثال.</li>
+            </ul>
+            <p>البيانات المخزّنة في متصفحك (السمة، اللغة، السجل المؤقت) تحت سيطرتك ويمكن مسحها في أي وقت من إعدادات بيانات الموقع في المتصفح.</p>
+
+            <h2 id="ar-contact">8. التواصل</h2>
+            <p>يمكن إرسال الأسئلة المتعلقة بحذف البيانات، أو بكيفية تعامل نبض مع معلوماتك، إلى:</p>
+            <p><a href="mailto:eng.mhashim@gmail.com">eng.mhashim@gmail.com</a></p>
+
+            <div class="legal-note">
+              توضح هذه الصفحة تطبيق نبض كما هو مبني حاليًا. وهي مقدمة لأغراض معلوماتية فقط ولا تشكل نصيحة قانونية.
+            </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a class="brand" href="index.html" aria-label="NABD home">
+            <span class="brand-orb"><span class="brand-orb-core"></span></span>
+            <span class="brand-name" data-i18n="brand">NABD</span>
+          </a>
+          <p data-i18n="footer.tagline">AI trend intelligence for a country that never stops moving.</p>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer.c1">Product</h4>
+          <a href="pages/dashboard.html?view=analysis" data-page="pages/dashboard.html?view=analysis" data-i18n="footer.l11">Live analysis</a>
+          <a href="index.html#why" data-i18n="footer.l12">Features</a>
+          <a href="index.html#cta" data-i18n="footer.l13">Pricing</a>
+          <a href="pages/dashboard.html?view=analysis" data-page="pages/dashboard.html?view=analysis" data-i18n="footer.l14">Live dashboard</a>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer.c2">Company</h4>
+          <a href="index.html#why" data-i18n="footer.l21">About</a>
+          <a href="index.html#use-cases" data-i18n="footer.l22">Use cases</a>
+          <a href="index.html#cta" data-i18n="footer.l23">Contact</a>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer.c3">Resources</h4>
+          <a href="index.html#cta" data-i18n="footer.l31">Documentation</a>
+          <a href="pages/api.html" data-page="pages/api.html" data-i18n="footer.l32">API reference</a>
+          <a href="index.html#social" data-i18n="footer.l33">Status</a>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer.c4">Legal</h4>
+          <a href="privacy-policy.html" data-page="privacy-policy.html" data-i18n="footer.l41">Privacy</a>
+          <a href="terms.html" data-page="terms.html" data-i18n="footer.l42">Terms</a>
+          <a href="privacy-policy.html#storage" data-i18n="footer.l43">Security</a>
+          <a href="data-deletion.html" data-page="data-deletion.html" data-i18n="footer.l44">Data deletion</a>
+        </div>
+      </div>
+      <div class="footer-bottom mono">
+        <span>© <span id="year"></span> <span data-i18n="footer.copyright">NABD (نبض) Intelligence Systems</span></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

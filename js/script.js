@@ -118,11 +118,11 @@
       'footer.c3': 'Resources', 'footer.l31': 'Documentation', 'footer.l32': 'API reference',
       'footer.l33': 'Status',
       'footer.c4': 'Legal', 'footer.l41': 'Privacy', 'footer.l42': 'Terms',
-      'footer.l43': 'Security', 'footer.l44': 'DPA',
+      'footer.l43': 'Security', 'footer.l44': 'Data deletion',
       'footer.copyright': 'NABD (نبض) Intelligence Systems', 'footer.status': 'All systems operational',
       'nav.legal.eyebrow': 'NABD · LEGAL',
       'nav.legal.privacy': 'Privacy Policy', 'nav.legal.terms': 'Terms of Service',
-      'nav.legal.effective': 'Effective Date:',
+      'nav.legal.effective': 'Effective Date:', 'nav.legal.deletion': 'User Data Deletion',
 
       /* workspace */
       'ws.back': 'Home', 'ws.new': 'New analysis', 'ws.querylabel': 'TRACKING', 'ws.private.badge': 'Private Analysis',
@@ -909,11 +909,11 @@
       'footer.c3': 'الموارد', 'footer.l31': 'التوثيق', 'footer.l32': 'مرجع API',
       'footer.l33': 'الحالة',
       'footer.c4': 'القانونية', 'footer.l41': 'الخصوصية', 'footer.l42': 'الشروط',
-      'footer.l43': 'الأمان', 'footer.l44': 'اتفاقية حماية البيانات',
+      'footer.l43': 'الأمان', 'footer.l44': 'حذف البيانات',
       'footer.copyright': 'نبض لأنظمة الاستخبارات', 'footer.status': 'جميع الأنظمة تعمل',
       'nav.legal.eyebrow': 'نبض · قانوني',
       'nav.legal.privacy': 'سياسة الخصوصية', 'nav.legal.terms': 'شروط الخدمة',
-      'nav.legal.effective': 'تاريخ السريان:',
+      'nav.legal.effective': 'تاريخ السريان:', 'nav.legal.deletion': 'حذف بيانات المستخدم',
 
       /* workspace */
       'ws.back': 'الرئيسية', 'ws.new': 'تحليل جديد', 'ws.querylabel': 'المتابعة', 'ws.private.badge': 'تحليل خاص',
