@@ -2641,7 +2641,110 @@
     }
     renderSignalDash();
 
-    /* ---- account & security (two-step, OTP-verified) ---- */
+    /* ---- field validation — identical rules to the sign-up form ---- */
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    const DISPOSABLE_DOMAINS = [
+      'mailinator.com', 'yopmail.com', 'guerrillamail.com', 'tempmail.com',
+      '10minutemail.com', 'throwaway.com', 'trashmail.com', 'sharklasers.com',
+      'getnada.com', 'temp-mail.org', 'maildrop.cc', 'mohmal.com',
+      'emailnator.com', 'fakeinbox.com', 'dropmail.me', 'inboxkitten.com',
+      'tmpmail.org', 'spam4.me', 'mailnesia.com', 'dispostable.com', 'burnermail.io'
+    ];
+    function isValidEmail(v) {
+      const s = (v || '').trim();
+      if (!EMAIL_RE.test(s)) return false;
+      const at = s.lastIndexOf('@');
+      if (at < 1 || at === s.length - 1) return false;
+      const domain = s.slice(at + 1).toLowerCase();
+      const parts = domain.split('.');
+      const host = parts[parts.length - 2] || '';
+      const tld = parts[parts.length - 1] || '';
+      if (!host || !/^[a-z]{2,}$/.test(tld)) return false;
+      if (DISPOSABLE_DOMAINS.indexOf(domain) !== -1) return false;
+      return true;
+    }
+    function passwordScore(v) {
+      let s = 0;
+      if (!v) return 0;
+      if (v.length >= 8) s++;
+      if (v.length >= 12) s++;
+      if (/[A-Z]/.test(v) && /[a-z]/.test(v)) s++;
+      if (/\d/.test(v)) s++;
+      if (/[^A-Za-z0-9]/.test(v)) s++;
+      return s;
+    }
+    function passwordLevel(score) {
+      if (score <= 1) return 'weak';
+      if (score === 2) return 'fair';
+      if (score === 3) return 'good';
+      return 'strong';
+    }
+    function setFieldState(input, msgEl, msg, ok) {
+      if (input) {
+        input.classList.toggle('field-invalid', !ok);
+        input.setAttribute('aria-invalid', ok ? 'false' : 'true');
+      }
+      if (msgEl) {
+        msgEl.textContent = ok ? '' : msg || '';
+        if (msgEl.textContent) {
+          msgEl.classList.remove('field-msg-in');
+          void msgEl.offsetWidth; /* restart the fade */
+          msgEl.classList.add('field-msg-in');
+        } else {
+          msgEl.classList.remove('field-msg-in');
+        }
+      }
+      return ok;
+    }
+    function wireField(input, msgEl, validator) {
+      if (!input || !msgEl) return null;
+      let touched = false;
+      const check = () => validator(input.value);
+      input.addEventListener('blur', () => { touched = true; check(); });
+      input.addEventListener('input', () => { if (touched) check(); });
+      return () => { touched = true; return check(); };
+    }
+
+    const emailNewEl = $('secEmailNew');
+    const pwNewEl = $('secPassNew');
+    const pwConfEl = $('secPassConf');
+    /* strength meter — same markup/behaviour as the sign-up form */
+    const meter = $('secPwdMeter');
+    const levelEl = $('secPwdLevel');
+    function renderStrength() {
+      const score = passwordScore(pwNewEl ? pwNewEl.value : '');
+      if (!score) {
+        if (meter) { meter.style.width = '0%'; meter.className = ''; }
+        if (levelEl) levelEl.textContent = '';
+        return;
+      }
+      const lvl = passwordLevel(score);
+      const pct = { weak: 25, fair: 50, good: 75, strong: 100 }[lvl];
+      if (meter) { meter.style.width = pct + '%'; meter.className = 'lvl-' + lvl; }
+      if (levelEl) levelEl.textContent = L('auth.pwd.' + lvl);
+    }
+    const emailCheck = wireField(emailNewEl, $('secEmailNewMsg'), (v) => {
+      const empty = !(v || '').trim();
+      const ok = !empty && isValidEmail(v);
+      setFieldState(emailNewEl, $('secEmailNewMsg'), ok ? '' : (empty ? L('auth.err.email') : L('auth.err.email.bad')), ok);
+      return ok;
+    });
+    const pwdCheck = wireField(pwNewEl, $('secPassNewMsg'), (v) => {
+      const empty = !(v || '');
+      const ok = !empty && v.length >= 8;
+      setFieldState(pwNewEl, $('secPassNewMsg'), empty ? L('auth.err.pass.required') : (ok ? '' : L('auth.err.pass')), ok);
+      return ok;
+    });
+    if (pwNewEl) pwNewEl.addEventListener('input', renderStrength);
+    const confCheck = wireField(pwConfEl, $('secPassConfMsg'), (v) => {
+      const empty = !(v || '');
+      const ok = !empty && pwNewEl && v === pwNewEl.value;
+      setFieldState(pwConfEl, $('secPassConfMsg'), empty ? L('auth.err.confirm.req') : (ok ? '' : L('auth.err.match')), ok);
+      return ok;
+    });
+    function clearFieldState(input, msgId) {
+      setFieldState(input, $(msgId), '', true);
+    }
     function secMsg(id, text) { const el = $(id); if (el) el.textContent = text || ''; }
     function secShowStep(form, step) {
       const s1 = $(form + 'Step1');
@@ -2649,108 +2752,6 @@
       if (s1) s1.hidden = step !== 1;
       if (s2) s2.hidden = step !== 2;
     }
-
-    /* strict email check: sane local part + real domain with an alpha TLD */
-    function emailValid(v) {
-      if (!v || v.length > 200 || /\s/.test(v)) return false;
-      const at = v.lastIndexOf('@');
-      if (at < 1 || at === v.length - 1) return false;
-      const local = v.slice(0, at);
-      const dom = v.slice(at + 1);
-      if (!/^[A-Za-z0-9._%+-]+$/.test(local)) return false;
-      if (local[0] === '.' || local[local.length - 1] === '.' || local.indexOf('..') !== -1) return false;
-      if (!/^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}$/.test(dom)) return false;
-      return true;
-    }
-
-    /* "did you mean" for near-misses of common providers (gmial.com -> gmail.com) */
-    const COMMON_DOMAINS = ['gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com', 'icloud.com', 'live.com', 'msn.com', 'aol.com', 'proton.me', 'protonmail.com'];
-    function domainHint(v) {
-      const at = v.lastIndexOf('@');
-      if (at < 0) return null;
-      const dom = v.slice(at + 1).toLowerCase();
-      if (!dom || COMMON_DOMAINS.indexOf(dom) !== -1) return null;
-      const lev = (a, b) => {
-        let prev = [], cur = [];
-        for (let j = 0; j <= b.length; j++) prev[j] = j;
-        for (let i = 1; i <= a.length; i++) {
-          cur = [i];
-          for (let j = 1; j <= b.length; j++) {
-            cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-          }
-          prev = cur.slice();
-        }
-        return prev[b.length];
-      };
-      for (let i = 0; i < COMMON_DOMAINS.length; i++) {
-        if (lev(dom, COMMON_DOMAINS[i]) <= (dom.length <= 6 ? 1 : 2)) return COMMON_DOMAINS[i];
-      }
-      return null;
-    }
-
-    function pwRules(p) {
-      return {
-        len: p.length >= 8,
-        letter: /[A-Za-z\u0600-\u06FF]/.test(p),
-        num: /\d/.test(p)
-      };
-    }
-
-    /* live validation wiring */
-    const emailNewEl = $('secEmailNew');
-    const emailLiveEl = $('secEmailLive');
-    const pwNewEl = $('secPassNew');
-    const pwConfEl = $('secPassConf');
-    const confLiveEl = $('secConfLive');
-    function markInput(el, state) {
-      if (!el) return;
-      el.classList.toggle('is-ok', state === 'ok');
-      el.classList.toggle('is-err', state === 'err');
-    }
-    function renderEmailCheck() {
-      if (!emailNewEl || !emailLiveEl) return null;
-      const v = emailNewEl.value.trim();
-      if (!v) { emailLiveEl.textContent = ''; emailLiveEl.className = 'sec-live'; markInput(emailNewEl, ''); return null; }
-      if (!emailValid(v)) {
-        emailLiveEl.textContent = L('prof.sec.v.email.bad');
-        emailLiveEl.className = 'sec-live bad';
-        markInput(emailNewEl, 'err');
-        return { ok: false };
-      }
-      const hint = domainHint(v);
-      if (hint) {
-        emailLiveEl.textContent = L('prof.sec.v.domain').split('{d}').join(v.slice(0, v.lastIndexOf('@') + 1) + hint);
-        emailLiveEl.className = 'sec-live warn';
-        markInput(emailNewEl, '');
-        return { ok: true, hint: v.slice(0, v.lastIndexOf('@') + 1) + hint };
-      }
-      emailLiveEl.textContent = L('prof.sec.v.email.ok');
-      emailLiveEl.className = 'sec-live good';
-      markInput(emailNewEl, 'ok');
-      return { ok: true };
-    }
-    function renderPwChecks() {
-      const p = pwNewEl ? pwNewEl.value : '';
-      const r = pwRules(p);
-      document.querySelectorAll('#secPwRules .pw-rule').forEach((chip) => {
-        chip.classList.toggle('ok', !!r[chip.dataset.rule]);
-      });
-      markInput(pwNewEl, !p ? '' : (r.len && r.letter && r.num) ? 'ok' : 'err');
-      renderConfCheck();
-      return !p || (r.len && r.letter && r.num);
-    }
-    function renderConfCheck() {
-      const conf = pwConfEl ? pwConfEl.value : '';
-      const same = conf !== '' && pwNewEl && conf === pwNewEl.value;
-      if (!confLiveEl) return;
-      if (!conf) { confLiveEl.textContent = ''; confLiveEl.className = 'sec-live'; markInput(pwConfEl, ''); return; }
-      if (same) { confLiveEl.textContent = L('prof.sec.v.conf.ok'); confLiveEl.className = 'sec-live good'; markInput(pwConfEl, 'ok'); }
-      else { confLiveEl.textContent = L('prof.sec.v.conf.bad'); confLiveEl.className = 'sec-live bad'; markInput(pwConfEl, 'err'); }
-    }
-    if (emailNewEl) emailNewEl.addEventListener('input', renderEmailCheck);
-    if (emailNewEl) emailNewEl.addEventListener('change', renderEmailCheck);
-    if (pwNewEl) pwNewEl.addEventListener('input', renderPwChecks);
-    if (pwConfEl) pwConfEl.addEventListener('input', renderConfCheck);
 
     let emailPending = null;
     let emailStep = 1;
@@ -2767,9 +2768,8 @@
         const pass = passEl ? passEl.value : '';
         const email = newEl ? newEl.value.trim() : '';
         if (!pass) { secMsg('secEmailMsg', L('prof.sec.err.pass')); return; }
-        const chk = renderEmailCheck();
-        if (!email) { secMsg('secEmailMsg', L('prof.sec.err.email')); return; }
-        if (!chk || !chk.ok || !emailValid(email)) { secMsg('secEmailMsg', L('prof.sec.v.email.bad')); return; }
+        if (!email) { secMsg('secEmailMsg', L('auth.err.email')); if (emailCheck) emailCheck(); return; }
+        if (emailCheck && !emailCheck()) return;
         if (btn) btn.disabled = true;
         N.api('/api/auth?action=change-email', { method: 'POST', body: { password: pass, email: email } })
           .then(() => {
@@ -2809,7 +2809,7 @@
           if (passEl) passEl.value = '';
           if (newEl) newEl.value = '';
           if (otpEl) otpEl.value = '';
-          renderEmailCheck();
+          clearFieldState(newEl, 'secEmailNewMsg');
           if (btn) btn.textContent = L('prof.sec.emailBtn');
         });
     });
@@ -2832,9 +2832,10 @@
         const next = newEl ? newEl.value : '';
         const conf = confEl ? confEl.value : '';
         if (!cur) { secMsg('secPassMsg', L('prof.sec.err.pass')); return; }
-        const r = pwRules(next);
-        if (!(r.len && r.letter && r.num)) { secMsg('secPassMsg', L('auth.err.pass')); renderPwChecks(); return; }
-        if (next !== conf) { secMsg('secPassMsg', L('auth.err.match')); renderConfCheck(); return; }
+        if (!next) { secMsg('secPassMsg', L('auth.err.pass.required')); if (pwdCheck) pwdCheck(); return; }
+        if (pwdCheck && !pwdCheck()) return;
+        if (!conf) { secMsg('secPassMsg', L('auth.err.confirm.req')); if (confCheck) confCheck(); return; }
+        if (confCheck && !confCheck()) return;
         if (btn) btn.disabled = true;
         N.api('/api/auth?action=change-password', { method: 'POST', body: { currentPassword: cur } })
           .then((d) => {
@@ -2846,6 +2847,9 @@
               if (curEl) curEl.value = '';
               if (newEl) newEl.value = '';
               if (confEl) confEl.value = '';
+              renderStrength();
+              clearFieldState(newEl, 'secPassNewMsg');
+              clearFieldState(confEl, 'secPassConfMsg');
               const note = $('secPassNote');
               if (note) note.textContent = L('prof.sec.note.pass');
               if (btn) btn.textContent = L('prof.sec.verifyBtn');
@@ -2872,7 +2876,9 @@
           if (confEl) confEl.value = '';
           if (curEl) curEl.value = '';
           if (otpEl) otpEl.value = '';
-          renderPwChecks();
+          renderStrength();
+          clearFieldState(newEl, 'secPassNewMsg');
+          clearFieldState(confEl, 'secPassConfMsg');
           if (btn) btn.textContent = L('prof.sec.sendBtn');
         })
         .catch((err) => secMsg('secPassMsg', (err && err.message) || L('prof.sec.err')))
