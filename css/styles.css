@@ -5188,6 +5188,31 @@ body[data-page="settings"] .card-head { border-bottom: 1px solid var(--line-soft
   letter-spacing: .35em;
   text-align: center;
 }
+.prof-sec-panel input.is-ok { border-color: rgba(45, 206, 125, .55); }
+.prof-sec-panel input.is-ok:focus { border-color: rgba(45, 206, 125, .65); box-shadow: 0 0 0 3px rgba(45, 206, 125, .14); background: var(--surface-2); }
+.prof-sec-panel input.is-err { border-color: rgba(239, 77, 87, .55); }
+.prof-sec-panel input.is-err:focus { border-color: rgba(239, 77, 87, .65); box-shadow: 0 0 0 3px rgba(239, 77, 87, .14); background: var(--surface-2); }
+.sec-live { min-height: 16px; font-size: .74rem; line-height: 1.35; }
+.sec-live.good { color: var(--pos); }
+.sec-live.bad { color: var(--danger); }
+.sec-live.warn { color: var(--warn); }
+.pw-rules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pw-rule {
+  font-size: .7rem;
+  padding: 3px 9px;
+  border-radius: 99px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  transition: color .2s var(--ease), background .2s var(--ease);
+}
+.pw-rule.ok {
+  background: rgba(45, 206, 125, .13);
+  color: var(--pos);
+}
 .prof-sec-panel .btn { align-self: flex-start; }
 .prof-empty.sm { padding: 22px 10px; font-size: .8rem; }
 

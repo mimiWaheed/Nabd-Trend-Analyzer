@@ -114,7 +114,8 @@
               <label class="sr-only" for="secEmailPass" data-i18n="prof.sec.curpass">Current password</label>
               <input type="password" id="secEmailPass" autocomplete="current-password" maxlength="100" data-i18n-ph="prof.sec.ph.pass" placeholder="Current password">
               <label class="sr-only" for="secEmailNew" data-i18n="prof.sec.newemail">New email</label>
-              <input type="email" id="secEmailNew" autocomplete="email" maxlength="200" data-i18n-ph="prof.sec.ph.email" placeholder="New email address">
+              <input type="email" id="secEmailNew" autocomplete="email" maxlength="200" spellcheck="false" data-i18n-ph="prof.sec.ph.email" placeholder="New email address">
+              <div class="sec-live" id="secEmailLive" aria-live="polite"></div>
             </div>
             <div class="prof-sec-step" id="secEmailStep2" hidden>
               <p class="prof-sec-note" id="secEmailNote"></p>
@@ -136,10 +137,16 @@
             <div class="prof-sec-step" id="secPassStep1">
               <label class="sr-only" for="secPassCur" data-i18n="prof.sec.curpass">Current password</label>
               <input type="password" id="secPassCur" autocomplete="current-password" maxlength="100" data-i18n-ph="prof.sec.ph.pass" placeholder="Current password">
+              <div class="pw-rules" id="secPwRules" aria-live="polite">
+                <span class="pw-rule" data-rule="len" data-i18n="prof.sec.pw.len">8+ characters</span>
+                <span class="pw-rule" data-rule="letter" data-i18n="prof.sec.pw.letter">Contains a letter</span>
+                <span class="pw-rule" data-rule="num" data-i18n="prof.sec.pw.num">Contains a number</span>
+              </div>
               <label class="sr-only" for="secPassNew" data-i18n="prof.sec.newpass">New password</label>
               <input type="password" id="secPassNew" autocomplete="new-password" maxlength="100" data-i18n-ph="prof.sec.ph.new" placeholder="New password">
               <label class="sr-only" for="secPassConf" data-i18n="prof.sec.conf">Confirm new password</label>
               <input type="password" id="secPassConf" autocomplete="new-password" maxlength="100" data-i18n-ph="prof.sec.ph.conf" placeholder="Confirm new password">
+              <div class="sec-live" id="secConfLive" aria-live="polite"></div>
             </div>
             <div class="prof-sec-step" id="secPassStep2" hidden>
               <p class="prof-sec-note" id="secPassNote"></p>
