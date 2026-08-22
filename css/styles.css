@@ -4067,6 +4067,8 @@ html[dir="rtl"] .db-results .summary-body .empty-state { text-align: right; }
   border: 1px solid var(--line-soft);
   border-radius: 10px;
   background: var(--surface-1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
   color: var(--text);
   text-align: left;
   cursor: pointer;
