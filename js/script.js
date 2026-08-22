@@ -49,7 +49,6 @@
       'demo.sent.t': 'SENTIMENT SPLIT', 'demo.sent.s': 'ACROSS THESE SIGNALS',
       'demo.src.t': 'SOURCE MIX', 'demo.src.s': 'PUBLISHERS IN THIS COVERAGE',
       'demo.rel.none': 'No related keywords in the current feed.',
-      'demo.clarify': 'Refine your topic',
       'demo.nosig': 'No live signal for "{q}" this minute — here is what Egypt is searching right now:',
       'demo.guide.t': 'Take this further',
       'demo.g.export': 'Export this analysis', 'demo.g.export.s': 'PDF, CSV or shareable link',
@@ -862,7 +861,6 @@
       'demo.sent.t': 'توزيع المشاعر', 'demo.sent.s': 'على هذه الإشارات',
       'demo.src.t': 'مزيج المصادر', 'demo.src.s': 'الناشرون في هذه التغطية',
       'demo.rel.none': 'لا توجد كلمات ذات صلة في التغذية الحالية.',
-      'demo.clarify': 'حدّد موضوعك',
       'demo.nosig': 'لا توجد إشارة حية لـ«{q}» في هذه اللحظة — هذا ما يبحث عنه المصريون الآن:',
       'demo.guide.t': 'خُذ هذا أبعد',
       'demo.g.export': 'صدّر هذا التحليل', 'demo.g.export.s': 'PDF أو CSV أو رابط قابل للمشاركة',
@@ -2404,7 +2402,6 @@
     let demoLive = false;
     let demoRunning = false;
     let demoSuggIdx = -1;
-    let demoClarifyBusy = false;
     const dInput = $('demoInput');
     const dRun = $('demoRunBtn');
     const dSteps = $('demoSteps');
@@ -2476,30 +2473,96 @@
         .map((x) => x.it);
     }
 
-    /* NABD's smart-search layer: ask the AI clarity endpoint when the
-       local trend list has nothing close. Silent-fail to local chips. */
-    async function aiClarify(query) {
-      if (demoClarifyBusy) return null;
-      demoClarifyBusy = true;
+    /* NABD's smart-search clarification — same UX as the dashboard:
+       a panel with a spark header, AI intent suggestions, and a
+       "search anyway" escape. Any failure runs the search directly
+       so the AI is never a point of failure. */
+    let clarifyToken = 0;
+    function clarifyPanelEl() { return document.getElementById('demoClarify'); }
+    function closeClarify() {
+      const p = clarifyPanelEl();
+      if (p) p.hidden = true;
+      clarifyToken++;
+    }
+    function ensureClarifyPanel() {
+      let p = clarifyPanelEl();
+      if (p || !dInput) return p;
+      p = document.createElement('div');
+      p.className = 'clarify-panel';
+      p.id = 'demoClarify';
+      p.hidden = true;
+      p.innerHTML =
+        '<div class="clarify-head"><span class="clarify-spark" aria-hidden="true"></span><span class="clarify-title" id="demoClarifyTitle"></span></div>' +
+        '<div class="clarify-list" id="demoClarifyList"></div>' +
+        '<button type="button" class="clarify-anyway" id="demoClarifyAnyway"></button>';
+      dInput.closest('.search-box').parentNode.appendChild(p);
+      p.addEventListener('click', (e) => {
+        const item = e.target.closest('.clarify-item');
+        if (item) {
+          const q = item.dataset.q || '';
+          closeClarify();
+          if (dInput) dInput.value = q;
+          runSignals(q);
+          return;
+        }
+        if (e.target.closest('#demoClarifyAnyway')) {
+          const q = p.dataset.original || '';
+          closeClarify();
+          runSignals(q);
+        }
+      });
+      return p;
+    }
+    function renderClarifyLoading() {
+      const p = ensureClarifyPanel();
+      if (!p) return;
+      p.querySelector('#demoClarifyTitle').textContent = t('db.clarify.thinking');
+      p.querySelector('#demoClarifyList').innerHTML = '<div class="clarify-thinking"><span class="clarify-spinner" aria-hidden="true"></span></div>';
+      p.querySelector('#demoClarifyAnyway').hidden = true;
+      p.hidden = false;
+    }
+    function renderClarify(originalQ, suggestions) {
+      const p = ensureClarifyPanel();
+      if (!p) { runSignals(originalQ); return; }
+      p.dataset.original = originalQ;
+      p.querySelector('#demoClarifyTitle').textContent = t('db.clarify.t');
+      p.querySelector('#demoClarifyList').innerHTML = suggestions.map((s) =>
+        '<button type="button" class="clarify-item" data-q="' + escHtml(s.query) + '">' +
+        '<span>' + escHtml(s.label) + '</span>' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>' +
+        '</button>'
+      ).join('');
+      const anyway = p.querySelector('#demoClarifyAnyway');
+      anyway.textContent = fillTpl('db.clarify.anyway', { q: originalQ });
+      anyway.hidden = false;
+      p.hidden = false;
+    }
+    async function evaluateQuery(q) {
+      /* obvious live-trend matches skip the AI entirely */
+      if (bestMatch(q).score >= 80) { runSignals(q); return; }
+      const token = ++clarifyToken;
+      renderClarifyLoading();
       try {
         const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 8000);
+        const timer = setTimeout(() => ctrl.abort(), 9000);
         const res = await fetch('/api/nabd', {
           method: 'POST',
-          headers: Object.assign({ 'Content-Type': 'application/json' }, { Accept: 'application/json' }),
-          body: JSON.stringify({ task: 'query_clarification', message: query }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ task: 'query_clarification', message: q }),
           signal: ctrl.signal
         });
         clearTimeout(timer);
-        const body = await res.json();
-        const sug = body && body.ok && body.clarification && Array.isArray(body.clarification.suggestions)
-          ? body.clarification.suggestions.slice(0, 4).map((s) => ({ label: s.label, query: s.query }))
-          : null;
-        return sug && sug.length ? sug : null;
+        if (token !== clarifyToken) return;
+        const data = await res.json().catch(() => null);
+        const c = data && data.ok && data.clarification;
+        if (c && c.needs_clarification && Array.isArray(c.suggestions) && c.suggestions.length) {
+          renderClarify(q, c.suggestions);
+        } else {
+          closeClarify();
+          runSignals(q);
+        }
       } catch (e) {
-        return null;
-      } finally {
-        setTimeout(() => { demoClarifyBusy = false; }, 4000);
+        if (token === clarifyToken) { closeClarify(); runSignals(q); }
       }
     }
 
@@ -2524,7 +2587,7 @@
       dSugg.hidden = false;
     }
 
-    async function updateSuggestions() {
+    function updateSuggestions() {
       if (!dInput || !dSugg || demoRunning) return;
       const q = dInput.value.trim();
       if (q.length < 2 || !demoItems.length) {
@@ -2532,15 +2595,7 @@
         else hideSugg();
         return;
       }
-      const loc = localSuggestions(q, 5);
-      if (loc.length >= 3) { paintSugg(loc.map((it) => ({ label: it.title, query: it.title, traffic: it.traffic }))); return; }
-      paintSugg(loc.map((it) => ({ label: it.title, query: it.title, traffic: it.traffic })));
-      const ai = await aiClarify(q);
-      if (ai && dInput.value.trim() === q) {
-        const merged = loc.map((it) => ({ label: it.title, query: it.title, traffic: it.traffic }));
-        ai.forEach((s) => { if (!merged.some((m) => normOf(m.query) === normOf(s.query))) merged.push(s); });
-        paintSugg(merged.slice(0, 6), loc.length ? null : 'demo.clarify');
-      }
+      paintSugg(localSuggestions(q, 5).map((it) => ({ label: it.title, query: it.title, traffic: it.traffic })));
     }
 
     function sentimentSplit(items) {
@@ -2558,16 +2613,23 @@
     }
 
     function paintDonut(split) {
-      const C = 100;
-      const setSeg = (id, val, off) => {
+      /* same tiling math as N.buildDonut: offset = -accumulated, so the
+         segments connect seamlessly; +0.45 overlap kills AA seams */
+      const OVERLAP = 0.45;
+      const segs = [
+        ['demoSegPos', split.p],
+        ['demoSegNeu', split.neu],
+        ['demoSegNeg', split.n]
+      ];
+      let acc = 0;
+      segs.forEach(([id, v]) => {
         const el = $(id);
         if (!el) return;
-        el.style.strokeDasharray = val.toFixed(2) + ' ' + C.toFixed(2);
-        el.style.strokeDashoffset = (25 - off).toFixed(2);
-      };
-      setSeg('demoSegPos', split.p, 0);
-      setSeg('demoSegNeu', split.neu, split.p);
-      setSeg('demoSegNeg', split.n, split.p + split.neu);
+        const len = Math.max(0, Math.min(100, v));
+        el.style.strokeDasharray = (len ? len + OVERLAP : 0).toFixed(2) + ' ' + Math.max(0, 100 - len).toFixed(2);
+        el.style.strokeDashoffset = (-acc).toFixed(2);
+        acc += len;
+      });
       const valEl = $('demoDonutVal');
       if (valEl) valEl.textContent = split.p + '%';
       const lp = $('demoLegPos'), ln = $('demoLegNeu'), lg = $('demoLegNeg');
@@ -2641,6 +2703,7 @@
       if (demoRunning || !demoItems.length || !dInput) return;
       opts = opts || {};
       hideSugg();
+      closeClarify();
 
       let topic = opts.topic || null;
       let query = dInput.value.trim();
@@ -2655,6 +2718,15 @@
         query = topic.title;
       }
       if (!query) query = demoItems[0].title;
+
+      /* explicit pick or initial auto-run goes straight to results;
+         a typed search first passes NABD's AI clarification layer */
+      if (opts.initial || topic || opts.direct) { runSignals(query); return; }
+      evaluateQuery(query);
+    }
+
+    function runSignals(query) {
+      if (demoRunning || !dInput) return;
 
       demoRunning = true;
       dRun.disabled = true;
@@ -2734,6 +2806,7 @@
       dInput.addEventListener('focus', () => { updateSuggestions(); });
       dInput.addEventListener('input', () => {
         demoSuggIdx = -1;
+        closeClarify();
         /* typing a new search hides the previous analysis */
         if (dResults) dResults.hidden = true;
         updateSuggestions();
@@ -2755,9 +2828,10 @@
           if (chosen) dInput.value = q;
           hideSugg();
           dInput.blur();
-          runDemo();
+          runDemo({ direct: chosen ? true : false });
         } else if (e.key === 'Escape') {
           hideSugg();
+          closeClarify();
         }
       });
       dInput.addEventListener('blur', () => { setTimeout(hideSugg, 150); });
@@ -2769,9 +2843,13 @@
         e.preventDefault();
         dInput.value = btn.dataset.q;
         hideSugg();
-        runDemo();
+        runDemo({ direct: true });
       });
     }
+    document.addEventListener('click', (e) => {
+      const p = clarifyPanelEl();
+      if (p && !p.hidden && !p.contains(e.target) && !(dInput && dInput.closest('.search-box').contains(e.target))) closeClarify();
+    });
     if (dRun) dRun.addEventListener('click', () => runDemo());
 
     const dNotice = $('demoNotice');
