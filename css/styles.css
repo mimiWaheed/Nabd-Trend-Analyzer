@@ -893,7 +893,14 @@ html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
 .demo-live .live-dot { background: #34d399; box-shadow: 0 0 10px rgba(52, 211, 153, .8); }
 .demo-updated { font-size: .7rem; color: var(--text-muted); letter-spacing: .08em; }
 
-.demo-search { width: 100%; padding-right: 8px; }
+.demo-search { width: 100%; padding-right: 8px; position: relative; z-index: 5; }
+.demo-search .clarify-panel {
+  top: calc(100% + 10px);
+  z-index: 60;
+  background: var(--card-surface, var(--bg-soft));
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  backdrop-filter: blur(22px) saturate(1.4);
+}
 .demo-search input {
   flex: 1;
   min-width: 0;

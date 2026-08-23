@@ -2112,7 +2112,13 @@
   const accEsc = (s) => String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   function displayNameOf(u) {
-    return String((u && (u.name || u.full_name || u.username)) || '').trim() || 'NABD';
+    if (!u) return 'NABD';
+    const full = [u.firstName || u.first, u.lastName || u.last]
+      .map((p) => String(p || '').trim()).filter(Boolean).join(' ');
+    if (full) return full;
+    if (u.name) return String(u.name).trim();
+    const email = String(u.email || '');
+    return email.indexOf('@') > 1 ? email.split('@')[0] : 'NABD';
   }
   function navPaintAccount(u) {
     if (!navAuthBox || !navAccountBox) return;
@@ -2565,7 +2571,9 @@
         '<div class="clarify-head"><span class="clarify-spark" aria-hidden="true"></span><span class="clarify-title" id="demoClarifyTitle"></span></div>' +
         '<div class="clarify-list" id="demoClarifyList"></div>' +
         '<button type="button" class="clarify-anyway" id="demoClarifyAnyway"></button>';
-      dInput.closest('.search-box').parentNode.appendChild(p);
+      /* anchored to the search box itself, so it floats above the
+         results/next-section content with a blurred glass backdrop */
+      dInput.closest('.search-box').appendChild(p);
       p.addEventListener('click', (e) => {
         const item = e.target.closest('.clarify-item');
         if (item) {
