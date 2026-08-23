@@ -2660,11 +2660,8 @@
     function updateSuggestions() {
       if (!dInput || !dSugg || demoRunning) return;
       const q = dInput.value.trim();
-      if (q.length < 2 || !demoItems.length) {
-        if (!q && demoItems.length) paintSugg(demoItems.slice(0, 5).map((it) => ({ label: it.title, query: it.title, traffic: it.traffic })));
-        else hideSugg();
-        return;
-      }
+      /* suggestions only once the visitor actually types — never on focus */
+      if (q.length < 2 || !demoItems.length) { hideSugg(); return; }
       paintSugg(localSuggestions(q, 5).map((it) => ({ label: it.title, query: it.title, traffic: it.traffic })));
     }
 
@@ -2772,26 +2769,24 @@
     function runDemo(opts) {
       if (demoRunning || !demoItems.length || !dInput) return;
       opts = opts || {};
-      hideSugg();
-      closeClarify();
 
       let topic = opts.topic || null;
       let query = dInput.value.trim();
 
-      if (!opts.initial && !topic) {
-        if (!query) {
-          topic = demoItems[0];         /* empty box on auto-run → lead trend */
-          dInput.value = topic.title;
-          query = topic.title;
-        }
-      } else if (topic) {
-        query = topic.title;
-      }
-      if (!query) query = demoItems[0].title;
+      if (topic) query = topic.title;
 
-      /* explicit pick or initial auto-run goes straight to results;
-         a typed search first passes NABD's AI clarification layer */
-      if (opts.initial || topic || opts.direct) { runSignals(query); return; }
+      /* nothing typed → never auto-search; offer the live trends instead */
+      if (!query) {
+        paintSugg(demoItems.slice(0, 5).map((it) => ({ label: it.title, query: it.title, traffic: it.traffic })));
+        dInput.focus();
+        return;
+      }
+      hideSugg();
+      closeClarify();
+
+      /* explicit pick goes straight to results; a typed search first
+         passes NABD's AI clarification layer */
+      if (topic || opts.direct) { runSignals(query); return; }
       evaluateQuery(query);
     }
 
@@ -2869,11 +2864,10 @@
       }
       paintUpdated();
       if (dInput) dInput.setAttribute('placeholder', demoItems[0].title);
-      runDemo({ initial: true });
     }
 
     if (dInput) {
-      dInput.addEventListener('focus', () => { updateSuggestions(); });
+      dInput.addEventListener('focus', () => { if (dInput.value.trim()) updateSuggestions(); });
       dInput.addEventListener('input', () => {
         demoSuggIdx = -1;
         closeClarify();
