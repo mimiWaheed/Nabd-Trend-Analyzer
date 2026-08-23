@@ -898,9 +898,11 @@ html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
 .demo-search .clarify-panel {
   top: calc(100% + 10px);
   z-index: 60;
-  background: var(--card-surface, var(--bg-soft));
-  -webkit-backdrop-filter: blur(22px) saturate(1.4);
-  backdrop-filter: blur(22px) saturate(1.4);
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .04)),
+    var(--card-surface, var(--bg-soft));
+  -webkit-backdrop-filter: blur(32px) saturate(1.6);
+  backdrop-filter: blur(32px) saturate(1.6);
 }
 .demo-search input {
   flex: 1;
