@@ -37,9 +37,9 @@
         </a>
         <nav class="nav-links" id="navLinks">
           <a href="#top" data-spy="top" data-i18n="nav.home">Home</a>
-          <a href="#use-cases" data-spy="use-cases" data-i18n="nav.usecases">Use Cases</a>
-          <a href="#cta" data-spy="cta" data-i18n="nav.docs">Documentation</a>
+          <a href="#demo" data-spy="demo" data-i18n="nav.demo">Demo</a>
           <a href="#why" data-spy="why" data-i18n="nav.about">About</a>
+          <a href="#use-cases" data-spy="use-cases" data-i18n="nav.usecases">Use Cases</a>
         </nav>
         <div class="nav-actions">
           <button class="theme-toggle" data-action="theme" aria-label="Toggle light / dark mode">
@@ -47,8 +47,11 @@
             <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
           </button>
           <button class="lang-toggle mono" data-action="lang">العربية</button>
-          <a class="nav-signin" href="pages/signin.html" data-page="pages/signin.html" data-i18n="nav.signin">Sign In</a>
-          <a class="btn btn-primary btn-sm" href="pages/signup.html" data-page="pages/signup.html" data-i18n="nav.getstarted">Get Started</a>
+          <div class="nav-auth" id="navAuth">
+            <a class="nav-signin" href="pages/signin.html" data-page="pages/signin.html" data-i18n="nav.signin">Sign In</a>
+            <a class="btn btn-primary btn-sm" href="pages/signup.html" data-page="pages/signup.html" data-i18n="nav.getstarted">Get Started</a>
+          </div>
+          <div class="nav-account" id="navAccount" hidden></div>
           <button class="nav-burger" id="navBurger" aria-label="Toggle menu">
             <span></span><span></span><span></span>
           </button>
@@ -90,17 +93,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
               </a>
             </div>
-            <div class="hero-trust reveal" style="--d:.2s">
-              <span class="live-dot" aria-hidden="true"></span>
-              <p class="mono" data-i18n="hero.trust">Egypt live · all 27 governorates · answers in seconds</p>
-            </div>
           </div>
-
-        <p class="hero-note mono" aria-hidden="true">
-          <span class="note-line"></span>
-          LIVE FROM THE NABD WORKSPACE
-          <span class="note-line"></span>
-        </p>
         </div><!-- /hero-content -->
       </div>
     </section>
@@ -137,11 +130,6 @@
         </div>
 
         <div class="demo-shell reveal" id="demoShell" style="--d:.08s">
-          <div class="demo-top">
-            <span class="demo-live mono"><span class="live-dot" aria-hidden="true"></span> <span data-i18n="demo.live">LIVE · EGYPT</span></span>
-            <span class="demo-updated mono" id="demoUpdated"></span>
-          </div>
-
           <div class="search-box demo-search">
             <span class="search-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg></span>
             <input type="text" id="demoInput" autocomplete="off" spellcheck="false" aria-label="Ask about any Egyptian topic">
@@ -150,6 +138,11 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </button>
             <div class="demo-sugg" id="demoSugg" hidden></div>
+          </div>
+
+          <div class="demo-top">
+            <span class="demo-live mono"><span class="live-dot" aria-hidden="true"></span> <span data-i18n="demo.live">LIVE · EGYPT</span></span>
+            <span class="demo-updated mono" id="demoUpdated"></span>
           </div>
 
           <ol class="demo-steps" id="demoSteps" aria-hidden="true" hidden>
@@ -462,7 +455,7 @@
     </section>
 
     <!-- ============ USE CASES ============ -->
-    <section class="usecases" id="use-cases">
+    <section class="usecases band-blue" id="use-cases">
       <div class="container">
         <div class="section-head left reveal">
           <div class="eyebrow"><span class="eyebrow-dot"></span> <span data-i18n="uc.eyebrow">USE CASES</span></div>

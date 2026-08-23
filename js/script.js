@@ -17,6 +17,7 @@
     en: {
       brand: 'NABD',
       'nav.home': 'Home', 'nav.analysis': 'Analysis',
+      'nav.demo': 'Demo',
       'nav.usecases': 'Use Cases', 'nav.docs': 'Documentation', 'nav.about': 'About',
       'nav.signin': 'Sign In', 'nav.getstarted': 'Get Started',
       'hero.eyebrow': 'SIGNAL INTELLIGENCE · EGYPT',
@@ -828,6 +829,7 @@
 
     ar: {
       brand: 'نبض',
+      'nav.demo': 'الديمو',
       'nav.home': 'الرئيسية', 'nav.analysis': 'التحليل',
       'nav.usecases': 'حالات الاستخدام', 'nav.docs': 'التوثيق', 'nav.about': 'من نحن',
       'nav.signin': 'تسجيل الدخول', 'nav.getstarted': 'ابدأ الآن',
@@ -2099,9 +2101,77 @@
   }
 
   /* ----------------------------------------------------------
+     NAV ACCOUNT — auth-aware landing header.
+     Reuses the shared session helpers: paints instantly from the
+     local cache, then confirms against the server session
+     (GET /api/auth?action=me). Sign-out ends the server session
+     and restores Sign In / Get Started immediately.
+     ---------------------------------------------------------- */
+  const navAuthBox = $('navAuth');
+  const navAccountBox = $('navAccount');
+  const accEsc = (s) => String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  function displayNameOf(u) {
+    return String((u && (u.name || u.full_name || u.username)) || '').trim() || 'NABD';
+  }
+  function navPaintAccount(u) {
+    if (!navAuthBox || !navAccountBox) return;
+    navAccountBox.classList.remove('open');
+    if (!u) {
+      navAccountBox.hidden = true;
+      navAccountBox.innerHTML = '';
+      navAuthBox.hidden = false;
+      return;
+    }
+    const name = displayNameOf(u);
+    const email = u.email || '';
+    const img = avatarGet();
+    const avatar = img
+      ? '<span class="nav-avatar"><img src="' + accEsc(img) + '" alt=""></span>'
+      : '<span class="nav-avatar">' + accEsc((name || '?').charAt(0).toUpperCase()) + '</span>';
+    navAccountBox.innerHTML =
+      '<button type="button" class="nav-account-chip" id="navAccChip" aria-haspopup="true">' +
+        avatar +
+        '<span class="nav-account-name">' + accEsc(name) + '</span>' +
+        '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>' +
+      '</button>' +
+      '<div class="nav-account-menu" role="menu">' +
+        '<div class="nav-account-head"><b>' + accEsc(name) + '</b><span>' + accEsc(email) + '</span></div>' +
+        '<button type="button" class="nav-account-item" id="navAccWorkspace" role="menuitem">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>' +
+          '<span data-i18n="app.menu.workspace">Open workspace</span>' +
+        '</button>' +
+        '<button type="button" class="nav-account-item danger" id="navAccSignout" role="menuitem">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>' +
+          '<span data-i18n="app.menu.signout">Sign Out</span>' +
+        '</button>' +
+      '</div>';
+    navAccountBox.hidden = false;
+    navAuthBox.hidden = true;
+
+    $('navAccChip').addEventListener('click', (e) => {
+      e.stopPropagation();
+      navAccountBox.classList.toggle('open');
+    });
+    $('navAccWorkspace').addEventListener('click', () => { window.location.href = 'pages/dashboard.html'; });
+    $('navAccSignout').addEventListener('click', () => {
+      logout().catch(() => {}).then(() => navPaintAccount(null));
+    });
+  }
+  if (navAuthBox && navAccountBox) {
+    document.addEventListener('click', (e) => {
+      if (navAccountBox.classList.contains('open') && !navAccountBox.contains(e.target)) {
+        navAccountBox.classList.remove('open');
+      }
+    });
+    navPaintAccount(getUser());
+    authMe().then((u) => navPaintAccount(u)).catch(() => {});
+  }
+
+  /* ----------------------------------------------------------
      SCROLLSPY (landing only)
      ---------------------------------------------------------- */
-  const spySections = ['top', 'why', 'use-cases', 'cta']
+  const spySections = ['top', 'demo', 'why', 'use-cases']
     .map((id) => ({ id, el: document.getElementById(id) }))
     .filter((s) => s.el);
   if (spySections.length) {
