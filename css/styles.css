@@ -863,6 +863,7 @@ html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
 
 .demo-shell {
   position: relative;
+  z-index: 5;
   max-width: 980px;
   margin: 0 auto;
   padding: clamp(18px, 3vw, 30px);
