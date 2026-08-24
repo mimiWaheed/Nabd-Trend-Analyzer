@@ -1492,7 +1492,7 @@ html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
 .check input:disabled + .box { opacity: .5; cursor: default; }
 .link-soft { color: var(--accent); font-weight: 500; }
 .link-soft:hover { text-decoration: underline; }
-.auth-submit { width: 100%; margin-top: 4px; }
+.auth-submit { width: 100%; margin-top: 0; }
 .auth-alt { text-align: center; color: var(--text-muted); font-size: .85rem; margin: 22px 0; position: relative; }
 .auth-alt::before, .auth-alt::after {
   content: '';
@@ -1508,7 +1508,7 @@ html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
 .btn-google { background: var(--surface-1); border: 1px solid var(--border-strong); color: var(--text-soft); }
 .btn-google:hover { background: var(--surface-2); transform: translateY(-2px); }
 .auth-switch { text-align: center; margin-top: 24px; font-size: .88rem; color: var(--text-muted); }
-.auth-terms { margin-bottom: 22px; }
+.auth-terms { margin-bottom: 14px; }
 /* terms checkbox: box stays pinned next to the first line of text */
 .auth-terms .check { display: flex; align-items: flex-start; }
 .auth-terms .check input { top: 11px; transform: none; }
@@ -1528,6 +1528,7 @@ html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
   .auth-tools { top: 12px; inset-inline-end: 14px; }
 }
 .auth-error { color: var(--danger); font-size: .82rem; min-height: 1.2em; margin-bottom: 12px; }
+.auth-error:empty { min-height: 0; margin-bottom: 0; }
 .auth-otp .auth-sub { margin-bottom: 22px; }
 .auth-otp .mono { color: var(--text); }
 .auth-otp-resend { text-align: center; font-size: .85rem; color: var(--text-muted); margin-top: 18px; display: flex; gap: 6px; justify-content: center; align-items: baseline; }
@@ -1582,6 +1583,8 @@ html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
   line-height: 1.4;
   color: var(--danger);
 }
+/* don't reserve space for validation messages until they appear */
+.field-msg:empty { min-height: 0; margin-top: 0; }
 .field-msg-in { animation: fieldMsgIn .18s var(--ease) both; }
 @keyframes fieldMsgIn {
   from { opacity: 0; transform: translateY(-3px); }
@@ -6913,7 +6916,7 @@ html[dir="rtl"] .app-window { text-align: right; }
 }
 .field-row[style*="margin:0"] .field {
   flex: 1 !important;
-  margin: 0 0 18px !important;
+  margin: 0 !important;
 }
 
 /* ---- Mobile: make everything compact ---- */
