@@ -1363,8 +1363,10 @@ html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
   justify-content: center;
   padding: 24px 44px 44px;
 }
-/* keep the card inside the viewport */
+/* keep the card inside the viewport, nudged slightly below true center */
 .auth-card {
+  position: relative;
+  top: 3vh;
   width: 100%;
   max-width: 430px;
   flex: none;
