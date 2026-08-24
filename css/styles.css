@@ -1375,12 +1375,10 @@ html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px 44px 44px;
+  padding: 32px 44px;
 }
 /* card centered in the viewport */
 .auth-card {
-  position: relative;
-  top: 0;
   width: 100%;
   max-width: 430px;
   flex: none;
@@ -2778,7 +2776,7 @@ html[dir="rtl"] .field select {
    17. RESPONSIVE
    ------------------------------------------------------------ */
 @media (min-width: 1400px) {
-  .auth-panel { padding: 24px 60px 56px; }
+  .auth-panel { padding: 28px 60px; }
   .auth-card { max-width: 460px; padding: 36px 42px; }
   .auth-title { font-size: 2.1rem; }
 }
@@ -2791,7 +2789,7 @@ html[dir="rtl"] .field select {
   .ws-grid > .ws-card:nth-child(n) { grid-column: span 6 !important; }
   .ws-grid > .summary-card { grid-column: span 12 !important; }
   .auth-page { flex-direction: column; }
-  .auth-panel { max-width: none; padding: 20px 28px 48px; }
+  .auth-panel { max-width: none; padding: 28px; }
   .auth-art { display: none; }
   .conn-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
   .doc-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
@@ -2877,7 +2875,7 @@ html[dir="rtl"] .field select {
   .ws-query-text { max-width: 180px; }
   .region-grid { grid-template-columns: 1fr; }
   .donut { width: 120px; height: 120px; }
-  .auth-panel { padding: 36px 20px 32px; }
+  .auth-panel { padding: 34px 20px; }
   .auth-card { padding: 28px 20px; border-radius: 20px; }
   .auth-title { font-size: 1.55rem; }
   .auth-sub { font-size: .88rem; margin-bottom: 24px; }
@@ -2947,7 +2945,7 @@ html[dir="rtl"] .field select {
 }
 
 @media (max-width: 420px) {
-  .auth-panel { padding: 24px 16px 28px; }
+  .auth-panel { padding: 26px 16px; }
   .auth-card { padding: 24px 16px; border-radius: 18px; }
   .auth-title { font-size: 1.35rem; letter-spacing: -.02em; }
   .auth-sub { font-size: .82rem; margin-bottom: 20px; }
@@ -2975,7 +2973,7 @@ html[dir="rtl"] .field select {
 }
 
 @media (max-width: 360px) {
-  .auth-panel { padding: 20px 12px 24px; }
+  .auth-panel { padding: 22px 12px; }
   .auth-card { padding: 20px 14px; border-radius: 16px; }
   .auth-title { font-size: 1.2rem; }
   .auth-sub { font-size: .78rem; margin-bottom: 16px; }
