@@ -2071,6 +2071,17 @@
     navigate(a.getAttribute('href'));
   });
 
+  /* BACK / FORWARD CACHE — navigate() fades the page out via .page-leaving
+     before location.href. When the browser restores the page from bfcache
+     on Back, that class is still applied and the page renders blank.
+     Strip it and cancel any pending redirect on every restore. */
+  window.addEventListener('pageshow', () => {
+    document.querySelectorAll('.page-leaving').forEach((el) => {
+      el.classList.remove('page-leaving');
+      if (el._nabdNavToken) { clearTimeout(el._nabdNavToken); delete el._nabdNavToken; }
+    });
+  });
+
   function toast(el, msg) {
     if (!el) return;
     el.innerHTML = msg;
