@@ -1494,6 +1494,24 @@ html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
 .btn-google:hover { background: var(--surface-2); transform: translateY(-2px); }
 .auth-switch { text-align: center; margin-top: 24px; font-size: .88rem; color: var(--text-muted); }
 .auth-terms { margin-bottom: 22px; }
+/* terms checkbox: box stays pinned next to the first line of text */
+.auth-terms .check { display: flex; align-items: flex-start; }
+.auth-terms .check input { top: 11px; transform: none; }
+.auth-terms .check .box { margin-top: 2px; }
+
+/* corner tools — theme + language switches on auth pages */
+.auth-tools {
+  position: fixed;
+  top: 18px;
+  inset-inline-end: 22px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+@media (max-width: 640px) {
+  .auth-tools { top: 12px; inset-inline-end: 14px; }
+}
 .auth-error { color: var(--danger); font-size: .82rem; min-height: 1.2em; margin-bottom: 12px; }
 .auth-otp .auth-sub { margin-bottom: 22px; }
 .auth-otp .mono { color: var(--text); }
