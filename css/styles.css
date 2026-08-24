@@ -1363,12 +1363,11 @@ html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
   justify-content: center;
   padding: 24px 44px 44px;
 }
-/* shift the card above true center and keep it inside the viewport */
+/* keep the card inside the viewport */
 .auth-card {
   width: 100%;
   max-width: 430px;
   flex: none;
-  margin-bottom: 7vh;
   padding: 32px 38px;
   border-radius: 26px;
 }
@@ -6882,9 +6881,6 @@ html[dir="rtl"] .app-window { text-align: right; }
 .auth-card {
   width: 100%;
   max-width: 430px;
-  max-height: calc(100dvh - 48px);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   margin: 0 auto;
 }
 .field-row {
@@ -6912,7 +6908,6 @@ html[dir="rtl"] .app-window { text-align: right; }
     max-width: 100%;
     padding: 24px 18px;
     border-radius: 18px;
-    max-height: calc(100dvh - 24px);
   }
   .field-row {
     flex-direction: column;
