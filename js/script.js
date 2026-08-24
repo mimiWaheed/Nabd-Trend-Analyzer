@@ -2145,11 +2145,11 @@
         '<div class="nav-account-head"><b>' + accEsc(name) + '</b><span>' + accEsc(email) + '</span></div>' +
         '<button type="button" class="nav-account-item" id="navAccWorkspace" role="menuitem">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>' +
-          '<span data-i18n="app.menu.workspace">Open workspace</span>' +
+          '<span data-i18n="app.menu.workspace">' + accEsc(t('app.menu.workspace')) + '</span>' +
         '</button>' +
         '<button type="button" class="nav-account-item danger" id="navAccSignout" role="menuitem">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>' +
-          '<span data-i18n="app.menu.signout">Sign Out</span>' +
+          '<span data-i18n="app.menu.signout">' + accEsc(t('app.menu.signout')) + '</span>' +
         '</button>' +
       '</div>';
     navAccountBox.hidden = false;
