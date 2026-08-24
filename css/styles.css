@@ -1345,34 +1345,36 @@ html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
    ------------------------------------------------------------ */
 .auth-page {
   position: relative;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: stretch;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 .auth-bg { position: absolute; inset: 0; pointer-events: none; }
 .auth-panel {
   position: relative;
   flex: 1;
   min-width: 0;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 44px 44px 60px;
+  padding: 24px 44px 44px;
 }
+/* shift the card above true center and keep it inside the viewport */
 .auth-card {
   width: 100%;
   max-width: 430px;
   flex: none;
-  padding: 40px 38px;
+  margin-bottom: 7vh;
+  padding: 32px 38px;
   border-radius: 26px;
 }
-.auth-logo { display: inline-flex; align-items: center; gap: 11px; margin-bottom: 30px; font-weight: 700; font-size: 1.12rem; }
+.auth-logo { display: inline-flex; align-items: center; gap: 11px; margin-bottom: 22px; font-weight: 700; font-size: 1.12rem; }
 .auth-title { font-size: 1.9rem; font-weight: 800; letter-spacing: -.03em; margin-bottom: 8px; }
-.auth-sub { color: var(--text-muted); font-size: .95rem; margin-bottom: 30px; }
+.auth-sub { color: var(--text-muted); font-size: .95rem; margin-bottom: 24px; }
 
 .field { margin-bottom: 18px; }
 .field label {
@@ -2761,8 +2763,8 @@ html[dir="rtl"] .field select {
    17. RESPONSIVE
    ------------------------------------------------------------ */
 @media (min-width: 1400px) {
-  .auth-panel { padding: 44px 60px 60px; }
-  .auth-card { max-width: 460px; padding: 44px 42px; }
+  .auth-panel { padding: 24px 60px 56px; }
+  .auth-card { max-width: 460px; padding: 36px 42px; }
   .auth-title { font-size: 2.1rem; }
 }
 @media (max-width: 1100px) {
@@ -2774,7 +2776,7 @@ html[dir="rtl"] .field select {
   .ws-grid > .ws-card:nth-child(n) { grid-column: span 6 !important; }
   .ws-grid > .summary-card { grid-column: span 12 !important; }
   .auth-page { flex-direction: column; }
-  .auth-panel { max-width: none; padding: 36px 28px 40px; }
+  .auth-panel { max-width: none; padding: 20px 28px 48px; }
   .auth-art { display: none; }
   .conn-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
   .doc-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
