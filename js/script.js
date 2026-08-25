@@ -2238,6 +2238,12 @@
       window.addEventListener('scroll', () => {
         if (!heroTicking) { requestAnimationFrame(updateHero); heroTicking = true; }
       }, { passive: true });
+      /* the veil is an inline style — repaint it right away when the theme
+         flips or it would keep the previous mode's color until next scroll */
+      updateHero();
+      new MutationObserver(() => {
+        if (!heroTicking) { requestAnimationFrame(updateHero); heroTicking = true; }
+      }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     }
   }
 
