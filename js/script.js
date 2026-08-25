@@ -2226,7 +2226,11 @@
         heroImg.style.transform = 'scale(' + (1.08 + progress * 0.04) + ')';
         heroImg.style.filter = 'blur(' + (progress * 3) + 'px)';
         heroImg.style.opacity = String(1 - progress * 0.85);
-        heroOv.style.background = 'rgba(0,0,0,' + (0.35 + progress * 0.45) + ')';
+        /* veil darkens in dark mode, brightens in light mode */
+        const heroLight = document.documentElement.getAttribute('data-theme') === 'light';
+        heroOv.style.background = heroLight
+          ? 'rgba(255,255,255,' + (0.45 + progress * 0.4) + ')'
+          : 'rgba(0,0,0,' + (0.35 + progress * 0.45) + ')';
         heroCnt.style.opacity = 1 - progress;
         heroCnt.style.transform = 'translateY(' + (-progress * 20) + 'px)';
         heroTicking = false;
