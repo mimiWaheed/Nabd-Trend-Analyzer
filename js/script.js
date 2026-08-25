@@ -2213,7 +2213,8 @@
      ---------------------------------------------------------- */
   if (!reduceMotion) {
     const heroEl = document.querySelector('.hero');
-    const heroImg = document.querySelector('.hero-image-layer img');
+    /* scroll effects apply to the layer so both theme photos move/fade as one */
+    const heroImg = document.querySelector('.hero-image-layer');
     const heroOv  = document.querySelector('.hero-overlay');
     const heroCnt = document.querySelector('.hero-content');
     if (heroEl && heroImg && heroOv && heroCnt) {
