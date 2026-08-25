@@ -502,7 +502,7 @@ html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
 /* ------------------------------------------------------------
    6. HERO
    ------------------------------------------------------------ */
-.hero { position: relative; padding: 138px 0 40px; overflow: hidden; }
+.hero { position: relative; padding: 138px 0 200px; overflow: hidden; }
 
 .hero-image-layer {
   position: absolute; inset: 0; z-index: 0; overflow: hidden;
@@ -850,7 +850,9 @@ html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
 /* ------------------------------------------------------------
    8b. LIVE DEMO — real-data sneak peek
    ------------------------------------------------------------ */
-.demo { padding: 84px 0 30px; position: relative; }
+/* demo lives right under the hero copy — pulled up so the search bar
+   reads as the hero's interactive CTA, overlapping the hero's lower half */
+.demo { padding: 0 0 84px; margin-top: -150px; position: relative; }
 .demo::before {
   content: '';
   position: absolute; inset: 0;
@@ -6010,6 +6012,16 @@ html[lang="ar"] .prod-lead { line-height: 1.35; }
 .hero-copy h1 { margin: 24px auto 26px; max-width: 20ch; }
 .hero-sub { margin: 0 auto 36px; max-width: 640px; }
 .hero-cta { justify-content: center; }
+
+/* keep the hero→demo overlap balanced when the layout stacks */
+@media (max-width: 900px) {
+  .hero { padding-bottom: 170px; }
+  .demo { margin-top: -120px; }
+}
+@media (max-width: 560px) {
+  .hero { padding-bottom: 140px; }
+  .demo { margin-top: -95px; }
+}
 
 .app-window {
   max-width: 920px;
