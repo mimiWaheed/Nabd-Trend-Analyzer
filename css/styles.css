@@ -871,11 +871,11 @@ html[data-theme="light"] .theme-toggle .ic-moon { display: block; }
   padding: clamp(18px, 3vw, 30px);
   border-radius: 22px;
   border: 1px solid var(--border);
-  background: var(--surface-1);
-  -webkit-backdrop-filter: blur(16px) saturate(1.2);
-  backdrop-filter: blur(16px) saturate(1.2);
+  /* solid, not glass — renders cleanly over the hero photo in both themes */
+  background: #0C1424;
   box-shadow: var(--shadow-soft);
 }
+html[data-theme="light"] .demo-shell { background: #FFFFFF; }
 .demo-top {
   display: flex;
   align-items: center;
